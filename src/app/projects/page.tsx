@@ -115,67 +115,6 @@ export default function ProjectsPage() {
     
     loadData();
   }, [mounted]);
-    
-    if (savedProjects) {
-      try {
-        const parsed = JSON.parse(savedProjects);
-        const loadedProjects = parsed.map((p: any) => ({
-          ...p,
-          selectedKRs: Array.isArray(p.selectedKRs) ? p.selectedKRs : [],
-          designStatus: p.designStatus || 'select',
-          buildStatus: p.buildStatus || 'select',
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt
-        }));
-        setProjects(loadedProjects);
-        
-        // If no projects exist, create an empty one automatically
-        if (loadedProjects.length === 0) {
-          const emptyProject: Project = {
-            id: `project-1`,
-            priority: 1,
-            name: '',
-            plan: 'select',
-            initiative: '',
-            selectedKRs: [],
-            designStatus: 'select',
-            buildStatus: 'select',
-            problemStatement: '',
-            solution: '',
-            successMetric: '',
-            figmaLink: '',
-            prdLink: '',
-            customLinks: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          setProjects([emptyProject]);
-        }
-      } catch (error) {
-        console.error('❌ Failed to load projects:', error);
-      }
-    } else {
-      // No saved projects at all - create initial empty project
-      const emptyProject: Project = {
-        id: `project-1`,
-        priority: 1,
-        name: '',
-        plan: 'select',
-        initiative: '',
-        selectedKRs: [],
-        designStatus: 'select',
-        buildStatus: 'select',
-        problemStatement: '',
-        solution: '',
-        successMetric: '',
-        figmaLink: '',
-        prdLink: '',
-        customLinks: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setProjects([emptyProject]);
-    }
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
