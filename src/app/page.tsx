@@ -9,7 +9,7 @@ import { TabSystem } from '@/components/TabSystem';
 import { EditableHeader } from '@/components/EditableHeader';
 import { EditableCell } from '@/components/EditableCell';
 import { AuthForm } from '@/components/AuthForm';
-import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
+import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
