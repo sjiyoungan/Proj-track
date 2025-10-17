@@ -367,12 +367,12 @@ export default function Home() {
                         onClick={addNewProject}
                       >
                         <td className="px-2 py-4 whitespace-nowrap w-20">
-                          <div className="flex items-center">
-                            {/* Drag handle spacing (14px + 4px gap = 18px total) */}
-                            <div style={{ width: '18px' }}></div>
-                            {/* Priority number in w-16 container like SelectTrigger */}
-                            <div className="w-16 flex items-center justify-center" style={{ height: '32px' }}>
-                              <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                          <div className="flex items-center gap-1">
+                            {/* Drag handle spacing - exactly matching PriorityDropdown */}
+                            <div className="w-3.5 h-3.5"></div>
+                            {/* Priority number - matching Select structure */}
+                            <div className="w-16 h-8 flex items-center justify-center">
+                              <span className="text-sm text-slate-400 dark:text-slate-500">
                                 {projects.length + 1}
                               </span>
                             </div>
