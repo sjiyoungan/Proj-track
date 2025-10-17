@@ -366,17 +366,10 @@ export default function Home() {
                         className="bg-slate-50/50 dark:bg-slate-800/50 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                         onClick={addNewProject}
                       >
-                        <td className="px-2 py-4 whitespace-nowrap w-20">
-                          <div className="flex items-center gap-1">
-                            {/* Drag handle spacing - exactly matching PriorityDropdown */}
-                            <div className="w-3.5 h-3.5"></div>
-                            {/* Priority number - matching Select structure */}
-                            <div className="w-16 h-8 flex items-center justify-center">
-                              <span className="text-sm text-slate-400 dark:text-slate-500">
-                                {projects.length + 1}
-                              </span>
-                            </div>
-                          </div>
+                        <td className="py-4 whitespace-nowrap w-20" style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                          <span className="text-sm text-slate-400 dark:text-slate-500" style={{ marginLeft: '30px' }}>
+                            {projects.length + 1}
+                          </span>
                         </td>
                         <td className="pl-0 pr-4 py-4 whitespace-nowrap w-48">
                           <EditableCell
