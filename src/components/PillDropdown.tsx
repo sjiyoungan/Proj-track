@@ -113,7 +113,11 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
           {options
             .filter(option => option.value !== 'select')
             .map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+              <SelectItem 
+                key={option.value} 
+                value={option.value}
+                className={`${getStatusColor(option.value, type)} hover:opacity-90 cursor-pointer`}
+              >
                 {option.label}
               </SelectItem>
             ))}
