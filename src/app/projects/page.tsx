@@ -22,6 +22,7 @@ export default function ProjectsPage() {
   });
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
 
+  // Handle global KR changes
   const handleGlobalKRChange = (newKRs: KRItem[]) => {
     setGlobalKRs(newKRs);
   };
