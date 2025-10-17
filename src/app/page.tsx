@@ -43,6 +43,15 @@ export default function Home() {
   // Save to Supabase
   const saveToSupabase = async () => {
     try {
+      // If in share mode (no user), save to localStorage instead
+      if (!user && window.location.search.includes('share=true')) {
+        localStorage.setItem('shared-projects', JSON.stringify(projects));
+        localStorage.setItem('shared-globalKRs', JSON.stringify(globalKRs));
+        localStorage.setItem('shared-filterState', JSON.stringify(filterState));
+        localStorage.setItem('shared-headerTitle', headerTitle);
+        return;
+      }
+      
       await Promise.all([
         saveProjects(projects),
         saveGlobalKRs(globalKRs),
@@ -59,6 +68,51 @@ export default function Home() {
     
     const loadData = async () => {
       try {
+        // If in share mode (no user), load from localStorage instead
+        if (!user && window.location.search.includes('share=true')) {
+          const sharedProjects = localStorage.getItem('shared-projects');
+          const sharedGlobalKRs = localStorage.getItem('shared-globalKRs');
+          const sharedFilterState = localStorage.getItem('shared-filterState');
+          const sharedHeaderTitle = localStorage.getItem('shared-headerTitle');
+
+          if (sharedProjects) {
+            setProjects(JSON.parse(sharedProjects));
+          }
+          if (sharedGlobalKRs) {
+            setGlobalKRs(JSON.parse(sharedGlobalKRs));
+          }
+          if (sharedFilterState) {
+            setFilterState(JSON.parse(sharedFilterState));
+          }
+          if (sharedHeaderTitle) {
+            setHeaderTitle(sharedHeaderTitle);
+          }
+
+          // If no shared data exists, create empty project
+          if (!sharedProjects) {
+            const emptyProject: Project = {
+              id: `project-${Date.now()}`,
+              priority: 1,
+              name: '',
+              plan: 'select',
+              initiative: '',
+              selectedKRs: [],
+              designStatus: 'select',
+              buildStatus: 'select',
+              problemStatement: '',
+              solution: '',
+              successMetric: '',
+              figmaLink: '',
+              prdLink: '',
+              customLinks: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            setProjects([emptyProject]);
+          }
+          return;
+        }
+
         const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
           loadProjects(),
           loadGlobalKRs(),
@@ -70,6 +124,12 @@ export default function Home() {
         
         if (loadedFilterState) {
           setFilterState(loadedFilterState);
+        }
+
+        // Load header title
+        const savedTitle = localStorage.getItem('headerTitle');
+        if (savedTitle) {
+          setHeaderTitle(savedTitle);
         }
         
         // If no projects exist, create an empty one automatically
@@ -120,7 +180,7 @@ export default function Home() {
     };
     
     loadData();
-  }, [mounted]);
+  }, [mounted, user]);
 
   // Auto-save when data changes
   useEffect(() => {
@@ -257,7 +317,7 @@ export default function Home() {
       };
       
       setProjects([emptyProject]);
-      setHeaderTitle('');
+    setHeaderTitle('');
       setGlobalKRs([]);
       setFilterState({
         showInitiative: true,
@@ -297,6 +357,20 @@ export default function Home() {
         </div>
       </div>
     );
+  }
+
+  // Authentication checks - optional for sharing
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // Show auth form only if no user and not in share mode
+  if (!user && !window.location.search.includes('share=true')) {
+    return <AuthForm />;
   }
 
   return (
@@ -407,8 +481,7 @@ export default function Home() {
       </div>
     </div>
   );
-}
-
+  // Authentication checks
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

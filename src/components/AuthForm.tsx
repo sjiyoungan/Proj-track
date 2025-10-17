@@ -28,7 +28,9 @@ export function AuthForm() {
       if (error) {
         setMessage(error.message);
       } else if (isSignUp) {
-        setMessage('Check your email for the confirmation link!');
+        // Only show email confirmation message if there's no session (meaning email confirmation is required)
+        // If there's a session, the user was automatically signed in
+        setMessage('Account created successfully!');
       }
     } catch (error) {
       setMessage('An unexpected error occurred');
@@ -85,7 +87,7 @@ export function AuthForm() {
 
           {message && (
             <div className={`mt-4 p-3 rounded-md text-sm ${
-              message.includes('Check your email') 
+              message.includes('successfully') || message.includes('Check your email')
                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                 : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
             }`}>
