@@ -109,17 +109,21 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
             </div>
           )}
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="[&_[data-radix-select-item-indicator]]:hidden [&_svg]:hidden [&_[role='img']]:hidden">
           {options
             .filter(option => option.value !== 'select')
             .map((option) => (
-              <SelectItem 
-                key={option.value} 
-                value={option.value}
-                className={`${option.value === value ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'} cursor-pointer [&>span]:hidden`}
+              <div
+                key={option.value}
+                onClick={() => onChange(option.value)}
+                className={`px-2 py-1.5 cursor-pointer text-sm rounded-sm ${
+                  option.value === value 
+                    ? 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100' 
+                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}
               >
                 {option.label}
-              </SelectItem>
+              </div>
             ))}
         </SelectContent>
       </Select>
