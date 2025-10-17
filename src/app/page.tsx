@@ -130,8 +130,8 @@ export default function Home() {
 
         // Load header title
         const savedTitle = localStorage.getItem('headerTitle');
-        if (savedTitle) {
-          setHeaderTitle(savedTitle);
+    if (savedTitle) {
+      setHeaderTitle(savedTitle);
         }
         
         // If no projects exist, create an empty one automatically
@@ -419,7 +419,7 @@ export default function Home() {
               showHoverRow={showHoverRow}
               hoverRowLocked={hoverRowLocked}
               onHoverRowLocked={setHoverRowLocked}
-              onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
+              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
             />
 
               {/* Hover row - appears inside the table when hovering below (only on "all" tab) */}
@@ -539,7 +539,7 @@ export default function Home() {
               showHoverRow={showHoverRow}
               hoverRowLocked={hoverRowLocked}
               onHoverRowLocked={setHoverRowLocked}
-              onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
+              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
             />
 
             {/* Empty state messages */}
