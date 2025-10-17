@@ -196,7 +196,7 @@ export default function Home() {
     ));
   };
 
-  const handlePriorityUpdate = (projectId: string, newPriority: number) => {
+  const handleProjectReorder = (projectId: string, newPriority: number) => {
     setProjects(prev => {
       const updated = [...prev];
       const projectIndex = updated.findIndex(p => p.id === projectId);
