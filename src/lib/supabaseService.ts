@@ -109,20 +109,24 @@ export async function loadFilterState(): Promise<FilterState | null> {
   const { data, error } = await supabase
     .from('filter_state')
     .select('*')
-    .eq('id', 'default')
-    .single();
+    .eq('id', 'default');
   
   if (error) {
-    if (error.code === 'PGRST116') return null; // No rows found
-    throw error;
+    console.error('Error loading filter state:', error);
+    return null;
   }
   
+  if (!data || data.length === 0) {
+    return null; // No filter state found
+  }
+  
+  const filterData = data[0];
   return {
-    showInitiative: data.show_initiative,
-    showKR: data.show_kr,
-    showPlan: data.show_plan,
-    showDone: data.show_done,
-    showFuture: data.show_future,
-    sortBy: data.sort_by
+    showInitiative: filterData.show_initiative,
+    showKR: filterData.show_kr,
+    showPlan: filterData.show_plan,
+    showDone: filterData.show_done,
+    showFuture: filterData.show_future,
+    sortBy: filterData.sort_by
   };
 }
