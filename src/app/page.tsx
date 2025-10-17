@@ -237,12 +237,19 @@ export default function Home() {
     
     // Focus the name field of the newly added project after a brief delay
     setTimeout(() => {
-      const nameInputs = document.querySelectorAll('input[placeholder="Enter project"]');
-      const lastNameInput = nameInputs[nameInputs.length - 1] as HTMLElement;
-      if (lastNameInput) {
-        lastNameInput.click(); // Trigger edit mode
+      // Get all table rows
+      const rows = document.querySelectorAll('tbody tr:not([class*="cursor-pointer"])');
+      const lastRow = rows[rows.length - 1];
+      
+      if (lastRow) {
+        // Find the name field (second td, first editable cell)
+        const nameCell = lastRow.querySelector('td:nth-child(2) [class*="cursor-text"]') as HTMLElement;
+        if (nameCell) {
+          console.log('Clicking name cell to enter edit mode');
+          nameCell.click();
+        }
       }
-    }, 50);
+    }, 150);
   };
 
   const clearAllData = () => {
