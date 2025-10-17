@@ -422,15 +422,6 @@ export default function Home() {
         </div>
 
 
-        {/* Debug: Clear All Data Button (temporary) */}
-        <div className="mt-4 flex justify-center gap-2">
-          <Button onClick={clearAllData} variant="outline" className="text-sm">
-            Clear All Data (Reset)
-          </Button>
-          <Button onClick={resetKRData} variant="outline" className="text-sm">
-            Reset KR Data
-          </Button>
-        </div>
       </div>
     </div>
   );

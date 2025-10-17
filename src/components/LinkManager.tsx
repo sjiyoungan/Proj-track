@@ -233,24 +233,16 @@ export function LinkManager({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <LinkRow
-          label="Figma"
-          url={figmaLink}
-          isOpen={figmaDropdownOpen}
-          setIsOpen={setFigmaDropdownOpen}
-          onUrlChange={onFigmaChange}
-          dropdownRef={figmaRef}
-        />
+        {/* Add Custom Link button - moved to the left */}
+        <button
+          onClick={() => openCustomModal()}
+          className="flex items-center justify-center px-2 py-1.5 border border-transparent rounded-md text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+          style={{ height: '34px' }}
+        >
+          <Plus className="h-4 w-4" />
+        </button>
 
-        <LinkRow
-          label="PRD"
-          url={prdLink}
-          isOpen={prdDropdownOpen}
-          setIsOpen={setPrdDropdownOpen}
-          onUrlChange={onPRDChange}
-          dropdownRef={prdRef}
-        />
-
+        {/* Custom links - displayed to the left of Figma/PRD */}
         {customLinks.map((link) => (
         <div key={link.id} className="flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md" style={{ height: '34px' }}>
           <div className="flex items-center gap-0">
@@ -276,13 +268,23 @@ export function LinkManager({
         </div>
         ))}
 
-        <button
-          onClick={() => openCustomModal()}
-          className="flex items-center justify-center px-2 py-1.5 border border-transparent rounded-md text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
-          style={{ height: '34px' }}
-        >
-          <Plus className="h-4 w-4" />
-        </button>
+        <LinkRow
+          label="Figma"
+          url={figmaLink}
+          isOpen={figmaDropdownOpen}
+          setIsOpen={setFigmaDropdownOpen}
+          onUrlChange={onFigmaChange}
+          dropdownRef={figmaRef}
+        />
+
+        <LinkRow
+          label="PRD"
+          url={prdLink}
+          isOpen={prdDropdownOpen}
+          setIsOpen={setPrdDropdownOpen}
+          onUrlChange={onPRDChange}
+          dropdownRef={prdRef}
+        />
       </div>
 
       {/* Custom Link Modal */}

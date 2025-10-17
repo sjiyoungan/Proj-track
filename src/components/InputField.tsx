@@ -24,9 +24,7 @@ export function InputField({
 }: InputFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
-  const [displayWidth, setDisplayWidth] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
-  const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -61,11 +59,6 @@ export function InputField({
   };
 
   const handleClick = () => {
-    // Measure the display element width before switching to edit mode
-    if (displayRef.current && width === 'hug') {
-      const width = displayRef.current.offsetWidth;
-      setDisplayWidth(width);
-    }
     setIsEditing(true);
   };
 
@@ -76,124 +69,93 @@ export function InputField({
     }, 150);
   };
 
-  const baseStyles = "bg-white dark:bg-slate-900 border-0 focus:ring-0 focus:outline-none rounded";
   const sizeStyles = textSize === 'lg' 
     ? "text-2xl font-semibold" 
     : "text-sm";
-  
-  const widthStyles = width === 'fill' 
-    ? "w-full" 
-    : "w-auto";
-  
-  const paddingStyles = ""; // Padding set in inline styles
-  
-  // Apply width to inline styles for both input and display
-  const inputWidthStyles = width === 'fill' 
-    ? { width: '100%' }
-    : displayWidth && width === 'hug'
-    ? { width: `${displayWidth}px` }
-    : { 
-        width: 'fit-content', 
-        minWidth: 'fit-content',
-        maxWidth: 'fit-content'
-      };
 
-  const displayWidthStyles = width === 'fill' 
-    ? { width: '100%' }
-    : { 
-        width: 'fit-content', 
-        minWidth: 'fit-content',
-        maxWidth: 'fit-content'
-      };
-
-  if (isEditing) {
-    if (multiline) {
-      return (
-        <textarea
-          ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-          value={editValue}
-          onChange={(e) => setEditValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          className={cn(
-            "min-h-[60px] px-2 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded focus:outline-none focus:ring-0 focus:border-blue-500 resize-none bg-white dark:bg-slate-900 flex items-center",
-            className
-          )}
-          style={{
-            ...inputWidthStyles
-          }}
-          placeholder={placeholder}
-        />
-      );
-    }
-
-    return (
-      <input
-        ref={inputRef as React.RefObject<HTMLInputElement>}
-        value={editValue}
-        onChange={(e) => setEditValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={handleBlur}
-        className={cn(
-          baseStyles,
-          sizeStyles,
-          widthStyles,
-          paddingStyles,
-          "flex items-center placeholder:text-slate-400",
-          className
-        )}
-        style={{
-          outline: '1px solid transparent',
-          outlineOffset: '0px',
-          lineHeight: textSize === 'lg' ? '1.2' : 'normal',
-          paddingTop: '2px',
-          paddingBottom: '2px',
-          paddingLeft: '8px',
-          paddingRight: '8px',
-          height: textSize === 'lg' ? 'auto' : '32px',
-          minHeight: textSize === 'lg' ? '40px' : '32px',
-          maxWidth: width === 'hug' ? 'fit-content' : 'none',
-          boxSizing: 'border-box',
-          margin: '0',
-          border: 'none',
-          ...inputWidthStyles
-        } as React.CSSProperties}
-        onFocus={(e) => {
-          e.target.style.outline = '1px solid rgb(226 232 240)';
-        }}
-        placeholder={placeholder}
-      />
-    );
-  }
-
-  const displayMinHeight = textSize === 'lg' ? "min-h-[40px]" : "min-h-[32px]";
-  
   return (
     <div
-      ref={displayRef}
-      onClick={handleClick}
       className={cn(
-        "cursor-text hover:bg-slate-50 dark:hover:bg-slate-800 rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors flex items-center",
-        displayMinHeight,
-        sizeStyles,
-        widthStyles,
-        !value && "text-slate-400 dark:text-slate-500", // Blue-Mid color for empty state (lighter)
+        "rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors",
+        isEditing && "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
+        width === 'fill' ? "w-full" : "w-auto",
         className
       )}
       style={{
-        lineHeight: textSize === 'lg' ? '1.2' : 'normal',
-        paddingTop: '2px',
-        paddingBottom: '2px',
-        paddingLeft: '8px',
-        paddingRight: '8px',
-        height: textSize === 'lg' ? 'auto' : '32px',
-        minHeight: textSize === 'lg' ? '40px' : '32px',
-        maxWidth: width === 'hug' ? 'fit-content' : 'none',
-        boxSizing: 'border-box',
-        ...displayWidthStyles
-      } as React.CSSProperties}
+        padding: '2px'
+      }}
     >
-      {value || placeholder}
+      {isEditing ? (
+        multiline ? (
+          <textarea
+            ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className={cn(
+              "w-full bg-transparent border-none outline-none resize-none text-slate-900 dark:text-slate-100"
+            )}
+            style={{
+              paddingTop: '2px',
+              paddingBottom: '2px',
+              paddingLeft: '8px',
+              paddingRight: '8px',
+              height: textSize === 'lg' ? '40px' : '32px',
+              minHeight: textSize === 'lg' ? '40px' : '32px',
+              lineHeight: textSize === 'lg' ? '1.2' : 'normal',
+              fontSize: textSize === 'lg' ? '24px' : '14px',
+              boxSizing: 'border-box'
+            }}
+            placeholder={placeholder.replace('...', '')}
+          />
+        ) : (
+          <input
+            ref={inputRef as React.RefObject<HTMLInputElement>}
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className={cn(
+              "w-full bg-transparent border-none outline-none text-slate-900 dark:text-slate-100"
+            )}
+            style={{
+              paddingTop: '2px',
+              paddingBottom: '2px',
+              paddingLeft: '8px',
+              paddingRight: '8px',
+              height: textSize === 'lg' ? '40px' : '32px',
+              lineHeight: textSize === 'lg' ? '1.2' : 'normal',
+              fontSize: textSize === 'lg' ? '24px' : '14px',
+              boxSizing: 'border-box'
+            }}
+            placeholder={placeholder.replace('...', '')}
+          />
+        )
+      ) : (
+        <div
+          onClick={handleClick}
+          className={cn(
+            "cursor-text w-full",
+            !value && "text-slate-400 dark:text-slate-500"
+          )}
+          style={{
+            paddingTop: '2px',
+            paddingBottom: '2px',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            height: textSize === 'lg' ? '40px' : '32px',
+            lineHeight: textSize === 'lg' ? '36px' : '28px',
+            fontSize: textSize === 'lg' ? '24px' : '14px',
+            boxSizing: 'border-box',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {value || placeholder.replace('...', '')}
+        </div>
+      )}
     </div>
   );
 }

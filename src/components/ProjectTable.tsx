@@ -8,7 +8,7 @@ import { ChevronDown, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
 import { colors } from '@/lib/colors';
 import { EditableCell } from '@/components/EditableCell';
 import { HyperlinkCell } from '@/components/HyperlinkCell';
-import { InputField } from '@/components/InputField';
+import { DynamicInputField } from './DynamicInputField';
 import { LinkManager } from '@/components/LinkManager';
 import { PriorityDropdown } from '@/components/PriorityDropdown';
 import { PillDropdown } from '@/components/PillDropdown';
@@ -338,7 +338,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                     isDragging={draggedProjectId === project.id}
                   />
                 </td>
-                <td className="pl-0 pr-4 py-4 whitespace-nowrap">
+                <td className="pl-0 pr-4 py-4 whitespace-nowrap" style={{ maxWidth: '200px' }}>
                   <EditableCell
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
@@ -346,7 +346,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                   />
                 </td>
                 {filterState.showInitiative && (
-                  <td className="px-4 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 whitespace-nowrap" style={{ maxWidth: '200px' }}>
                     <EditableCell
                       value={project.initiative}
                       onChange={(value) => onProjectUpdate({ ...project, initiative: value })}
@@ -409,44 +409,49 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               {expandedRows.has(project.id) && (
                 <tr>
                   <td colSpan={[filterState.showPlan, filterState.showInitiative, filterState.showKR].filter(Boolean).length + (activeTab === 'all' ? 5 : 4)} className="px-4 py-4 bg-slate-50 dark:bg-slate-800 relative">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-4">
-                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
-                          Problem
-                        </label>
-                        <div className="flex-1">
-                          <InputField
-                            value={project.problemStatement}
-                            onChange={(value) => onProjectUpdate({ ...project, problemStatement: value })}
-                            placeholder="Describe the problem..."
-                          />
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-3 flex-1">
+                        <div className="flex items-start gap-2">
+                          <label className="font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap" style={{ fontSize: '13px', width: '100px', paddingTop: '7px' }}>
+                            Problem
+                          </label>
+                          <div className="flex-1">
+                            <DynamicInputField
+                              value={project.problemStatement}
+                              onChange={(value) => onProjectUpdate({ ...project, problemStatement: value })}
+                              placeholder="Describe the problem..."
+                              maxWidth="40vw"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <label className="font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap" style={{ fontSize: '13px', width: '100px', paddingTop: '7px' }}>
+                            Solution
+                          </label>
+                          <div className="flex-1">
+                            <DynamicInputField
+                              value={project.solution}
+                              onChange={(value) => onProjectUpdate({ ...project, solution: value })}
+                              placeholder="Describe the solution..."
+                              maxWidth="40vw"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <label className="font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap" style={{ fontSize: '13px', width: '100px', paddingTop: '8px' }}>
+                            Success metric
+                          </label>
+                          <div className="flex-1">
+                            <DynamicInputField
+                              value={project.successMetric}
+                              onChange={(value) => onProjectUpdate({ ...project, successMetric: value })}
+                              placeholder="Define success metrics..."
+                              maxWidth="40vw"
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4">
-                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
-                          Solution
-                        </label>
-                        <div className="flex-1">
-                          <InputField
-                            value={project.solution}
-                            onChange={(value) => onProjectUpdate({ ...project, solution: value })}
-                            placeholder="Describe the solution..."
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
-                          Success Metric
-                        </label>
-                        <div className="flex-1">
-                          <InputField
-                            value={project.successMetric}
-                            onChange={(value) => onProjectUpdate({ ...project, successMetric: value })}
-                            placeholder="Define success metrics..."
-                          />
-                        </div>
-                      </div>
-                      <div className="mt-4">
+                      <div className="ml-6">
                         <LinkManager
                           figmaLink={project.figmaLink}
                           prdLink={project.prdLink}
