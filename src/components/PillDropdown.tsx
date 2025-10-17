@@ -85,37 +85,38 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
               }} />
             </div>
           ) : (
-            <div className="flex items-center w-full h-full relative group/pill rounded transition-colors" style={{
-              outline: '1px solid transparent',
-              outlineOffset: '0px'
-            }} onMouseEnter={(e) => {
-              e.currentTarget.style.outline = '1px solid rgb(226 232 240)';
-            }} onMouseLeave={(e) => {
-              e.currentTarget.style.outline = '1px solid transparent';
+            // Text-only variant - consistent layout for empty and selected states
+            <div className="flex items-center h-5 relative group/pill rounded-full transition-colors border-0" style={{ 
+              width: 'fit-content',
+              paddingLeft: '8px',
+              paddingRight: '20px'
             }}>
-              <span className="text-xs text-slate-900 dark:text-slate-100 group-hover/pill:truncate" style={{ 
-                transform: 'translateX(0)',
-                transition: 'transform 0.2s ease',
-                textAlign: 'left',
-                paddingLeft: '8px',
-                paddingRight: '20px'
-              }}>
-                {value}
+              <span className={`text-xs transition-colors ${
+                (!value || value === '' || value === 'select')
+                  ? 'text-slate-400 dark:text-slate-500 group-hover/pill:text-slate-600 dark:group-hover/pill:text-slate-400'
+                  : 'text-slate-900 dark:text-slate-100'
+              }`}>
+                {(!value || value === '' || value === 'select') ? 'Select' : value}
               </span>
-              <ChevronDown className="h-3 w-3 opacity-0 group-hover/pill:opacity-100 transition-opacity absolute right-1 flex-shrink-0" style={{ 
+              <ChevronDown className={`h-3 w-3 transition-opacity absolute right-1 flex-shrink-0 ${
+                (!value || value === '' || value === 'select')
+                  ? 'opacity-100 text-slate-400 dark:text-slate-500 group-hover/pill:text-slate-600 dark:group-hover/pill:text-slate-400'
+                  : 'opacity-0 group-hover/pill:opacity-100 text-slate-900 dark:text-slate-100'
+              }`} style={{ 
                 marginRight: '2px',
-                paddingTop: '2px',
-                transform: 'translateY(0)'
+                paddingTop: '2px'
               }} />
             </div>
           )}
         </SelectTrigger>
         <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
+          {options
+            .filter(option => option.value !== 'select')
+            .map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>

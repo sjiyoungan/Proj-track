@@ -283,7 +283,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               </th>
             )}
             {filterState.showPlan && (
-              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '4px' }}>
+              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '8px' }}>
                 Plan
               </SortableHeader>
             )}
