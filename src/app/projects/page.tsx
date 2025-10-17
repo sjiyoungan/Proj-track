@@ -76,6 +76,7 @@ export default function ProjectsPage() {
             successMetric: '',
             figmaLink: '',
             prdLink: '',
+            customLinks: [],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
           };
@@ -100,6 +101,7 @@ export default function ProjectsPage() {
         successMetric: '',
         figmaLink: '',
         prdLink: '',
+        customLinks: [],
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -197,6 +199,7 @@ export default function ProjectsPage() {
       successMetric: '',
       figmaLink: '',
       prdLink: '',
+      customLinks: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
