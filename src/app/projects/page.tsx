@@ -124,7 +124,7 @@ export default function ProjectsPage() {
     ));
   };
 
-  const handlePriorityUpdate = (projectId: string, newPriority: number) => {
+  const handleProjectReorder = (projectId: string, newPriority: number) => {
     setProjects(prev => {
       const updated = [...prev];
       const projectIndex = updated.findIndex(p => p.id === projectId);
@@ -257,10 +257,13 @@ export default function ProjectsPage() {
               filterState={filterState}
               activeTab={activeTab}
               onProjectUpdate={handleProjectUpdate}
-              onPriorityUpdate={handlePriorityUpdate}
+              onProjectReorder={handleProjectReorder}
               onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
               onProjectDelete={handleProjectDelete}
               onAddNewProject={addNewProject}
+              showHoverRow={false}
+              hoverRowLocked={false}
+              onHoverRowLocked={() => {}}
             />
           </CardContent>
         </Card>
