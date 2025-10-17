@@ -44,11 +44,12 @@ export default function Home() {
   const saveToSupabase = async () => {
     try {
       // If in share mode (no user), save to localStorage instead
-      if (!user && window.location.search.includes('share=true')) {
-        localStorage.setItem('shared-projects', JSON.stringify(projects));
-        localStorage.setItem('shared-globalKRs', JSON.stringify(globalKRs));
-        localStorage.setItem('shared-filterState', JSON.stringify(filterState));
-        localStorage.setItem('shared-headerTitle', headerTitle);
+      const shareParam = new URLSearchParams(window.location.search).get('share');
+      if (!user && shareParam && shareParam.startsWith('share-')) {
+        localStorage.setItem(`shared-projects-${shareParam}`, JSON.stringify(projects));
+        localStorage.setItem(`shared-globalKRs-${shareParam}`, JSON.stringify(globalKRs));
+        localStorage.setItem(`shared-filterState-${shareParam}`, JSON.stringify(filterState));
+        localStorage.setItem(`shared-headerTitle-${shareParam}`, headerTitle);
         return;
       }
       
@@ -69,11 +70,12 @@ export default function Home() {
     const loadData = async () => {
       try {
         // If in share mode (no user), load from localStorage instead
-        if (!user && window.location.search.includes('share=true')) {
-          const sharedProjects = localStorage.getItem('shared-projects');
-          const sharedGlobalKRs = localStorage.getItem('shared-globalKRs');
-          const sharedFilterState = localStorage.getItem('shared-filterState');
-          const sharedHeaderTitle = localStorage.getItem('shared-headerTitle');
+        const shareParam = new URLSearchParams(window.location.search).get('share');
+        if (!user && shareParam && shareParam.startsWith('share-')) {
+          const sharedProjects = localStorage.getItem(`shared-projects-${shareParam}`);
+          const sharedGlobalKRs = localStorage.getItem(`shared-globalKRs-${shareParam}`);
+          const sharedFilterState = localStorage.getItem(`shared-filterState-${shareParam}`);
+          const sharedHeaderTitle = localStorage.getItem(`shared-headerTitle-${shareParam}`);
 
           if (sharedProjects) {
             setProjects(JSON.parse(sharedProjects));
@@ -369,7 +371,8 @@ export default function Home() {
   }
 
   // Show auth form only if no user and not in share mode
-  if (!user && !window.location.search.includes('share=true')) {
+  const shareParam = new URLSearchParams(window.location.search).get('share');
+  if (!user && !(shareParam && shareParam.startsWith('share-'))) {
     return <AuthForm />;
   }
 

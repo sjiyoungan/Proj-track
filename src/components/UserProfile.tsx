@@ -21,9 +21,10 @@ export function UserProfile() {
   };
 
   const handleShare = () => {
-    // Copy current page URL with share parameter
+    // Generate a unique share ID
+    const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('share', 'true');
+    currentUrl.searchParams.set('share', shareId);
     const shareUrl = currentUrl.toString();
     
     navigator.clipboard.writeText(shareUrl).then(() => {
@@ -56,7 +57,7 @@ export function UserProfile() {
           <Share2 className="mr-2 h-4 w-4" />
           Share
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 dark:text-red-400">
+        <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-black dark:text-white">
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
