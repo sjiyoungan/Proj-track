@@ -7,6 +7,11 @@ import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
 import { EditableHeader } from '@/components/EditableHeader';
+import { EditableCell } from '@/components/EditableCell';
+import { PriorityDropdown } from '@/components/PriorityDropdown';
+import { PillDropdown } from '@/components/PillDropdown';
+import { KRDropdown } from '@/components/KRDropdown';
+import { ChevronDown } from 'lucide-react';
 import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 
@@ -24,6 +29,8 @@ export default function Home() {
   });
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
   const [headerTitle, setHeaderTitle] = useState<string>('');
+  const [showHoverRow, setShowHoverRow] = useState(false);
+  const [hoverRowLocked, setHoverRowLocked] = useState(false);
 
   const handleHeaderTitleChange = (newTitle: string) => {
     setHeaderTitle(newTitle);
@@ -230,6 +237,16 @@ export default function Home() {
     };
     
     setProjects(prev => [...prev, newProject]);
+    setShowHoverRow(false); // Hide the hover row after adding
+    
+    // Focus the name field of the newly added project after a brief delay
+    setTimeout(() => {
+      const nameInputs = document.querySelectorAll('input[placeholder="Enter project"]');
+      const lastNameInput = nameInputs[nameInputs.length - 1] as HTMLElement;
+      if (lastNameInput) {
+        lastNameInput.click(); // Trigger edit mode
+      }
+    }, 50);
   };
 
   const clearAllData = () => {
@@ -317,8 +334,12 @@ export default function Home() {
         </div>
 
         {/* Project Table */}
-        <Card>
-          <CardContent className="p-0">
+        <div>
+          <Card className="overflow-hidden rounded-lg border border-slate-100 dark:border-slate-600">
+            <CardContent 
+              className="p-0"
+              onMouseEnter={() => setShowHoverRow(false)}
+            >
             <ProjectTable
               projects={projects}
               filterState={filterState}
@@ -327,12 +348,153 @@ export default function Home() {
               onPriorityUpdate={handlePriorityUpdate}
               onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
               onProjectDelete={handleProjectDelete}
-              globalKRs={globalKRs}
-              onGlobalKRChange={handleGlobalKRChange}
-              onAddNewProject={addNewProject}
-            />
+                globalKRs={globalKRs}
+                onGlobalKRChange={handleGlobalKRChange}
+                onAddNewProject={addNewProject}
+              />
+
+              {/* Hover row - appears inside the table when hovering below */}
+              {showHoverRow && (
+                <div 
+                  className="border-t border-slate-200 dark:border-slate-700"
+                  onMouseEnter={() => setShowHoverRow(true)}
+                  onMouseLeave={() => {
+                    if (!hoverRowLocked) {
+                      setShowHoverRow(false);
+                    }
+                  }}
+                >
+                  <table className="w-full table-fixed">
+                    <tbody className="bg-white dark:bg-slate-900">
+                      <tr className="bg-slate-50/50 dark:bg-slate-800/50 opacity-70 hover:opacity-100 transition-opacity">
+                        <td className="px-2 py-4 whitespace-nowrap w-20">
+                          <div onClick={addNewProject}>
+                            <PriorityDropdown
+                              currentPriority={projects.length + 1}
+                              maxPriority={projects.length + 1}
+                              onPriorityChange={() => {}}
+                              showDragHandle={true}
+                              onDragStart={() => {}}
+                              onDragOver={() => {}}
+                              onDrop={() => {}}
+                              isDragging={false}
+                            />
+                          </div>
+                        </td>
+                        <td className="pl-0 pr-4 py-4 whitespace-nowrap w-48">
+                          <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
+                            <EditableCell
+                              value=""
+                              onChange={() => {}}
+                              placeholder="Enter project"
+                            />
+                          </div>
+                        </td>
+                        {filterState.showInitiative && (
+                          <td className="px-4 py-4 whitespace-nowrap w-48">
+                            <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
+                              <EditableCell
+                                value=""
+                                onChange={() => {}}
+                                placeholder="Enter initiative..."
+                              />
+                            </div>
+                          </td>
+                        )}
+                        {filterState.showKR && (
+                          <td className="px-2 py-4 whitespace-nowrap w-32">
+                            <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
+                              <KRDropdown
+                                globalKRs={globalKRs}
+                                selectedKRIds={[]}
+                                onKRSelect={() => {}}
+                                onKRRemove={() => {}}
+                                onGlobalKRChange={handleGlobalKRChange}
+                              />
+                            </div>
+                          </td>
+                        )}
+                        {filterState.showPlan && (
+                          <td className="pl-0 pr-2 py-4 whitespace-nowrap w-32">
+                            <div 
+                              onMouseDown={(e) => {
+                                e.stopPropagation();
+                                setHoverRowLocked(true);
+                                addNewProject();
+                                setTimeout(() => setHoverRowLocked(false), 500);
+                              }}
+                            >
+                              <PillDropdown
+                                value="select"
+                                onChange={() => {}}
+                                type="plan"
+                                variant="text-only"
+                              />
+                            </div>
+                          </td>
+                        )}
+                        <td className="px-2 py-4 whitespace-nowrap w-28">
+                          <div 
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              setHoverRowLocked(true);
+                              addNewProject();
+                              setTimeout(() => setHoverRowLocked(false), 500);
+                            }}
+                          >
+                            <PillDropdown
+                              value="select"
+                              onChange={() => {}}
+                              type="design"
+                              variant="filled"
+                            />
+                          </div>
+                        </td>
+                        <td className="px-2 py-4 whitespace-nowrap w-24">
+                          <div 
+                            onMouseDown={(e) => {
+                              e.stopPropagation();
+                              setHoverRowLocked(true);
+                              addNewProject();
+                              setTimeout(() => setHoverRowLocked(false), 500);
+                            }}
+                          >
+                            <PillDropdown
+                              value="select"
+                              onChange={() => {}}
+                              type="build"
+                              variant="filled"
+                            />
+                          </div>
+                        </td>
+                        <td className="pr-0 py-4 whitespace-nowrap w-10">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-slate-500 dark:text-slate-400 opacity-0"
+                          >
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
           </CardContent>
         </Card>
+
+          {/* Hover zone to trigger the new row - only row height */}
+          <div 
+            className="h-16 w-full"
+            onMouseEnter={() => setShowHoverRow(true)}
+            onMouseLeave={() => {
+              if (!hoverRowLocked) {
+                setShowHoverRow(false);
+              }
+            }}
+          />
+        </div>
 
         {/* Add Project Button */}
         <div className="mt-6 flex justify-center">

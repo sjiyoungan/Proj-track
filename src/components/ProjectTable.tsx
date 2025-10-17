@@ -34,11 +34,6 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 
-  const handleEmptyStateInteraction = () => {
-    // Create a new project when user interacts with empty state
-    onAddNewProject();
-  };
-
   // Helper function to find the previous project ID in the sorted list
   const findPreviousProjectId = (projectId: string) => {
     const currentIndex = sortedProjects.findIndex(p => p.id === projectId);
@@ -262,7 +257,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-600">
+    <div className="overflow-x-auto">
       <table className="w-full table-fixed">
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
