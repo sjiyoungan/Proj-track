@@ -343,6 +343,34 @@ export default function Home() {
     }
   };
 
+  const getDisplayProjects = () => {
+    return projects.filter(project => {
+      // Apply tab filter
+      let passesTabFilter = true;
+      if (activeTab === 'in-progress') {
+        passesTabFilter = project.designStatus === 'In progress' || project.buildStatus === 'In progress';
+      } else if (activeTab === 'on-hold') {
+        passesTabFilter = project.designStatus === 'On hold' || project.buildStatus === 'On hold';
+      } else if (activeTab === 'done') {
+        passesTabFilter = project.designStatus === 'Done' && project.buildStatus === 'Done';
+      } else if (activeTab === 'future') {
+        passesTabFilter = project.designStatus === 'Future';
+      } else if (activeTab === 'not-started') {
+        passesTabFilter = project.designStatus === 'Not started' && project.buildStatus === 'Not started';
+      }
+
+      // Apply other filters
+      const passesInitiativeFilter = !filterState.showInitiative || project.initiative;
+      const passesKRFilter = !filterState.showKR || project.selectedKRs.length > 0;
+      const passesPlanFilter = !filterState.showPlan || project.plan !== 'select';
+      const passesDoneFilter = filterState.showDone || (project.designStatus !== 'Done' && project.buildStatus !== 'Done');
+      const passesFutureFilter = filterState.showFuture || project.designStatus !== 'Future';
+
+      return passesTabFilter && passesInitiativeFilter && passesKRFilter && 
+             passesPlanFilter && passesDoneFilter && passesFutureFilter;
+    });
+  };
+
   if (!mounted) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
