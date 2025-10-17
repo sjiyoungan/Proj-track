@@ -10,6 +10,7 @@ import { EditableHeader } from '@/components/EditableHeader';
 import { EditableCell } from '@/components/EditableCell';
 import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
+import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
 
 export default function Home() {
   const mounted = useMounted();
@@ -36,38 +37,37 @@ export default function Home() {
     setGlobalKRs(newKRs);
   };
 
-  // Simple save function
-  const saveToLocalStorage = () => {
+  // Save to Supabase
+  const saveToSupabase = async () => {
     try {
-      localStorage.setItem('projects', JSON.stringify(projects));
-      localStorage.setItem('headerTitle', headerTitle);
-      localStorage.setItem('globalKRs', JSON.stringify(globalKRs));
-      localStorage.setItem('filterState', JSON.stringify(filterState));
+      await Promise.all([
+        saveProjects(projects),
+        saveGlobalKRs(globalKRs),
+        saveFilterState(filterState)
+      ]);
     } catch (error) {
       console.error('❌ Save failed:', error);
     }
   };
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount
   useEffect(() => {
     if (!mounted) return;
-    const savedProjects = localStorage.getItem('projects');
-    const savedTitle = localStorage.getItem('headerTitle');
-    const savedGlobalKRs = localStorage.getItem('globalKRs');
-    const savedFilterState = localStorage.getItem('filterState');
     
-    if (savedProjects) {
+    const loadData = async () => {
       try {
-        const parsed = JSON.parse(savedProjects);
-        const loadedProjects = parsed.map((p: any) => ({
-          ...p,
-          selectedKRs: Array.isArray(p.selectedKRs) ? p.selectedKRs : [],
-          designStatus: p.designStatus || 'select',
-          buildStatus: p.buildStatus || 'select',
-          createdAt: p.createdAt,
-          updatedAt: p.updatedAt
-        }));
+        const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
+          loadProjects(),
+          loadGlobalKRs(),
+          loadFilterState()
+        ]);
+        
         setProjects(loadedProjects);
+        setGlobalKRs(loadedGlobalKRs);
+        
+        if (loadedFilterState) {
+          setFilterState(loadedFilterState);
+        }
         
         // If no projects exist, create an empty one automatically
         if (loadedProjects.length === 0) {
@@ -92,75 +92,37 @@ export default function Home() {
           setProjects([emptyProject]);
         }
       } catch (error) {
-        console.error('❌ Failed to load projects:', error);
+        console.error('❌ Failed to load data:', error);
+        // Fallback: create empty project if load fails
+        const emptyProject: Project = {
+          id: `project-1`,
+          priority: 1,
+          name: '',
+          plan: 'select',
+          initiative: '',
+          selectedKRs: [],
+          designStatus: 'select',
+          buildStatus: 'select',
+          problemStatement: '',
+          solution: '',
+          successMetric: '',
+          figmaLink: '',
+          prdLink: '',
+          customLinks: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setProjects([emptyProject]);
       }
-    } else {
-      // No saved projects at all - create initial empty project
-      const emptyProject: Project = {
-        id: `project-1`,
-        priority: 1,
-        name: '',
-        plan: 'select',
-        initiative: '',
-        selectedKRs: [],
-        designStatus: 'select',
-        buildStatus: 'select',
-        problemStatement: '',
-        solution: '',
-        successMetric: '',
-        figmaLink: '',
-        prdLink: '',
-        customLinks: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setProjects([emptyProject]);
-    }
+    };
     
-    if (savedTitle) {
-      setHeaderTitle(savedTitle);
-    }
-
-    if (savedGlobalKRs) {
-      try {
-        const parsed = JSON.parse(savedGlobalKRs);
-        // Simple migration: ensure all KRs have required fields
-        const migratedKRs = parsed.map((kr: any, index: number) => ({
-          id: kr.id || `kr-migrated-${index}`,
-          text: kr.text || '',
-          fillColor: kr.fillColor || '#f3f4f6',
-          textColor: kr.textColor || '#000000',
-          order: kr.order || index
-        }));
-        
-        setGlobalKRs(migratedKRs);
-      } catch (error) {
-        console.error('❌ Failed to load global KRs:', error);
-        // If loading fails, use empty array
-        setGlobalKRs([]);
-      }
-    } else {
-      setGlobalKRs([]);
-    }
-
-          if (savedFilterState) {
-            try {
-              const parsed = JSON.parse(savedFilterState);
-              // Add backward compatibility for showFuture
-              if (parsed.showFuture === undefined) {
-                parsed.showFuture = true;
-              }
-              setFilterState(parsed);
-            } catch (error) {
-              console.error('❌ Failed to load filter state:', error);
-            }
-          }
+    loadData();
   }, [mounted]);
 
   // Auto-save when data changes
   useEffect(() => {
     if (!mounted) return;
-    saveToLocalStorage();
+    saveToSupabase();
   }, [projects, headerTitle, globalKRs, filterState, mounted]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
@@ -255,48 +217,65 @@ export default function Home() {
     }, 150);
   };
 
-  const clearAllData = () => {
-    localStorage.removeItem('projects');
-    localStorage.removeItem('headerTitle');
-    localStorage.removeItem('globalKRs');
-    localStorage.removeItem('filterState');
-    
-    // Create an empty project just like on first load
-    const emptyProject: Project = {
-      id: `project-1`,
-      priority: 1,
-      name: '',
-      plan: 'select',
-      initiative: '',
-      selectedKRs: [],
-      designStatus: 'select',
-      buildStatus: 'select',
-      problemStatement: '',
-      solution: '',
-      successMetric: '',
-      figmaLink: '',
-      prdLink: '',
-      customLinks: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    
-    setProjects([emptyProject]);
-    setHeaderTitle('');
-    setGlobalKRs([]);
-    setFilterState({
-      showInitiative: true,
-      showKR: true,
-      showPlan: true,
-      showDone: true,
-      showFuture: true,
-      sortBy: 'priority-asc'
-    });
+  const clearAllData = async () => {
+    try {
+      // Clear all data from Supabase
+      await Promise.all([
+        saveProjects([]),
+        saveGlobalKRs([]),
+        saveFilterState({
+          showInitiative: true,
+          showKR: true,
+          showPlan: true,
+          showDone: true,
+          showFuture: true,
+          sortBy: 'priority-asc'
+        })
+      ]);
+      
+      // Create an empty project just like on first load
+      const emptyProject: Project = {
+        id: `project-1`,
+        priority: 1,
+        name: '',
+        plan: 'select',
+        initiative: '',
+        selectedKRs: [],
+        designStatus: 'select',
+        buildStatus: 'select',
+        problemStatement: '',
+        solution: '',
+        successMetric: '',
+        figmaLink: '',
+        prdLink: '',
+        customLinks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      setProjects([emptyProject]);
+      setHeaderTitle('');
+      setGlobalKRs([]);
+      setFilterState({
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority-asc'
+      });
+    } catch (error) {
+      console.error('❌ Failed to clear data:', error);
+    }
   };
 
-  const resetKRData = () => {
-    localStorage.removeItem('globalKRs');
-    setGlobalKRs([]);
+  const resetKRData = async () => {
+    try {
+      await saveGlobalKRs([]);
+      setGlobalKRs([]);
+    } catch (error) {
+      console.error('❌ Failed to reset KR data:', error);
+    }
   };
 
   if (!mounted) {

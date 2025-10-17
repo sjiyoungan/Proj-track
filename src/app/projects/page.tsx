@@ -7,6 +7,7 @@ import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
 import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
+import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
 
 export default function ProjectsPage() {
   const mounted = useMounted();
@@ -30,22 +31,90 @@ export default function ProjectsPage() {
   // Auto-save functionality
   useEffect(() => {
     if (!mounted) return;
-    const autoSave = () => {
-      localStorage.setItem('projects', JSON.stringify(projects));
-      localStorage.setItem('globalKRs', JSON.stringify(globalKRs));
-      localStorage.setItem('filterState', JSON.stringify(filterState));
+    const autoSave = async () => {
+      try {
+        await Promise.all([
+          saveProjects(projects),
+          saveGlobalKRs(globalKRs),
+          saveFilterState(filterState)
+        ]);
+      } catch (error) {
+        console.error('❌ Auto-save failed:', error);
+      }
     };
 
     const interval = setInterval(autoSave, 30000); // Auto-save every 30 seconds
     return () => clearInterval(interval);
   }, [projects, globalKRs, filterState, mounted]);
 
-  // Load from localStorage on mount
+  // Load from Supabase on mount
   useEffect(() => {
     if (!mounted) return;
-    const savedProjects = localStorage.getItem('projects');
-    const savedGlobalKRs = localStorage.getItem('globalKRs');
-    const savedFilterState = localStorage.getItem('filterState');
+    
+    const loadData = async () => {
+      try {
+        const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
+          loadProjects(),
+          loadGlobalKRs(),
+          loadFilterState()
+        ]);
+        
+        setProjects(loadedProjects);
+        setGlobalKRs(loadedGlobalKRs);
+        
+        if (loadedFilterState) {
+          setFilterState(loadedFilterState);
+        }
+        
+        // If no projects exist, create an empty one automatically
+        if (loadedProjects.length === 0) {
+          const emptyProject: Project = {
+            id: `project-1`,
+            priority: 1,
+            name: '',
+            plan: 'select',
+            initiative: '',
+            selectedKRs: [],
+            designStatus: 'select',
+            buildStatus: 'select',
+            problemStatement: '',
+            solution: '',
+            successMetric: '',
+            figmaLink: '',
+            prdLink: '',
+            customLinks: [],
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          setProjects([emptyProject]);
+        }
+      } catch (error) {
+        console.error('❌ Failed to load data:', error);
+        // Fallback: create empty project if load fails
+        const emptyProject: Project = {
+          id: `project-1`,
+          priority: 1,
+          name: '',
+          plan: 'select',
+          initiative: '',
+          selectedKRs: [],
+          designStatus: 'select',
+          buildStatus: 'select',
+          problemStatement: '',
+          solution: '',
+          successMetric: '',
+          figmaLink: '',
+          prdLink: '',
+          customLinks: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setProjects([emptyProject]);
+      }
+    };
+    
+    loadData();
+  }, [mounted]);
     
     if (savedProjects) {
       try {
