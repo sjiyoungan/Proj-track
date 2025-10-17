@@ -366,106 +366,95 @@ export default function Home() {
                 >
                   <table className="w-full table-fixed">
                     <tbody className="bg-white dark:bg-slate-900">
-                      <tr className="bg-slate-50/50 dark:bg-slate-800/50 opacity-70 hover:opacity-100 transition-opacity">
+                      <tr 
+                        className="bg-slate-50/50 dark:bg-slate-800/50 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
+                        onClick={(e) => {
+                          // Only add if clicking on the row itself or a cell, not on interactive elements
+                          const target = e.target as HTMLElement;
+                          const isInteractive = target.closest('button, input, select, [role="combobox"]');
+                          if (!isInteractive) {
+                            addNewProject();
+                          }
+                        }}
+                      >
                         <td className="px-2 py-4 whitespace-nowrap w-20">
-                          <div onClick={addNewProject}>
-                            <PriorityDropdown
-                              currentPriority={projects.length + 1}
-                              maxPriority={projects.length + 1}
-                              onPriorityChange={() => {}}
-                              showDragHandle={true}
-                              onDragStart={() => {}}
-                              onDragOver={() => {}}
-                              onDrop={() => {}}
-                              isDragging={false}
-                            />
-                          </div>
+                          <PriorityDropdown
+                            currentPriority={projects.length + 1}
+                            maxPriority={projects.length + 1}
+                            onPriorityChange={() => {}}
+                            showDragHandle={true}
+                            onDragStart={() => {}}
+                            onDragOver={() => {}}
+                            onDrop={() => {}}
+                            isDragging={false}
+                          />
                         </td>
                         <td className="pl-0 pr-4 py-4 whitespace-nowrap w-48">
-                          <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
-                            <EditableCell
-                              value=""
-                              onChange={() => {}}
-                              placeholder="Enter project"
-                            />
-                          </div>
+                          <EditableCell
+                            value=""
+                            onChange={() => {}}
+                            placeholder="Enter project"
+                          />
                         </td>
                         {filterState.showInitiative && (
                           <td className="px-4 py-4 whitespace-nowrap w-48">
-                            <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
-                              <EditableCell
-                                value=""
-                                onChange={() => {}}
-                                placeholder="Enter initiative..."
-                              />
-                            </div>
+                            <EditableCell
+                              value=""
+                              onChange={() => {}}
+                              placeholder="Enter initiative..."
+                            />
                           </td>
                         )}
                         {filterState.showKR && (
                           <td className="px-2 py-4 whitespace-nowrap w-32">
-                            <div onMouseDown={(e) => { e.preventDefault(); addNewProject(); }}>
-                              <KRDropdown
-                                globalKRs={globalKRs}
-                                selectedKRIds={[]}
-                                onKRSelect={() => {}}
-                                onKRRemove={() => {}}
-                                onGlobalKRChange={handleGlobalKRChange}
-                              />
-                            </div>
+                            <KRDropdown
+                              globalKRs={globalKRs}
+                              selectedKRIds={[]}
+                              onKRSelect={() => {}}
+                              onKRRemove={() => {}}
+                              onGlobalKRChange={handleGlobalKRChange}
+                            />
                           </td>
                         )}
                         {filterState.showPlan && (
                           <td className="pl-0 pr-2 py-4 whitespace-nowrap w-32">
-                            <div 
-                              onMouseDown={(e) => {
-                                e.stopPropagation();
-                                setHoverRowLocked(true);
-                                addNewProject();
-                                setTimeout(() => setHoverRowLocked(false), 500);
-                              }}
-                            >
-                              <PillDropdown
-                                value="select"
-                                onChange={() => {}}
-                                type="plan"
-                                variant="text-only"
-                              />
-                            </div>
+                            <PillDropdown
+                              value="select"
+                              onChange={() => {}}
+                              type="plan"
+                              variant="text-only"
+                            />
                           </td>
                         )}
-                        <td className="px-2 py-4 whitespace-nowrap w-28">
-                          <div 
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              setHoverRowLocked(true);
-                              addNewProject();
-                              setTimeout(() => setHoverRowLocked(false), 500);
-                            }}
-                          >
-                            <PillDropdown
-                              value="select"
-                              onChange={() => {}}
-                              type="design"
-                              variant="filled"
-                            />
-                          </div>
+                        <td 
+                          className="px-2 py-4 whitespace-nowrap w-28"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoverRowLocked(true);
+                            setTimeout(() => setHoverRowLocked(false), 1000);
+                          }}
+                        >
+                          <PillDropdown
+                            value="select"
+                            onChange={() => {}}
+                            type="design"
+                            variant="filled"
+                          />
                         </td>
-                        <td className="px-2 py-4 whitespace-nowrap w-24">
-                          <div 
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              setHoverRowLocked(true);
-                              addNewProject();
-                              setTimeout(() => setHoverRowLocked(false), 500);
-                            }}
-                          >
-                            <PillDropdown
-                              value="select"
-                              onChange={() => {}}
-                              type="build"
-                              variant="filled"
-                            />
-                          </div>
+                        <td 
+                          className="px-2 py-4 whitespace-nowrap w-24"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoverRowLocked(true);
+                            setTimeout(() => setHoverRowLocked(false), 1000);
+                          }}
+                        >
+                          <PillDropdown
+                            value="select"
+                            onChange={() => {}}
+                            type="build"
+                            variant="filled"
+                          />
                         </td>
                         <td className="pr-0 py-4 whitespace-nowrap w-10">
                           <Button
