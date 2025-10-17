@@ -237,7 +237,27 @@ export default function Home() {
     localStorage.removeItem('headerTitle');
     localStorage.removeItem('globalKRs');
     localStorage.removeItem('filterState');
-    setProjects([]);
+    
+    // Create an empty project just like on first load
+    const emptyProject: Project = {
+      id: `project-1`,
+      priority: 1,
+      name: '',
+      plan: 'select',
+      initiative: '',
+      selectedKRs: [],
+      designStatus: 'select',
+      buildStatus: 'select',
+      problemStatement: '',
+      solution: '',
+      successMetric: '',
+      figmaLink: '',
+      prdLink: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    setProjects([emptyProject]);
     setHeaderTitle('');
     setGlobalKRs([]);
     setFilterState({
