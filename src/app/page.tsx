@@ -367,12 +367,15 @@ export default function Home() {
                         onClick={addNewProject}
                       >
                         <td className="px-2 py-4 whitespace-nowrap w-20">
-                          <div className="flex items-center justify-center">
-                            {/* Keep spacing but show just the number in light blue */}
-                            <div style={{ width: '24px' }}></div>
-                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                              {projects.length + 1}
-                            </span>
+                          <div className="flex items-center gap-1">
+                            {/* Drag handle spacing (14px width + 4px gap) */}
+                            <div className="w-3.5 h-3.5"></div>
+                            {/* Priority number in w-16 container like SelectTrigger */}
+                            <div className="w-16 flex items-center justify-center" style={{ height: '32px' }}>
+                              <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                                {projects.length + 1}
+                              </span>
+                            </div>
                           </div>
                         </td>
                         <td className="pl-0 pr-4 py-4 whitespace-nowrap w-48">
