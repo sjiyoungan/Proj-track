@@ -30,13 +30,13 @@ export function FilterBar({ filterState, onFilterChange, activeTab }: FilterBarP
       <Badge
         variant="outline"
         className={`cursor-pointer hover:bg-primary/10 ml-2 ${
-          filterState.showOKR 
+          filterState.showKR 
             ? 'border-slate-400 dark:border-slate-500 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100' 
             : 'border-slate-200 dark:border-slate-700 bg-transparent text-slate-500 dark:text-slate-400'
         }`}
-        onClick={() => onFilterChange({ ...filterState, showOKR: !filterState.showOKR })}
+        onClick={() => onFilterChange({ ...filterState, showKR: !filterState.showKR })}
       >
-        OKR
+        KR
       </Badge>
 
       {/* Plan Chip */}

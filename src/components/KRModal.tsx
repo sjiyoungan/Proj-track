@@ -5,11 +5,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { GripVertical, Plus, Trash2, Palette } from 'lucide-react';
-import { OKRItem } from '@/types/project';
+import { KRItem } from '@/types/project';
 
-interface OKRModalProps {
-  okrItems: OKRItem[];
-  onOKRChange: (okrItems: OKRItem[]) => void;
+interface KRModalProps {
+  krItems: KRItem[];
+  onKRChange: (krItems: KRItem[]) => void;
   children: React.ReactNode;
 }
 
@@ -18,35 +18,57 @@ const predefinedColors = [
   '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'
 ];
 
-export function OKRModal({ okrItems, onOKRChange, children }: OKRModalProps) {
+export function KRModal({ krItems, onKRChange, children }: KRModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [items, setItems] = useState<OKRItem[]>(okrItems);
+  const [items, setItems] = useState<KRItem[]>(krItems);
+  const [windowHasFocus, setWindowHasFocus] = useState(true);
+  const isNavigatingAway = React.useRef(false);
+
+  // Track window focus state
+  React.useEffect(() => {
+    const handleFocus = () => {
+      setWindowHasFocus(true);
+      isNavigatingAway.current = false;
+    };
+    const handleBlur = () => {
+      setWindowHasFocus(false);
+      isNavigatingAway.current = true;
+    };
+    
+    window.addEventListener('focus', handleFocus);
+    window.addEventListener('blur', handleBlur);
+    
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
 
   const addNewItem = () => {
-    const newItem: OKRItem = {
-      id: `okr-${Date.now()}`,
+    const newItem: KRItem = {
+      id: `kr-${Date.now()}`,
       text: '',
       color: predefinedColors[0],
       order: items.length
     };
     const newItems = [...items, newItem];
     setItems(newItems);
-    onOKRChange(newItems);
+    onKRChange(newItems);
   };
 
-  const updateItem = (id: string, updates: Partial<OKRItem>) => {
+  const updateItem = (id: string, updates: Partial<KRItem>) => {
     const newItems = items.map(item => 
       item.id === id ? { ...item, ...updates } : item
     ).filter(item => item.text.trim() !== ''); // Remove empty items
     
     setItems(newItems);
-    onOKRChange(newItems);
+    onKRChange(newItems);
   };
 
   const deleteItem = (id: string) => {
     const newItems = items.filter(item => item.id !== id);
     setItems(newItems);
-    onOKRChange(newItems);
+    onKRChange(newItems);
   };
 
   const moveItem = (fromIndex: number, toIndex: number) => {
@@ -61,7 +83,7 @@ export function OKRModal({ okrItems, onOKRChange, children }: OKRModalProps) {
     }));
     
     setItems(updatedItems);
-    onOKRChange(updatedItems);
+    onKRChange(updatedItems);
   };
 
   const getTextColor = (backgroundColor: string) => {
@@ -75,13 +97,33 @@ export function OKRModal({ okrItems, onOKRChange, children }: OKRModalProps) {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (open === true) {
+        // Always allow opening
+        setIsOpen(true);
+      } else {
+        // Only close if not navigating away
+        if (!isNavigatingAway.current) {
+          setIsOpen(false);
+        }
+      }
+    }}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent 
+        className="max-w-2xl" 
+        onInteractOutside={(e) => {
+          // Allow clicking outside to close
+          setIsOpen(false);
+        }}
+        onEscapeKeyDown={(e) => {
+          // Allow escape key to close
+          setIsOpen(false);
+        }}
+      >
         <DialogHeader>
-          <DialogTitle>Manage OKRs</DialogTitle>
+          <DialogTitle>Manage KRs</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
@@ -108,8 +150,8 @@ export function OKRModal({ okrItems, onOKRChange, children }: OKRModalProps) {
                 <Input
                   value={item.text}
                   onChange={(e) => updateItem(item.id, { text: e.target.value })}
-                  placeholder="Enter OKR..."
-                  className="flex-1"
+                  placeholder="Enter KR..."
+                  className="flex-1 border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
                 
                 {/* Delete Button */}
@@ -132,7 +174,7 @@ export function OKRModal({ okrItems, onOKRChange, children }: OKRModalProps) {
             className="w-full"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add Another OKR
+            Add Another KR
           </Button>
           
           {/* Color Palette */}

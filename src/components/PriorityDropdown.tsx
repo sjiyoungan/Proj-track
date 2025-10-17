@@ -42,7 +42,7 @@ export function PriorityDropdown({
         value={currentPriority.toString()}
         onValueChange={(value) => onPriorityChange(parseInt(value))}
       >
-        <SelectTrigger className="w-16 border-none shadow-none focus:ring-0 hover:border-blue-500 hover:outline hover:outline-blue-500 bg-transparent transition-colors [&>svg]:opacity-0 hover:[&>svg]:opacity-50" style={{ height: '32px', borderRadius: '4px' }}>
+        <SelectTrigger className="w-16 border-none shadow-none focus:ring-0 hover:border-slate-200 dark:hover:border-slate-700 hover:outline hover:outline-slate-200 dark:hover:outline-slate-700 bg-transparent transition-colors [&>svg]:opacity-0 group-hover:[&>svg]:opacity-50" style={{ height: '32px', borderRadius: '4px' }}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

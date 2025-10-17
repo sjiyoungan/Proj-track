@@ -7,7 +7,7 @@ import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
 import { EditableHeader } from '@/components/EditableHeader';
-import { Project, FilterState, TabFilter } from '@/types/project';
+import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 
 // Mock data for demonstration
 const mockProjects: Project[] = [
@@ -17,10 +17,7 @@ const mockProjects: Project[] = [
     name: 'User Authentication System',
     plan: 'Prime',
     initiative: 'Core Platform',
-    okr: [
-      { id: 'okr1', text: 'Implement OAuth 2.0', color: '#3B82F6', order: 0 },
-      { id: 'okr2', text: 'Add 2FA support', color: '#10B981', order: 1 }
-    ],
+    selectedKRs: ['okr1', 'okr2'],
     designStatus: 'Done',
     buildStatus: 'In progress',
     problemStatement: 'Users need secure authentication to access the platform',
@@ -37,9 +34,7 @@ const mockProjects: Project[] = [
     name: 'Dashboard Analytics',
     plan: 'Free',
     initiative: 'Analytics',
-    okr: [
-      { id: 'okr3', text: 'Real-time metrics', color: '#F59E0B', order: 0 }
-    ],
+    selectedKRs: ['okr3'],
     designStatus: 'In progress',
     buildStatus: 'Not started',
     problemStatement: 'Users need insights into their data usage',
@@ -56,10 +51,7 @@ const mockProjects: Project[] = [
     name: 'Mobile App Redesign',
     plan: 'Pre-account',
     initiative: 'Mobile Experience',
-    okr: [
-      { id: 'okr4', text: 'iOS redesign', color: '#8B5CF6', order: 0 },
-      { id: 'okr5', text: 'Android redesign', color: '#EF4444', order: 1 }
-    ],
+    selectedKRs: ['okr4', 'okr5'],
     designStatus: 'Not started',
     buildStatus: 'Not started',
     problemStatement: 'Current mobile app has poor UX',
@@ -76,10 +68,7 @@ const mockProjects: Project[] = [
     name: 'Email Notification System',
     plan: 'Prime',
     initiative: 'Communication',
-    okr: [
-      { id: 'okr6', text: 'Transactional emails', color: '#06B6D4', order: 0 },
-      { id: 'okr7', text: 'Marketing campaigns', color: '#84CC16', order: 1 }
-    ],
+    selectedKRs: ['okr6', 'okr7'],
     designStatus: 'In progress',
     buildStatus: 'On hold',
     problemStatement: 'Users are not receiving important notifications',
@@ -96,10 +85,7 @@ const mockProjects: Project[] = [
     name: 'API Rate Limiting',
     plan: 'Free',
     initiative: 'Infrastructure',
-    okr: [
-      { id: 'okr8', text: 'Implement rate limits', color: '#F97316', order: 0 },
-      { id: 'okr9', text: 'Monitor usage patterns', color: '#EC4899', order: 1 }
-    ],
+    selectedKRs: ['okr8', 'okr9'],
     designStatus: 'Done',
     buildStatus: 'Not started',
     problemStatement: 'API is being abused causing performance issues',
@@ -116,10 +102,7 @@ const mockProjects: Project[] = [
     name: 'User Onboarding Flow',
     plan: 'Prime',
     initiative: 'User Experience',
-    okr: [
-      { id: 'okr10', text: 'Interactive tutorial', color: '#10B981', order: 0 },
-      { id: 'okr11', text: 'Progress tracking', color: '#8B5CF6', order: 1 }
-    ],
+    selectedKRs: ['okr10', 'okr11'],
     designStatus: 'Not started',
     buildStatus: 'Not started',
     problemStatement: 'New users struggle to understand the platform',
@@ -136,11 +119,7 @@ const mockProjects: Project[] = [
     name: 'Data Export Feature',
     plan: 'Free',
     initiative: 'Data Management',
-    okr: [
-      { id: 'okr12', text: 'CSV export', color: '#F59E0B', order: 0 },
-      { id: 'okr13', text: 'PDF reports', color: '#EF4444', order: 1 },
-      { id: 'okr14', text: 'Scheduled exports', color: '#06B6D4', order: 2 }
-    ],
+    selectedKRs: ['okr12', 'okr13', 'okr14'],
     designStatus: 'In progress',
     buildStatus: 'In progress',
     problemStatement: 'Users need to export their data for analysis',
@@ -153,11 +132,30 @@ const mockProjects: Project[] = [
   }
 ];
 
+// Mock global KRs data
+const mockGlobalKRs: KRItem[] = [
+  { id: 'okr1', text: 'Implement OAuth 2.0', color: '#3B82F6', order: 0 },
+  { id: 'okr2', text: 'Add 2FA support', color: '#10B981', order: 1 },
+  { id: 'okr3', text: 'Real-time metrics', color: '#F59E0B', order: 2 },
+  { id: 'okr4', text: 'iOS redesign', color: '#8B5CF6', order: 3 },
+  { id: 'okr5', text: 'Android redesign', color: '#EF4444', order: 4 },
+  { id: 'okr6', text: 'Transactional emails', color: '#06B6D4', order: 5 },
+  { id: 'okr7', text: 'Marketing campaigns', color: '#84CC16', order: 6 },
+  { id: 'okr8', text: 'Implement rate limits', color: '#F97316', order: 7 },
+  { id: 'okr9', text: 'Monitor usage patterns', color: '#EC4899', order: 8 },
+  { id: 'okr10', text: 'Interactive tutorial', color: '#10B981', order: 9 },
+  { id: 'okr11', text: 'Progress tracking', color: '#8B5CF6', order: 10 },
+  { id: 'okr12', text: 'CSV export', color: '#F59E0B', order: 11 },
+  { id: 'okr13', text: 'PDF reports', color: '#EF4444', order: 12 },
+  { id: 'okr14', text: 'Scheduled exports', color: '#06B6D4', order: 13 }
+];
+
 export default function Home() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [globalKRs, setGlobalKRs] = useState<KRItem[]>(mockGlobalKRs);
   const [filterState, setFilterState] = useState<FilterState>({
     showInitiative: true,
-    showOKR: true,
+    showKR: true,
     showPlan: true,
     sortBy: 'priority-asc'
   });
@@ -168,11 +166,16 @@ export default function Home() {
     setHeaderTitle(newTitle);
   };
 
+  const handleGlobalKRChange = (newKRs: KRItem[]) => {
+    setGlobalKRs(newKRs);
+  };
+
   // Simple save function
   const saveToLocalStorage = () => {
     try {
       localStorage.setItem('projects', JSON.stringify(projects));
       localStorage.setItem('headerTitle', headerTitle);
+      localStorage.setItem('globalKRs', JSON.stringify(globalKRs));
       console.log('💾 Saved to localStorage');
     } catch (error) {
       console.error('❌ Save failed:', error);
@@ -183,12 +186,14 @@ export default function Home() {
   useEffect(() => {
     const savedProjects = localStorage.getItem('projects');
     const savedTitle = localStorage.getItem('headerTitle');
+    const savedGlobalKRs = localStorage.getItem('globalKRs');
     
     if (savedProjects) {
       try {
         const parsed = JSON.parse(savedProjects);
         setProjects(parsed.map((p: any) => ({
           ...p,
+          selectedKRs: Array.isArray(p.selectedKRs) ? p.selectedKRs : [],
           createdAt: new Date(p.createdAt),
           updatedAt: new Date(p.updatedAt)
         })));
@@ -202,12 +207,22 @@ export default function Home() {
       setHeaderTitle(savedTitle);
       console.log('📂 Loaded header title from localStorage');
     }
+
+    if (savedGlobalKRs) {
+      try {
+        const parsed = JSON.parse(savedGlobalKRs);
+        setGlobalKRs(parsed);
+        console.log('📂 Loaded global KRs from localStorage');
+      } catch (error) {
+        console.error('❌ Failed to load global KRs:', error);
+      }
+    }
   }, []);
 
   // Auto-save when data changes
   useEffect(() => {
     saveToLocalStorage();
-  }, [projects, headerTitle]);
+  }, [projects, headerTitle, globalKRs]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     console.log('📝 Project update triggered:', updatedProject.id, updatedProject.name);
@@ -266,10 +281,10 @@ export default function Home() {
     const newProject: Project = {
       id: `project-${Date.now()}`,
       priority: projects.length + 1,
-      name: 'New Project',
+      name: '',
       plan: 'Free',
       initiative: '',
-      okr: [],
+      selectedKRs: [],
       designStatus: 'Not started',
       buildStatus: 'Not started',
       problemStatement: '',
@@ -287,8 +302,10 @@ export default function Home() {
   const clearAllData = () => {
     localStorage.removeItem('projects');
     localStorage.removeItem('headerTitle');
+    localStorage.removeItem('globalKRs');
     setProjects([]);
     setHeaderTitle('');
+    setGlobalKRs([]);
     console.log('🗑️ Cleared all data');
   };
 
@@ -325,6 +342,8 @@ export default function Home() {
               onPriorityUpdate={handlePriorityUpdate}
               onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
               onProjectDelete={handleProjectDelete}
+              globalKRs={globalKRs}
+              onGlobalKRChange={handleGlobalKRChange}
             />
           </CardContent>
         </Card>

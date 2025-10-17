@@ -52,29 +52,24 @@ const getStatusColor = (value: string, type: 'design' | 'build' | 'plan') => {
 export function PillDropdown({ value, onChange, type, variant }: PillDropdownProps) {
   const options = type === 'plan' ? planOptions : statusOptions;
   
-  // Calculate the width needed for the longest option
-  const longestOption = options.reduce((longest, option) => 
-    option.label.length > longest.length ? option.label : longest, ''
-  );
-  
-  // Fix width to "In progress" length (11 characters) for all pills - text only, no chevron space
-  // Add 16px padding (8px left + 8px right) for better text spacing
-  const estimatedWidth = Math.max(11 * 7 + 16, 100);
+  // Fixed width to accommodate "In progress" (longest text) + padding + chevron space
+  const fixedWidth = 120; // Enough for "In progress" + padding + chevron
 
   return (
     <div className="group">
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger 
-          className={`w-[${estimatedWidth}px] h-5 border-none shadow-none focus:ring-0 focus:outline-none focus:ring-offset-0 focus:border-transparent hover:border-transparent bg-transparent p-0 [&>svg]:opacity-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none`}
-          style={{ width: `${estimatedWidth}px` }}
+          className={`${variant === 'text-only' ? 'h-8' : 'h-5'} border-none shadow-none focus:ring-0 focus:outline-none focus:ring-offset-0 focus:border-transparent hover:border-transparent bg-transparent p-0 [&>svg]:opacity-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none`}
+          style={{ width: `${fixedWidth}px` }}
         >
           {variant === 'filled' ? (
-            <div className={`flex items-center justify-center w-full h-full px-2 rounded-full ${getStatusColor(value, type)} relative hover:opacity-90 transition-opacity group/pill`}>
+            <div className={`flex items-center justify-center w-full h-full rounded-full ${getStatusColor(value, type)} relative hover:opacity-90 transition-opacity group/pill`}>
               <span className="text-xs text-center group-hover/pill:truncate" style={{ 
-                width: '100%',
-                maxWidth: 'calc(100% - 20px)',
                 transform: 'translateX(0)',
-                transition: 'transform 0.2s ease'
+                transition: 'transform 0.2s ease',
+                textAlign: 'center',
+                paddingLeft: '18px',
+                paddingRight: '20px'
               }}>
                 {value}
               </span>
@@ -85,12 +80,20 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
               }} />
             </div>
           ) : (
-            <div className="flex items-center justify-center w-full h-full px-2 relative group/pill">
-              <span className="text-xs text-slate-900 dark:text-slate-100 text-center group-hover/pill:truncate" style={{ 
-                width: '100%',
-                maxWidth: 'calc(100% - 20px)',
+            <div className="flex items-center w-full h-full relative group/pill rounded transition-colors" style={{
+              outline: '1px solid transparent',
+              outlineOffset: '0px'
+            }} onMouseEnter={(e) => {
+              e.currentTarget.style.outline = '1px solid rgb(226 232 240)';
+            }} onMouseLeave={(e) => {
+              e.currentTarget.style.outline = '1px solid transparent';
+            }}>
+              <span className="text-xs text-slate-900 dark:text-slate-100 group-hover/pill:truncate" style={{ 
                 transform: 'translateX(0)',
-                transition: 'transform 0.2s ease'
+                transition: 'transform 0.2s ease',
+                textAlign: 'left',
+                paddingLeft: '8px',
+                paddingRight: '20px'
               }}>
                 {value}
               </span>

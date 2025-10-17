@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Project, FilterState, TabFilter } from '@/types/project';
+import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
+import { colors } from '@/lib/colors';
 import { EditableCell } from '@/components/EditableCell';
 import { HyperlinkCell } from '@/components/HyperlinkCell';
 import { PriorityDropdown } from '@/components/PriorityDropdown';
 import { PillDropdown } from '@/components/PillDropdown';
-import { OKRModal } from '@/components/OKRModal';
+import { KRDropdown } from '@/components/KRDropdown';
 import { SortableHeader } from '@/components/SortableHeader';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
@@ -21,9 +22,11 @@ interface ProjectTableProps {
   onPriorityUpdate: (projectId: string, newPriority: number) => void;
   onSortChange: (sortOption: any) => void;
   onProjectDelete: (projectId: string) => void;
+  globalKRs: KRItem[];
+  onGlobalKRChange: (krs: KRItem[]) => void;
 }
 
-export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate, onPriorityUpdate, onSortChange, onProjectDelete }: ProjectTableProps) {
+export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate, onPriorityUpdate, onSortChange, onProjectDelete, globalKRs, onGlobalKRChange }: ProjectTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const [insertAfterId, setInsertAfterId] = useState<string | null>(null);
@@ -196,6 +199,30 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
     setProjectToDelete(null);
   };
 
+  const handleKRSelect = (projectId: string, krId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      const currentSelectedKRs = Array.isArray(project.selectedKRs) ? project.selectedKRs : [];
+      const updatedProject = {
+        ...project,
+        selectedKRs: [...currentSelectedKRs, krId]
+      };
+      onProjectUpdate(updatedProject);
+    }
+  };
+
+  const handleKRRemove = (projectId: string, krId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    if (project) {
+      const currentSelectedKRs = Array.isArray(project.selectedKRs) ? project.selectedKRs : [];
+      const updatedProject = {
+        ...project,
+        selectedKRs: currentSelectedKRs.filter(id => id !== krId)
+      };
+      onProjectUpdate(updatedProject);
+    }
+  };
+
   // Simple display - just show the sorted projects as they are
   const getDisplayProjects = () => {
     return sortedProjects;
@@ -203,13 +230,13 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-600">
-      <table className="w-full table-fixed">
+      <table className="w-full table-auto">
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
             <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
               Priority
             </SortableHeader>
-            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="pl-6 w-48">
+            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-48" style={{ paddingLeft: '9px' }}>
               Name
             </SortableHeader>
             {filterState.showInitiative && (
@@ -217,22 +244,22 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                 Initiative
               </th>
             )}
-            {filterState.showOKR && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-16">
-                OKR
+            {filterState.showKR && (
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-32">
+                KR
               </th>
             )}
             {filterState.showPlan && (
-              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32">
+              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '8px' }}>
                 Plan
               </SortableHeader>
             )}
             {activeTab === 'all' && (
-              <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32">
+              <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
                 Design Status
               </SortableHeader>
             )}
-            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32">
+            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
               Build Status
             </SortableHeader>
             <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-10">
@@ -274,18 +301,18 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                     currentPriority={project.priority}
                     maxPriority={projects.length}
                     onPriorityChange={(newPriority) => onPriorityUpdate(project.id, newPriority)}
-                    showDragHandle={filterState.sortBy.includes('priority')}
+                    showDragHandle={true}
                     onDragStart={(e) => handleDragStart(e, project.id)}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     isDragging={draggedProjectId === project.id}
                   />
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap">
+                <td className="pl-0 pr-4 py-4 whitespace-nowrap">
                   <EditableCell
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
-                    placeholder="Enter project name..."
+                    placeholder="Enter project"
                   />
                 </td>
                 {filterState.showInitiative && (
@@ -297,41 +324,19 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                     />
                   </td>
                 )}
-                {filterState.showOKR && (
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <div className="flex gap-1 flex-wrap">
-                        {project.okr.slice(0, 2).map((okr) => (
-                          <Badge
-                            key={okr.id}
-                            className="text-xs"
-                            style={{ 
-                              backgroundColor: okr.color, 
-                              color: getTextColor(okr.color)
-                            }}
-                          >
-                            {okr.text}
-                          </Badge>
-                        ))}
-                        {project.okr.length > 2 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{project.okr.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                      <OKRModal
-                        okrItems={project.okr}
-                        onOKRChange={(okrItems) => onProjectUpdate({ ...project, okr: okrItems })}
-                      >
-                        <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
-                      </OKRModal>
-                    </div>
+                {filterState.showKR && (
+                  <td className="px-2 py-4 whitespace-nowrap">
+                    <KRDropdown
+                      globalKRs={globalKRs}
+                      selectedKRIds={Array.isArray(project.selectedKRs) ? project.selectedKRs : []}
+                      onKRSelect={(krId) => handleKRSelect(project.id, krId)}
+                      onKRRemove={(krId) => handleKRRemove(project.id, krId)}
+                      onGlobalKRChange={onGlobalKRChange}
+                    />
                   </td>
                 )}
                 {filterState.showPlan && (
-                  <td className="px-2 py-4 whitespace-nowrap">
+                  <td className="pl-0 pr-2 py-4 whitespace-nowrap">
                     <PillDropdown
                       value={project.plan}
                       onChange={(value) => onProjectUpdate({ ...project, plan: value as any })}

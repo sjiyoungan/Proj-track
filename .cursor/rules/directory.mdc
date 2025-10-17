@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+CRITICAL: Always use this directory for ALL operations: C:\Users\jiyoo\Cursorprojects\Proj-track
+
+- All terminal commands must run from: C:\Users\jiyoo\Cursorprojects\Proj-track
+- All file operations must reference: C:\Users\jiyoo\Cursorprojects\Proj-track
+- Never use: G:\My Drive\Projects\Cursor\Proj-track
+- Never use: C:\Users\jiyoo\ (parent directory)
+
+Project Root Directory: C:\Users\jiyoo\Cursorprojects\Proj-track
