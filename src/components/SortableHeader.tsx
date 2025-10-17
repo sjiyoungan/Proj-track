@@ -9,6 +9,7 @@ interface SortableHeaderProps {
   currentSort: SortOption;
   onSortChange: (sortOption: SortOption) => void;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export function SortableHeader({ 
@@ -16,7 +17,8 @@ export function SortableHeader({
   sortKey, 
   currentSort, 
   onSortChange, 
-  className = "" 
+  className = "",
+  style
 }: SortableHeaderProps) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -67,6 +69,7 @@ export function SortableHeader({
   return (
     <th 
       className={`pl-2 pr-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors ${className}`}
+      style={style}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

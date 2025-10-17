@@ -24,14 +24,20 @@ interface ProjectTableProps {
   onProjectDelete: (projectId: string) => void;
   globalKRs: KRItem[];
   onGlobalKRChange: (krs: KRItem[]) => void;
+  onAddNewProject: () => void;
 }
 
-export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate, onPriorityUpdate, onSortChange, onProjectDelete, globalKRs, onGlobalKRChange }: ProjectTableProps) {
+export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate, onPriorityUpdate, onSortChange, onProjectDelete, globalKRs, onGlobalKRChange, onAddNewProject }: ProjectTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const [insertAfterId, setInsertAfterId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+
+  const handleEmptyStateInteraction = () => {
+    // Create a new project when user interacts with empty state
+    onAddNewProject();
+  };
 
   // Helper function to find the previous project ID in the sorted list
   const findPreviousProjectId = (projectId: string) => {
@@ -42,20 +48,43 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
     return sortedProjects[currentIndex - 1].id;
   };
 
-  // Filter projects based on active tab
+  // Filter projects based on active tab and filter state
   const filteredProjects = projects.filter(project => {
+    // First apply tab filter
+    let passesTabFilter = true;
     switch (activeTab) {
       case 'in-progress':
-        return project.designStatus === 'In progress' || project.buildStatus === 'In progress';
+        passesTabFilter = project.designStatus === 'In progress' || project.buildStatus === 'In progress';
+        break;
       case 'not-started':
-        return project.designStatus === 'Not started' && project.buildStatus === 'Not started';
+        passesTabFilter = project.designStatus === 'Not started' && project.buildStatus === 'Not started';
+        break;
       case 'on-hold':
-        return project.designStatus === 'On hold' || project.buildStatus === 'On hold';
+        passesTabFilter = project.designStatus === 'On hold' || project.buildStatus === 'On hold';
+        break;
       case 'done':
-        return project.designStatus === 'Done' && project.buildStatus === 'Done';
+        passesTabFilter = project.designStatus === 'Done' && project.buildStatus === 'Done';
+        break;
+      case 'future':
+        passesTabFilter = project.designStatus === 'Future';
+        break;
       default:
-        return true;
+        passesTabFilter = true;
     }
+
+    // Then apply done filter
+    let passesDoneFilter = true;
+    if (!filterState.showDone) {
+      passesDoneFilter = project.designStatus !== 'Done' && project.buildStatus !== 'Done';
+    }
+
+    // Then apply future filter
+    let passesFutureFilter = true;
+    if (!filterState.showFuture) {
+      passesFutureFilter = project.designStatus !== 'Future';
+    }
+
+    return passesTabFilter && passesDoneFilter && passesFutureFilter;
   });
 
   // Sort projects
@@ -73,10 +102,14 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
         return a.plan.localeCompare(b.plan);
       case 'plan-desc':
         return b.plan.localeCompare(a.plan);
-      case 'okr-asc':
-        return a.okr[0]?.text.localeCompare(b.okr[0]?.text || '') || 0;
-      case 'okr-desc':
-        return b.okr[0]?.text.localeCompare(a.okr[0]?.text || '') || 0;
+      case 'kr-asc':
+        const aFirstKR = globalKRs.find(kr => a.selectedKRs.includes(kr.id));
+        const bFirstKR = globalKRs.find(kr => b.selectedKRs.includes(kr.id));
+        return (aFirstKR?.text || '').localeCompare(bFirstKR?.text || '');
+      case 'kr-desc':
+        const aFirstKRDesc = globalKRs.find(kr => a.selectedKRs.includes(kr.id));
+        const bFirstKRDesc = globalKRs.find(kr => b.selectedKRs.includes(kr.id));
+        return (bFirstKRDesc?.text || '').localeCompare(aFirstKRDesc?.text || '');
       case 'buildStatus-asc':
         return a.buildStatus.localeCompare(b.buildStatus);
       case 'buildStatus-desc':
@@ -230,7 +263,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
 
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-600">
-      <table className="w-full table-auto">
+      <table className="w-full table-fixed">
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
             <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
@@ -250,16 +283,14 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               </th>
             )}
             {filterState.showPlan && (
-              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '8px' }}>
+              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '4px' }}>
                 Plan
               </SortableHeader>
             )}
-            {activeTab === 'all' && (
-              <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
-                Design Status
-              </SortableHeader>
-            )}
-            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
+            <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
+              Design Status
+            </SortableHeader>
+            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-24">
               Build Status
             </SortableHeader>
             <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-10">
@@ -267,25 +298,12 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">
-          {getDisplayProjects().length === 0 ? (
-            <tr>
-              <td 
-                colSpan={filterState.showPlan ? 8 : 7} 
-                className="px-4 py-12 text-center text-slate-500 dark:text-slate-400"
-              >
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="text-lg font-medium">No projects yet</div>
-                  <div className="text-sm">Click "Add Project" to get started</div>
-                </div>
-              </td>
-            </tr>
-          ) : (
-            getDisplayProjects().map((project, index) => (
+          {getDisplayProjects().map((project, index) => (
             <React.Fragment key={project.id}>
               {/* Drop zone above first row */}
               {index === 0 && insertAfterId === 'start' && draggedProjectId && (
                 <tr>
-                  <td colSpan={filterState.showPlan ? 7 : 6} className="h-px bg-slate-200 dark:bg-slate-700"></td>
+                  <td colSpan={filterState.showPlan ? (activeTab === 'all' ? 7 : 6) : (activeTab === 'all' ? 6 : 5)} className="h-px bg-slate-200 dark:bg-slate-700"></td>
                 </tr>
               )}
               <tr 
@@ -345,16 +363,14 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                     />
                   </td>
                 )}
-                {activeTab === 'all' && (
-                  <td className="px-2 py-4 whitespace-nowrap">
-                    <PillDropdown
-                      value={project.designStatus}
-                      onChange={(value) => onProjectUpdate({ ...project, designStatus: value as any })}
-                      type="design"
-                      variant="filled"
-                    />
-                  </td>
-                )}
+                <td className="px-2 py-4 whitespace-nowrap">
+                  <PillDropdown
+                    value={project.designStatus}
+                    onChange={(value) => onProjectUpdate({ ...project, designStatus: value as any })}
+                    type="design"
+                    variant="filled"
+                  />
+                </td>
                 <td className="px-2 py-4 whitespace-nowrap">
                   <PillDropdown
                     value={project.buildStatus}
@@ -380,7 +396,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               </tr>
               {expandedRows.has(project.id) && (
                 <tr>
-                  <td colSpan={[filterState.showPlan, filterState.showInitiative, filterState.showOKR].filter(Boolean).length + (activeTab === 'all' ? 5 : 4)} className="px-4 py-4 bg-slate-50 dark:bg-slate-800 relative">
+                  <td colSpan={[filterState.showPlan, filterState.showInitiative, filterState.showKR].filter(Boolean).length + (activeTab === 'all' ? 5 : 4)} className="px-4 py-4 bg-slate-50 dark:bg-slate-800 relative">
                     <div className="space-y-4">
                       <div>
                         <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Problem Statement</h4>
@@ -439,12 +455,11 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               {/* Drop zone after each row */}
               {insertAfterId === project.id && draggedProjectId && (
                 <tr>
-                  <td colSpan={filterState.showPlan ? 7 : 6} className="h-px bg-slate-200 dark:bg-slate-700"></td>
+                  <td colSpan={filterState.showPlan ? (activeTab === 'all' ? 7 : 6) : (activeTab === 'all' ? 6 : 5)} className="h-px bg-slate-200 dark:bg-slate-700"></td>
                 </tr>
               )}
             </React.Fragment>
-            ))
-          )}
+          ))}
         </tbody>
       </table>
       

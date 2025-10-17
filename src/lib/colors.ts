@@ -5,7 +5,7 @@ export const colors = {
     blue: 'text-blue-600',
     blueBg: 'bg-blue-600',
     blueBorder: 'border-blue-600',
-    blueOutline: 'outline-blue-600',
+    blueOutline: 'outline-slate-200 dark:outline-slate-700',
   },
   
   // Container colors

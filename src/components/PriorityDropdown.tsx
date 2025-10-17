@@ -38,21 +38,23 @@ export function PriorityDropdown({
           <GripVertical className="h-3.5 w-3.5 text-slate-500" />
         </div>
       )}
-      <Select
-        value={currentPriority.toString()}
-        onValueChange={(value) => onPriorityChange(parseInt(value))}
-      >
-        <SelectTrigger className="w-16 border-none shadow-none focus:ring-0 hover:border-slate-200 dark:hover:border-slate-700 hover:outline hover:outline-slate-200 dark:hover:outline-slate-700 bg-transparent transition-colors [&>svg]:opacity-0 group-hover:[&>svg]:opacity-50" style={{ height: '32px', borderRadius: '4px' }}>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {priorities.map((priority) => (
-            <SelectItem key={priority} value={priority.toString()}>
-              {priority}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="group/priority">
+        <Select
+          value={currentPriority.toString()}
+          onValueChange={(value) => onPriorityChange(parseInt(value))}
+        >
+          <SelectTrigger className="w-16 border-none shadow-none focus:ring-0 hover:border-slate-200 dark:hover:border-slate-700 hover:outline hover:outline-slate-200 dark:hover:outline-slate-700 bg-transparent transition-colors [&>svg]:opacity-0 group-hover/priority:[&>svg]:opacity-50" style={{ height: '32px', borderRadius: '4px' }}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {priorities.map((priority) => (
+              <SelectItem key={priority} value={priority.toString()}>
+                {priority}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }

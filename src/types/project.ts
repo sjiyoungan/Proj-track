@@ -1,7 +1,8 @@
 export interface KRItem {
   id: string;
   text: string;
-  color: string;
+  fillColor: string;
+  textColor: string;
   order: number;
 }
 
@@ -19,8 +20,8 @@ export interface Project {
   successMetric: string;
   figmaLink: string;
   prdLink: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string | Date;
+  updatedAt: string | Date;
 }
 
 export type SortOption = 
@@ -34,7 +35,9 @@ export interface FilterState {
   showInitiative: boolean;
   showKR: boolean;
   showPlan: boolean;
+  showDone: boolean;
+  showFuture: boolean;
   sortBy: SortOption;
 }
 
-export type TabFilter = 'all' | 'in-progress' | 'not-started' | 'on-hold' | 'done';
+export type TabFilter = 'all' | 'in-progress' | 'not-started' | 'on-hold' | 'done' | 'future';

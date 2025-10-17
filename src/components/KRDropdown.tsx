@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ChevronDown, Plus, X } from 'lucide-react';
 import { colors } from '@/lib/colors';
@@ -20,6 +20,8 @@ export function KRDropdown({ globalKRs, selectedKRIds, onKRSelect, onKRRemove, o
     onGlobalKRChange(newKRs);
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Get selected KRs for display
   const selectedKRs = globalKRs.filter(kr => selectedKRIds.includes(kr.id));
   
@@ -32,18 +34,18 @@ export function KRDropdown({ globalKRs, selectedKRIds, onKRSelect, onKRRemove, o
       {selectedKRs.map((kr) => (
             <div
               key={kr.id}
-              className="group/kr flex items-center text-xs text-slate-900 dark:text-slate-100 rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+              className="group/kr flex items-center text-xs rounded-full relative hover:opacity-90 transition-opacity"
               style={{ 
-                height: '32px',
-                paddingTop: '2px',
-                paddingBottom: '2px',
-                paddingLeft: '8px',
-                paddingRight: '8px',
+                height: '20px',
+                backgroundColor: kr.fillColor === 'no-fill' ? '#f3f4f6' : kr.fillColor,
+                color: kr.textColor || '#000000',
+                paddingLeft: '18px',
+                paddingRight: '20px',
                 width: 'fit-content',
                 boxSizing: 'border-box'
               }}
             >
-              <span style={{ textAlign: 'left' }}>
+              <span style={{ textAlign: 'center' }}>
                 {kr.text}
               </span>
               <button
@@ -51,8 +53,11 @@ export function KRDropdown({ globalKRs, selectedKRIds, onKRSelect, onKRRemove, o
                   e.stopPropagation();
                   onKRRemove(kr.id);
                 }}
-                className="opacity-0 group-hover/kr:opacity-100 transition-opacity ml-1 flex-shrink-0"
-                style={{ paddingTop: '2px' }}
+                className="opacity-0 group-hover/kr:opacity-100 transition-opacity absolute right-1 flex-shrink-0"
+                style={{ 
+                  paddingTop: '2px',
+                  marginRight: '2px'
+                }}
               >
                 <X className="w-3 h-3 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200" />
               </button>
@@ -61,7 +66,7 @@ export function KRDropdown({ globalKRs, selectedKRIds, onKRSelect, onKRRemove, o
       
       {/* Dropdown for adding new KRs */}
       <div className="group">
-        <Select onValueChange={onKRSelect} value="" modal={false}>
+        <Select onValueChange={onKRSelect} value="">
           <SelectTrigger 
             className="border-none shadow-none focus:ring-0 focus:outline-none focus:ring-offset-0 focus:border-transparent hover:border-transparent bg-transparent p-0 [&>svg]:opacity-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none w-[32px]"
             style={{ height: '32px' }}
@@ -83,30 +88,34 @@ export function KRDropdown({ globalKRs, selectedKRIds, onKRSelect, onKRRemove, o
             {availableKRs.map((kr) => (
               <SelectItem key={kr.id} value={kr.id} className="pl-2">
                 <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: kr.color }}
-                  />
                   <span>{kr.text}</span>
                 </div>
               </SelectItem>
             ))}
             <div className={`${availableKRs.length > 0 ? 'border-t border-slate-200 dark:border-slate-700 mt-1 pt-1' : ''}`}>
-              <KRModal
-                krItems={globalKRs}
-                onKRChange={handleKRChange}
+              <div 
+                className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded"
+                onClick={() => setIsModalOpen(true)}
               >
-                <div className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 rounded">
-                  <div className={`${colors.container.blue} flex items-center justify-center`} style={{ width: '16px', height: '12px' }}>
-                    <Plus className="w-4 h-3" />
-                  </div>
-                  <span className={colors.container.blue}>Add KR</span>
+                <div className={`${colors.container.blue} flex items-center justify-center`} style={{ width: '16px', height: '12px' }}>
+                  <Plus className="w-4 h-3" />
                 </div>
-              </KRModal>
+                <span className={colors.container.blue}>Add KR</span>
+              </div>
             </div>
           </SelectContent>
         </Select>
       </div>
+      
+      {/* KRModal outside of SelectContent */}
+      <KRModal
+        krItems={globalKRs}
+        onKRChange={onGlobalKRChange}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      >
+        <div className="hidden" />
+      </KRModal>
     </div>
   );
 }

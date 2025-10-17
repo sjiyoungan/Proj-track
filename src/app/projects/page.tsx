@@ -5,112 +5,102 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
-import { Project, FilterState, TabFilter } from '@/types/project';
-
-// Mock data for demonstration
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    priority: 1,
-    name: 'User Authentication System',
-    plan: 'Prime',
-    initiative: 'Core Platform',
-    okr: [
-      { id: 'okr1', text: 'Implement OAuth 2.0', color: '#3B82F6', order: 0 },
-      { id: 'okr2', text: 'Add 2FA support', color: '#10B981', order: 1 }
-    ],
-    designStatus: 'Done',
-    buildStatus: 'In progress',
-    problemStatement: 'Users need secure authentication to access the platform',
-    solution: 'Implement OAuth 2.0 with 2FA support using industry standards',
-    successMetric: '95% user login success rate within 3 seconds',
-    figmaLink: 'https://figma.com/design/123',
-    prdLink: 'https://docs.google.com/prd/123',
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-20')
-  },
-  {
-    id: '2',
-    priority: 2,
-    name: 'Dashboard Analytics',
-    plan: 'Free',
-    initiative: 'Analytics',
-    okr: [
-      { id: 'okr3', text: 'Real-time metrics', color: '#F59E0B', order: 0 }
-    ],
-    designStatus: 'In progress',
-    buildStatus: 'Not started',
-    problemStatement: 'Users need insights into their data usage',
-    solution: 'Build interactive dashboard with real-time analytics',
-    successMetric: '80% of users check dashboard weekly',
-    figmaLink: 'https://figma.com/design/456',
-    prdLink: 'https://docs.google.com/prd/456',
-    createdAt: new Date('2024-01-10'),
-    updatedAt: new Date('2024-01-18')
-  },
-  {
-    id: '3',
-    priority: 3,
-    name: 'Mobile App Redesign',
-    plan: 'Pre-account',
-    initiative: 'Mobile Experience',
-    okr: [
-      { id: 'okr4', text: 'iOS redesign', color: '#8B5CF6', order: 0 },
-      { id: 'okr5', text: 'Android redesign', color: '#EF4444', order: 1 }
-    ],
-    designStatus: 'Not started',
-    buildStatus: 'Not started',
-    problemStatement: 'Current mobile app has poor UX',
-    solution: 'Complete redesign with modern UI patterns',
-    successMetric: 'Increase mobile app rating to 4.5+ stars',
-    figmaLink: 'https://figma.com/design/789',
-    prdLink: 'https://docs.google.com/prd/789',
-    createdAt: new Date('2024-01-05'),
-    updatedAt: new Date('2024-01-12')
-  }
-];
+import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
+import { useMounted } from '@/hooks/useMounted';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const mounted = useMounted();
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [globalKRs, setGlobalKRs] = useState<KRItem[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
     showInitiative: true,
-    showOKR: true,
+    showKR: true,
     showPlan: true,
+    showDone: true,
+    showFuture: true,
     sortBy: 'priority-asc'
   });
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
 
+  const handleGlobalKRChange = (newKRs: KRItem[]) => {
+    setGlobalKRs(newKRs);
+  };
+
   // Auto-save functionality
   useEffect(() => {
+    if (!mounted) return;
     const autoSave = () => {
       localStorage.setItem('projects', JSON.stringify(projects));
+      localStorage.setItem('globalKRs', JSON.stringify(globalKRs));
+      localStorage.setItem('filterState', JSON.stringify(filterState));
     };
 
     const interval = setInterval(autoSave, 30000); // Auto-save every 30 seconds
     return () => clearInterval(interval);
-  }, [projects]);
+  }, [projects, globalKRs, filterState, mounted]);
 
   // Load from localStorage on mount
   useEffect(() => {
+    if (!mounted) return;
     const savedProjects = localStorage.getItem('projects');
+    const savedGlobalKRs = localStorage.getItem('globalKRs');
+    const savedFilterState = localStorage.getItem('filterState');
+    
     if (savedProjects) {
       try {
         const parsed = JSON.parse(savedProjects);
         setProjects(parsed.map((p: any) => ({
           ...p,
-          createdAt: new Date(p.createdAt),
-          updatedAt: new Date(p.updatedAt)
+          selectedKRs: Array.isArray(p.selectedKRs) ? p.selectedKRs : [],
+          designStatus: p.designStatus || 'select',
+          buildStatus: p.buildStatus || 'select',
+          createdAt: p.createdAt,
+          updatedAt: p.updatedAt
         })));
       } catch (error) {
-        console.error('Error loading saved projects:', error);
+        console.error('❌ Failed to load projects:', error);
       }
     }
-  }, []);
+
+    if (savedGlobalKRs) {
+      try {
+        const parsed = JSON.parse(savedGlobalKRs);
+        // Simple migration: ensure all KRs have required fields
+        const migratedKRs = parsed.map((kr: any, index: number) => ({
+          id: kr.id || `kr-migrated-${index}`,
+          text: kr.text || '',
+          fillColor: kr.fillColor || '#f3f4f6',
+          textColor: kr.textColor || '#000000',
+          order: kr.order || index
+        }));
+        
+        setGlobalKRs(migratedKRs);
+      } catch (error) {
+        console.error('❌ Failed to load global KRs:', error);
+        setGlobalKRs([]);
+      }
+    } else {
+      setGlobalKRs([]);
+    }
+
+          if (savedFilterState) {
+            try {
+              const parsed = JSON.parse(savedFilterState);
+              // Add backward compatibility for showFuture
+              if (parsed.showFuture === undefined) {
+                parsed.showFuture = true;
+              }
+              setFilterState(parsed);
+            } catch (error) {
+              console.error('❌ Failed to load filter state:', error);
+            }
+          }
+  }, [mounted]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
       p.id === updatedProject.id 
-        ? { ...updatedProject, updatedAt: new Date() }
+        ? { ...updatedProject, updatedAt: new Date().toISOString() }
         : p
     ));
   };
@@ -148,6 +138,28 @@ export default function ProjectsPage() {
     });
   };
 
+  const addNewProject = () => {
+    const newProject: Project = {
+      id: `project-${projects.length + 1}`,
+      priority: projects.length + 1,
+      name: '',
+      plan: 'Free',
+      initiative: '',
+      selectedKRs: [],
+      designStatus: 'select',
+      buildStatus: 'select',
+      problemStatement: '',
+      solution: '',
+      successMetric: '',
+      figmaLink: '',
+      prdLink: '',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    setProjects(prev => [...prev, newProject]);
+  };
+
   const handleProjectDelete = (projectId: string) => {
     setProjects(prev => {
       const updated = prev.filter(p => p.id !== projectId);
@@ -158,6 +170,31 @@ export default function ProjectsPage() {
       }));
     });
   };
+
+  const handleGlobalKRChange = (newKRs: KRItem[]) => {
+    setGlobalKRs(newKRs);
+  };
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+              Projects
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              Manage and track your project progress
+            </p>
+          </div>
+          <div className="animate-pulse">
+            <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded mb-4"></div>
+            <div className="h-96 bg-slate-200 dark:bg-slate-700 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -178,6 +215,7 @@ export default function ProjectsPage() {
             <TabSystem 
               activeTab={activeTab} 
               onTabChange={setActiveTab}
+              projects={projects}
             />
           </CardContent>
         </Card>
@@ -198,12 +236,15 @@ export default function ProjectsPage() {
           <CardContent className="p-0">
             <ProjectTable
               projects={projects}
+              globalKRs={globalKRs}
+              onGlobalKRChange={handleGlobalKRChange}
               filterState={filterState}
               activeTab={activeTab}
               onProjectUpdate={handleProjectUpdate}
               onPriorityUpdate={handlePriorityUpdate}
               onSortChange={setFilterState}
               onProjectDelete={handleProjectDelete}
+              onAddNewProject={addNewProject}
             />
           </CardContent>
         </Card>

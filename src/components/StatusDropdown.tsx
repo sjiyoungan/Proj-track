@@ -18,6 +18,7 @@ const planOptions = [
 ];
 
 const statusOptions = [
+  { value: '', label: 'Select' },
   { value: 'Not started', label: 'Not started' },
   { value: 'In progress', label: 'In progress' },
   { value: 'On hold', label: 'On hold' },
@@ -28,6 +29,11 @@ const statusOptions = [
 
 // Color mapping for each status
 const getStatusColor = (value: string, type: 'design' | 'build' | 'plan') => {
+  // Handle empty/select state with transparent background and InputField empty state text color
+  if (!value || value === '') {
+    return 'bg-transparent text-slate-400 dark:text-slate-500';
+  }
+  
   if (type === 'plan') {
     switch (value) {
       case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
@@ -64,19 +70,19 @@ export function StatusDropdown({ value, onChange, type, usePillStyle = true }: S
 
   return (
     <div className="group">
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value || undefined} onValueChange={onChange}>
         <SelectTrigger 
           className={`w-[${estimatedWidth}px] h-5 border-none shadow-none focus:ring-0 focus:outline-none focus:ring-offset-0 focus:border-transparent hover:border-transparent bg-transparent p-0 [&>svg]:opacity-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none`}
           style={{ width: `${estimatedWidth}px` }}
         >
           {usePillStyle ? (
             <div className={`flex items-center justify-center w-full h-full px-2 rounded-full ${getStatusColor(value, type)} relative hover:opacity-90 transition-opacity`}>
-              <span className="text-xs">{value}</span>
+              <span className="text-xs">{(!value || value === '') ? 'Select' : value}</span>
               <ChevronDown className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2" />
             </div>
           ) : (
             <div className="flex items-center justify-start w-full h-full px-2 relative">
-              <span className="text-xs text-slate-900 dark:text-slate-100">{value}</span>
+              <span className="text-xs text-slate-900 dark:text-slate-100">{(!value || value === '') ? 'Select' : value}</span>
               <ChevronDown className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2" />
             </div>
           )}

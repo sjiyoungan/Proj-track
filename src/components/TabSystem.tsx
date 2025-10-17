@@ -2,20 +2,42 @@
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { TabFilter } from '@/types/project';
+import { TabFilter, Project } from '@/types/project';
 
 interface TabSystemProps {
   activeTab: TabFilter;
   onTabChange: (tab: TabFilter) => void;
+  projects: Project[];
 }
 
-export function TabSystem({ activeTab, onTabChange }: TabSystemProps) {
+export function TabSystem({ activeTab, onTabChange, projects }: TabSystemProps) {
+  // Calculate counts based on design status
+  const getTabCount = (tabId: TabFilter): number => {
+    switch (tabId) {
+      case 'all':
+        return projects.length;
+      case 'in-progress':
+        return projects.filter(p => p.designStatus === 'In progress' || p.buildStatus === 'In progress').length;
+      case 'not-started':
+        return projects.filter(p => p.designStatus === 'Not started' && p.buildStatus === 'Not started').length;
+      case 'on-hold':
+        return projects.filter(p => p.designStatus === 'On hold' || p.buildStatus === 'On hold').length;
+      case 'done':
+        return projects.filter(p => p.designStatus === 'Done' && p.buildStatus === 'Done').length;
+      case 'future':
+        return projects.filter(p => p.designStatus === 'Future').length;
+      default:
+        return 0;
+    }
+  };
+
   const tabs = [
-    { id: 'all' as TabFilter, label: 'All', count: 12 },
-    { id: 'in-progress' as TabFilter, label: 'In Progress', count: 5 },
-    { id: 'not-started' as TabFilter, label: 'Not Started', count: 4 },
-    { id: 'on-hold' as TabFilter, label: 'On Hold', count: 2 },
-    { id: 'done' as TabFilter, label: 'Done', count: 1 },
+    { id: 'all' as TabFilter, label: 'All', count: getTabCount('all') },
+    { id: 'in-progress' as TabFilter, label: 'In Progress', count: getTabCount('in-progress') },
+    { id: 'not-started' as TabFilter, label: 'Not Started', count: getTabCount('not-started') },
+    { id: 'on-hold' as TabFilter, label: 'On Hold', count: getTabCount('on-hold') },
+    { id: 'done' as TabFilter, label: 'Done', count: getTabCount('done') },
+    { id: 'future' as TabFilter, label: 'Future', count: getTabCount('future') },
   ];
 
   return (
@@ -30,7 +52,7 @@ export function TabSystem({ activeTab, onTabChange }: TabSystemProps) {
             {tab.label}
             <Badge 
               variant={activeTab === tab.id ? "default" : "secondary"}
-              className="text-[9px] px-1 py-0.5 h-3.5 min-w-3.5 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+              className="text-[9px] px-1 py-0.5 h-3.5 min-w-3.5 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-slate-100"
             >
               {tab.count}
             </Badge>

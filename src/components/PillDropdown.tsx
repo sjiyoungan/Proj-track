@@ -28,6 +28,11 @@ const statusOptions = [
 
 // Color mapping for each status
 const getStatusColor = (value: string, type: 'design' | 'build' | 'plan') => {
+  // Empty state for design/build only
+  if ((type === 'design' || type === 'build') && (!value || value === '' || value === 'select')) {
+    return 'bg-transparent text-slate-400 dark:text-slate-500 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:text-slate-600 dark:hover:text-slate-300';
+  }
+  
   if (type === 'plan') {
     switch (value) {
       case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
@@ -57,13 +62,13 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
 
   return (
     <div className="group">
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value || undefined} onValueChange={onChange}>
         <SelectTrigger 
           className={`${variant === 'text-only' ? 'h-8' : 'h-5'} border-none shadow-none focus:ring-0 focus:outline-none focus:ring-offset-0 focus:border-transparent hover:border-transparent bg-transparent p-0 [&>svg]:opacity-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none`}
           style={{ width: `${fixedWidth}px` }}
         >
           {variant === 'filled' ? (
-            <div className={`flex items-center justify-center w-full h-full rounded-full ${getStatusColor(value, type)} relative hover:opacity-90 transition-opacity group/pill`}>
+            <div className={`flex items-center justify-center w-full h-full rounded-full ${getStatusColor(value, type)} relative ${(!value || value === '' || value === 'select') ? '' : 'hover:opacity-90'} transition-opacity group/pill`}>
               <span className="text-xs text-center group-hover/pill:truncate" style={{ 
                 transform: 'translateX(0)',
                 transition: 'transform 0.2s ease',
@@ -71,9 +76,9 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
                 paddingLeft: '18px',
                 paddingRight: '20px'
               }}>
-                {value}
+                {(!value || value === '' || value === 'select') ? 'Select' : value}
               </span>
-              <ChevronDown className="h-3 w-3 opacity-0 group-hover/pill:opacity-100 transition-opacity absolute right-1 flex-shrink-0" style={{ 
+              <ChevronDown className={`h-3 w-3 transition-opacity absolute right-1 flex-shrink-0 ${(!value || value === '' || value === 'select') ? 'opacity-100 text-slate-400 dark:text-slate-500 group-hover/pill:text-slate-600 dark:group-hover/pill:text-slate-300' : 'opacity-0 group-hover/pill:opacity-100'}`} style={{ 
                 marginRight: '2px',
                 paddingTop: '2px',
                 transform: 'translateY(0)'
