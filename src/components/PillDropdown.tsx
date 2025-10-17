@@ -116,7 +116,7 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
               <SelectItem 
                 key={option.value} 
                 value={option.value}
-                className={`${option.value === value ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'} cursor-pointer`}
+                className={`${option.value === value ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800'} cursor-pointer [&>span]:hidden`}
               >
                 {option.label}
               </SelectItem>
