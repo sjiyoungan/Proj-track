@@ -356,8 +356,8 @@ export default function Home() {
                 onAddNewProject={addNewProject}
               />
 
-              {/* Hover row - appears inside the table when hovering below */}
-              {showHoverRow && (
+              {/* Hover row - appears inside the table when hovering below (only on "all" tab) */}
+              {showHoverRow && activeTab === 'all' && (
                 <div 
                   className="border-t border-slate-200 dark:border-slate-700"
                   onMouseEnter={() => setShowHoverRow(true)}
@@ -382,7 +382,7 @@ export default function Home() {
                           <EditableCell
                             value=""
                             onChange={() => {}}
-                            placeholder="Enter project"
+                            placeholder="Enter name to add project"
                           />
                         </td>
                         {filterState.showInitiative && (
@@ -417,12 +417,6 @@ export default function Home() {
           />
         </div>
 
-        {/* Add Project Button */}
-        <div className="mt-6 flex justify-center">
-          <Button onClick={addNewProject} className="px-8 py-3">
-            Add Project
-          </Button>
-        </div>
 
         {/* Debug: Clear All Data Button (temporary) */}
         <div className="mt-4 flex justify-center gap-2">

@@ -293,7 +293,22 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
           </tr>
         </thead>
         <tbody className="bg-white dark:bg-slate-900 divide-y divide-slate-200 dark:divide-slate-700">
-          {getDisplayProjects().map((project, index) => (
+          {getDisplayProjects().length === 0 ? (
+            <tr>
+              <td 
+                colSpan={8} 
+                className="px-4 py-12 text-center text-slate-500 dark:text-slate-400"
+              >
+                {activeTab === 'future' 
+                  ? 'No projects planned for the future yet'
+                  : activeTab === 'not-started'
+                  ? 'No projects labeled as not started'
+                  : `No projects ${activeTab !== 'all' ? activeTab.replace('-', ' ') : ''} yet`
+                }
+              </td>
+            </tr>
+          ) : (
+            getDisplayProjects().map((project, index) => (
             <React.Fragment key={project.id}>
               {/* Drop zone above first row */}
               {index === 0 && insertAfterId === 'start' && draggedProjectId && (
@@ -454,7 +469,8 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                 </tr>
               )}
             </React.Fragment>
-          ))}
+          ))
+          )}
         </tbody>
       </table>
       
