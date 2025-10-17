@@ -8,12 +8,15 @@ import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
 import { EditableHeader } from '@/components/EditableHeader';
 import { EditableCell } from '@/components/EditableCell';
+import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
+import { useAuth } from '@/contexts/AuthContext';
 import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
 
 export default function Home() {
   const mounted = useMounted();
+  const { user, loading: authLoading } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [globalKRs, setGlobalKRs] = useState<KRItem[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
@@ -401,6 +404,139 @@ export default function Home() {
         </div>
 
 
+      </div>
+    </div>
+  );
+}
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthForm />;
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <Card className="overflow-hidden rounded-lg border border-slate-100 dark:border-slate-600">
+          <CardContent className="p-0">
+            <EditableHeader 
+              title={headerTitle}
+              onTitleChange={setHeaderTitle}
+            />
+            
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-600">
+              <TabSystem 
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                projects={projects}
+              />
+            </div>
+            
+            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-600">
+              <FilterBar 
+                filterState={filterState}
+                onFilterChange={setFilterState}
+                activeTab={activeTab}
+              />
+            </div>
+
+            <ProjectTable
+              projects={projects}
+              globalKRs={globalKRs}
+              filterState={filterState}
+              activeTab={activeTab}
+              onProjectUpdate={handleProjectUpdate}
+              onProjectDelete={handleProjectDelete}
+              onProjectReorder={handleProjectReorder}
+              onGlobalKRChange={handleGlobalKRChange}
+              onAddNewProject={addNewProject}
+              showHoverRow={showHoverRow}
+              hoverRowLocked={hoverRowLocked}
+              onHoverRowLocked={setHoverRowLocked}
+            />
+
+            {/* Empty state messages */}
+            {getDisplayProjects().length === 0 && (
+              <div className="px-6 py-8 text-center">
+                <div className="text-slate-500 dark:text-slate-400">
+                  {activeTab === 'future' && 'No projects planned for the future yet'}
+                  {activeTab === 'not-started' && 'No projects labeled as not started'}
+                  {activeTab === 'in-progress' && 'No projects in progress yet'}
+                  {activeTab === 'on-hold' && 'No projects on hold yet'}
+                  {activeTab === 'done' && 'No completed projects yet'}
+                  {activeTab === 'all' && 'No projects yet'}
+                </div>
+              </div>
+            )}
+
+            {/* Hover row for adding new projects - only show in 'all' tab */}
+            {activeTab === 'all' && showHoverRow && (
+              <div className="px-6 py-2">
+                <table className="w-full">
+                  <tbody>
+                    <tr 
+                      className="border-b border-slate-100 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      onMouseEnter={() => setShowHoverRow(true)}
+                      onMouseLeave={() => {
+                        if (!hoverRowLocked) {
+                          setShowHoverRow(false);
+                        }
+                      }}
+                      onMouseDown={() => addNewProject()}
+                    >
+                      <td className="pl-6 py-4 whitespace-nowrap w-20">
+                        <div className="flex items-center">
+                          <div className="w-4 h-4"></div>
+                          <div 
+                            className="text-slate-400 dark:text-slate-500 font-bold"
+                            style={{ marginLeft: '30px', paddingLeft: '8px' }}
+                          >
+                            {projects.length + 1}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-2 py-4 whitespace-nowrap">
+                        <EditableCell
+                          value=""
+                          placeholder="Enter name to add project"
+                          onChange={() => {}}
+                          onBlur={() => {}}
+                          onKeyDown={() => {}}
+                          textSize="sm"
+                          width="fill"
+                        />
+                      </td>
+                      <td className="px-2 py-4 whitespace-nowrap w-32"></td>
+                      <td className="px-2 py-4 whitespace-nowrap w-28"></td>
+                      <td className="px-2 py-4 whitespace-nowrap w-24"></td>
+                      <td className="pr-6 py-4 whitespace-nowrap w-10"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Hover zone to trigger the new row - only row height */}
+            {activeTab === 'all' && (
+              <div 
+                className="h-16 w-full"
+                onMouseEnter={() => setShowHoverRow(true)}
+                onMouseLeave={() => {
+                  if (!hoverRowLocked) {
+                    setShowHoverRow(false);
+                  }
+                }}
+              />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
