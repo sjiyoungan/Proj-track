@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
-import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
+import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
 
@@ -258,7 +258,7 @@ export default function ProjectsPage() {
               activeTab={activeTab}
               onProjectUpdate={handleProjectUpdate}
               onPriorityUpdate={handlePriorityUpdate}
-              onSortChange={setFilterState}
+              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
               onProjectDelete={handleProjectDelete}
               onAddNewProject={addNewProject}
             />
