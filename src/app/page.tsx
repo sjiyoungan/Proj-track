@@ -8,10 +8,6 @@ import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
 import { EditableHeader } from '@/components/EditableHeader';
 import { EditableCell } from '@/components/EditableCell';
-import { PriorityDropdown } from '@/components/PriorityDropdown';
-import { PillDropdown } from '@/components/PillDropdown';
-import { KRDropdown } from '@/components/KRDropdown';
-import { ChevronDown } from 'lucide-react';
 import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 
@@ -368,23 +364,16 @@ export default function Home() {
                     <tbody className="bg-white dark:bg-slate-900">
                       <tr 
                         className="bg-slate-50/50 dark:bg-slate-800/50 opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
-                        onMouseDown={(e) => {
-                          // Trigger on mousedown for immediate response
-                          console.log('Row mousedown', e.target);
-                          addNewProject();
-                        }}
+                        onClick={addNewProject}
                       >
-                        <td className="px-2 py-4 whitespace-nowrap w-20" onMouseDown={(e) => e.stopPropagation()}>
-                          <PriorityDropdown
-                            currentPriority={projects.length + 1}
-                            maxPriority={projects.length + 1}
-                            onPriorityChange={() => {}}
-                            showDragHandle={true}
-                            onDragStart={() => {}}
-                            onDragOver={() => {}}
-                            onDrop={() => {}}
-                            isDragging={false}
-                          />
+                        <td className="px-2 py-4 whitespace-nowrap w-20">
+                          <div className="flex items-center justify-center">
+                            {/* Keep spacing but show just the number in light blue */}
+                            <div style={{ width: '24px' }}></div>
+                            <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                              {projects.length + 1}
+                            </span>
+                          </div>
                         </td>
                         <td className="pl-0 pr-4 py-4 whitespace-nowrap w-48">
                           <EditableCell
@@ -394,74 +383,17 @@ export default function Home() {
                           />
                         </td>
                         {filterState.showInitiative && (
-                          <td className="px-4 py-4 whitespace-nowrap w-48">
-                            <EditableCell
-                              value=""
-                              onChange={() => {}}
-                              placeholder="Enter initiative..."
-                            />
-                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap w-48"></td>
                         )}
                         {filterState.showKR && (
-                          <td className="px-2 py-4 whitespace-nowrap w-32" onMouseDown={(e) => e.stopPropagation()}>
-                            <KRDropdown
-                              globalKRs={globalKRs}
-                              selectedKRIds={[]}
-                              onKRSelect={() => {}}
-                              onKRRemove={() => {}}
-                              onGlobalKRChange={handleGlobalKRChange}
-                            />
-                          </td>
+                          <td className="px-2 py-4 whitespace-nowrap w-32"></td>
                         )}
                         {filterState.showPlan && (
-                          <td className="pl-0 pr-2 py-4 whitespace-nowrap w-32" onMouseDown={(e) => e.stopPropagation()}>
-                            <PillDropdown
-                              value="select"
-                              onChange={() => {}}
-                              type="plan"
-                              variant="text-only"
-                            />
-                          </td>
+                          <td className="pl-0 pr-2 py-4 whitespace-nowrap w-32"></td>
                         )}
-                        <td 
-                          className="px-2 py-4 whitespace-nowrap w-28"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            setHoverRowLocked(true);
-                            setTimeout(() => setHoverRowLocked(false), 1000);
-                          }}
-                        >
-                          <PillDropdown
-                            value="select"
-                            onChange={() => {}}
-                            type="design"
-                            variant="filled"
-                          />
-                        </td>
-                        <td 
-                          className="px-2 py-4 whitespace-nowrap w-24"
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                            setHoverRowLocked(true);
-                            setTimeout(() => setHoverRowLocked(false), 1000);
-                          }}
-                        >
-                          <PillDropdown
-                            value="select"
-                            onChange={() => {}}
-                            type="build"
-                            variant="filled"
-                          />
-                        </td>
-                        <td className="pr-0 py-4 whitespace-nowrap w-10">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-slate-500 dark:text-slate-400 opacity-0"
-                          >
-                            <ChevronDown className="h-4 w-4" />
-                          </Button>
-                        </td>
+                        <td className="px-2 py-4 whitespace-nowrap w-28"></td>
+                        <td className="px-2 py-4 whitespace-nowrap w-24"></td>
+                        <td className="pr-0 py-4 whitespace-nowrap w-10"></td>
                       </tr>
                     </tbody>
                   </table>
