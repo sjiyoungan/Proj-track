@@ -177,41 +177,6 @@ export default function ProjectsPage() {
       setProjects([emptyProject]);
     }
 
-    if (savedGlobalKRs) {
-      try {
-        const parsed = JSON.parse(savedGlobalKRs);
-        // Simple migration: ensure all KRs have required fields
-        const migratedKRs = parsed.map((kr: any, index: number) => ({
-          id: kr.id || `kr-migrated-${index}`,
-          text: kr.text || '',
-          fillColor: kr.fillColor || '#f3f4f6',
-          textColor: kr.textColor || '#000000',
-          order: kr.order || index
-        }));
-        
-        setGlobalKRs(migratedKRs);
-      } catch (error) {
-        console.error('❌ Failed to load global KRs:', error);
-        setGlobalKRs([]);
-      }
-    } else {
-      setGlobalKRs([]);
-    }
-
-          if (savedFilterState) {
-            try {
-              const parsed = JSON.parse(savedFilterState);
-              // Add backward compatibility for showFuture
-              if (parsed.showFuture === undefined) {
-                parsed.showFuture = true;
-              }
-              setFilterState(parsed);
-            } catch (error) {
-              console.error('❌ Failed to load filter state:', error);
-            }
-          }
-  }, [mounted]);
-
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
       p.id === updatedProject.id 
