@@ -365,9 +365,9 @@ export function LinkManager({
               <Button
                 onClick={saveCustomLink}
                 size="sm"
-                disabled={!customLabel || !customUrl || (editingCustomLink && customLabel === originalLabel && customUrl === originalUrl)}
+                disabled={!customLabel || !customUrl || (editingCustomLink !== null && customLabel === originalLabel && customUrl === originalUrl)}
                 className={`min-w-[73px] ${
-                  !customLabel || !customUrl || (editingCustomLink && customLabel === originalLabel && customUrl === originalUrl)
+                  !customLabel || !customUrl || (editingCustomLink !== null && customLabel === originalLabel && customUrl === originalUrl)
                     ? 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 cursor-not-allowed'
                     : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 border border-slate-400 dark:border-slate-500 text-slate-700 dark:text-slate-200'
                 }`}
