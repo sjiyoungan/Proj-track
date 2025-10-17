@@ -35,7 +35,7 @@ export async function loadProjects(): Promise<Project[]> {
   
   if (error) throw error;
   
-  return data.map(row => ({
+  return data.map((row: any) => ({
     id: row.id,
     priority: row.priority,
     name: row.name,
@@ -78,7 +78,7 @@ export async function loadGlobalKRs(): Promise<KRItem[]> {
   
   if (error) throw error;
   
-  return data.map(row => ({
+  return data.map((row: any) => ({
     id: row.id,
     text: row.text,
     fillColor: row.fill_color,
