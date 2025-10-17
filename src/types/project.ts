@@ -6,6 +6,12 @@ export interface KRItem {
   order: number;
 }
 
+export interface CustomLink {
+  id: string;
+  label: string;
+  url: string;
+}
+
 export interface Project {
   id: string;
   priority: number;
@@ -20,6 +26,7 @@ export interface Project {
   successMetric: string;
   figmaLink: string;
   prdLink: string;
+  customLinks: CustomLink[];
   createdAt: string | Date;
   updatedAt: string | Date;
 }

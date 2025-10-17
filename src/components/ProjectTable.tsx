@@ -8,6 +8,8 @@ import { ChevronDown, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
 import { colors } from '@/lib/colors';
 import { EditableCell } from '@/components/EditableCell';
 import { HyperlinkCell } from '@/components/HyperlinkCell';
+import { InputField } from '@/components/InputField';
+import { LinkManager } from '@/components/LinkManager';
 import { PriorityDropdown } from '@/components/PriorityDropdown';
 import { PillDropdown } from '@/components/PillDropdown';
 import { KRDropdown } from '@/components/KRDropdown';
@@ -393,7 +395,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-slate-500 dark:text-slate-400"
+                    className="text-slate-400 dark:text-slate-500"
                     onClick={() => toggleRow(project.id)}
                   >
                     {expandedRows.has(project.id) ? (
@@ -407,47 +409,52 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
               {expandedRows.has(project.id) && (
                 <tr>
                   <td colSpan={[filterState.showPlan, filterState.showInitiative, filterState.showKR].filter(Boolean).length + (activeTab === 'all' ? 5 : 4)} className="px-4 py-4 bg-slate-50 dark:bg-slate-800 relative">
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Problem Statement</h4>
-                        <HyperlinkCell
-                          value={project.problemStatement}
-                          onChange={(value) => onProjectUpdate({ ...project, problemStatement: value })}
-                          placeholder="Describe the problem..."
-                          multiline={true}
-                        />
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-4">
+                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
+                          Problem
+                        </label>
+                        <div className="flex-1">
+                          <InputField
+                            value={project.problemStatement}
+                            onChange={(value) => onProjectUpdate({ ...project, problemStatement: value })}
+                            placeholder="Describe the problem..."
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Solution</h4>
-                        <HyperlinkCell
-                          value={project.solution}
-                          onChange={(value) => onProjectUpdate({ ...project, solution: value })}
-                          placeholder="Describe the solution..."
-                          multiline={true}
-                        />
+                      <div className="flex items-center gap-4">
+                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
+                          Solution
+                        </label>
+                        <div className="flex-1">
+                          <InputField
+                            value={project.solution}
+                            onChange={(value) => onProjectUpdate({ ...project, solution: value })}
+                            placeholder="Describe the solution..."
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">Success Metric</h4>
-                        <HyperlinkCell
-                          value={project.successMetric}
-                          onChange={(value) => onProjectUpdate({ ...project, successMetric: value })}
-                          placeholder="Define success metrics..."
-                          multiline={true}
-                        />
+                      <div className="flex items-center gap-4">
+                        <label className="font-semibold text-slate-900 dark:text-slate-100 uppercase whitespace-nowrap" style={{ fontSize: '11px', width: '110px' }}>
+                          Success Metric
+                        </label>
+                        <div className="flex-1">
+                          <InputField
+                            value={project.successMetric}
+                            onChange={(value) => onProjectUpdate({ ...project, successMetric: value })}
+                            placeholder="Define success metrics..."
+                          />
+                        </div>
                       </div>
-                      <div className="flex gap-4">
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={project.figmaLink} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Figma
-                          </a>
-                        </Button>
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={project.prdLink} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            PRD
-                          </a>
-                        </Button>
+                      <div className="mt-4">
+                        <LinkManager
+                          figmaLink={project.figmaLink}
+                          prdLink={project.prdLink}
+                          customLinks={project.customLinks || []}
+                          onFigmaChange={(value) => onProjectUpdate({ ...project, figmaLink: value })}
+                          onPRDChange={(value) => onProjectUpdate({ ...project, prdLink: value })}
+                          onCustomLinksChange={(links) => onProjectUpdate({ ...project, customLinks: links })}
+                        />
                       </div>
                     </div>
                     {/* Delete button in bottom right corner */}
