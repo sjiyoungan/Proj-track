@@ -615,10 +615,6 @@ export default function Home() {
                           value=""
                           placeholder="Enter name to add project"
                           onChange={() => {}}
-                          onBlur={() => {}}
-                          onKeyDown={() => {}}
-                          textSize="sm"
-                          width="fill"
                         />
                       </td>
                       <td className="px-2 py-4 whitespace-nowrap w-32"></td>
