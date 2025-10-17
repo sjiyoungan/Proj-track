@@ -405,16 +405,19 @@ export default function Home() {
             >
             <ProjectTable
               projects={projects}
+              globalKRs={globalKRs}
               filterState={filterState}
               activeTab={activeTab}
               onProjectUpdate={handleProjectUpdate}
-              onPriorityUpdate={handlePriorityUpdate}
-              onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
               onProjectDelete={handleProjectDelete}
-                globalKRs={globalKRs}
-                onGlobalKRChange={handleGlobalKRChange}
-                onAddNewProject={addNewProject}
-              />
+              onProjectReorder={handleProjectReorder}
+              onGlobalKRChange={handleGlobalKRChange}
+              onAddNewProject={addNewProject}
+              showHoverRow={showHoverRow}
+              hoverRowLocked={hoverRowLocked}
+              onHoverRowLocked={setHoverRowLocked}
+              onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
+            />
 
               {/* Hover row - appears inside the table when hovering below (only on "all" tab) */}
               {showHoverRow && activeTab === 'all' && (
@@ -533,6 +536,7 @@ export default function Home() {
               showHoverRow={showHoverRow}
               hoverRowLocked={hoverRowLocked}
               onHoverRowLocked={setHoverRowLocked}
+              onSortChange={(sortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
             />
 
             {/* Empty state messages */}

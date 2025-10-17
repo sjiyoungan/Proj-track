@@ -18,18 +18,35 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 interface ProjectTableProps {
   projects: Project[];
+  globalKRs: KRItem[];
   filterState: FilterState;
   activeTab: TabFilter;
   onProjectUpdate: (project: Project) => void;
-  onPriorityUpdate: (projectId: string, newPriority: number) => void;
-  onSortChange: (sortOption: any) => void;
   onProjectDelete: (projectId: string) => void;
-  globalKRs: KRItem[];
+  onProjectReorder: (projectId: string, newPriority: number) => void;
   onGlobalKRChange: (krs: KRItem[]) => void;
   onAddNewProject: () => void;
+  showHoverRow: boolean;
+  hoverRowLocked: boolean;
+  onHoverRowLocked: (locked: boolean) => void;
+  onSortChange?: (sortOption: string) => void;
 }
 
-export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate, onPriorityUpdate, onSortChange, onProjectDelete, globalKRs, onGlobalKRChange, onAddNewProject }: ProjectTableProps) {
+export function ProjectTable({ 
+  projects, 
+  globalKRs,
+  filterState, 
+  activeTab, 
+  onProjectUpdate, 
+  onProjectDelete, 
+  onProjectReorder, 
+  onGlobalKRChange, 
+  onAddNewProject,
+  showHoverRow,
+  hoverRowLocked,
+  onHoverRowLocked,
+  onSortChange
+}: ProjectTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const [insertAfterId, setInsertAfterId] = useState<string | null>(null);
@@ -202,7 +219,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
     filteredProjects.forEach((project, index) => {
       const newPriority = index + 1;
       if (project.priority !== newPriority) {
-        onPriorityUpdate(project.id, newPriority);
+        onProjectReorder(project.id, newPriority);
       }
     });
     
@@ -330,7 +347,7 @@ export function ProjectTable({ projects, filterState, activeTab, onProjectUpdate
                   <PriorityDropdown
                     currentPriority={project.priority}
                     maxPriority={projects.length}
-                    onPriorityChange={(newPriority) => onPriorityUpdate(project.id, newPriority)}
+                    onPriorityChange={(newPriority) => onProjectReorder(project.id, newPriority)}
                     showDragHandle={true}
                     onDragStart={(e) => handleDragStart(e, project.id)}
                     onDragOver={handleDragOver}
