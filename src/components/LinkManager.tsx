@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ExternalLink, Plus, Edit, Edit2, Edit3, Pencil, Trash2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InputField } from '@/components/InputField';
 
 interface CustomLink {
   id: string;
@@ -54,15 +55,22 @@ export function LinkManager({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const [originalLabel, setOriginalLabel] = useState('');
+  const [originalUrl, setOriginalUrl] = useState('');
+
   const openCustomModal = (link?: CustomLink) => {
     if (link) {
       setEditingCustomLink(link);
       setCustomLabel(link.label);
       setCustomUrl(link.url);
+      setOriginalLabel(link.label);
+      setOriginalUrl(link.url);
     } else {
       setEditingCustomLink(null);
       setCustomLabel('');
       setCustomUrl('');
+      setOriginalLabel('');
+      setOriginalUrl('');
     }
     setCustomModalOpen(true);
   };
@@ -95,15 +103,17 @@ export function LinkManager({
     setEditingCustomLink(null);
   };
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   const confirmDelete = (linkId: string) => {
     setLinkToDelete(linkId);
-    setDeleteConfirmOpen(true);
+    setShowDeleteConfirm(true);
   };
 
   const deleteCustomLink = () => {
     if (linkToDelete) {
       onCustomLinksChange(customLinks.filter(link => link.id !== linkToDelete));
-      setDeleteConfirmOpen(false);
+      setShowDeleteConfirm(false);
       setLinkToDelete(null);
       setCustomModalOpen(false);
     }
@@ -241,27 +251,19 @@ export function LinkManager({
           dropdownRef={prdRef}
         />
 
-        <button
-          onClick={() => openCustomModal()}
-          className="flex items-center justify-center px-2 py-1.5 border border-transparent rounded-md text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
-          style={{ height: '34px' }}
-        >
-          <Plus className="h-4 w-4" />
-        </button>
-      </div>
-
-      {customLinks.map((link) => (
+        {customLinks.map((link) => (
         <div key={link.id} className="flex items-center gap-2 pl-3 pr-1.5 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md" style={{ height: '34px' }}>
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap" title={link.label}>
-            {link.label}
-          </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0">
             <a
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-2 py-1 px-2 -ml-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              style={{ height: '22px' }}
             >
+              <span className="font-medium text-slate-700 dark:text-slate-300" style={{ fontSize: '12px' }}>
+                {link.label}
+              </span>
               <ExternalLink className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
             </a>
             <button
@@ -272,57 +274,79 @@ export function LinkManager({
             </button>
           </div>
         </div>
-      ))}
+        ))}
+
+        <button
+          onClick={() => openCustomModal()}
+          className="flex items-center justify-center px-2 py-1.5 border border-transparent rounded-md text-slate-400 dark:text-slate-500 hover:border-slate-200 dark:hover:border-slate-700 transition-colors"
+          style={{ height: '34px' }}
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      </div>
 
       {/* Custom Link Modal */}
       {customModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-              {editingCustomLink ? 'Edit Link' : 'Add Link'}
-            </h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                  Label
-                </label>
-                <input
-                  type="text"
+          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md pt-6 px-6 pb-0">
+            {showDeleteConfirm ? (
+              <>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                  Delete Link
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 pb-1">
+                  Are you sure you want to delete this link? This action cannot be undone.
+                </p>
+                <div className="flex justify-end gap-2 pb-6">
+                  <Button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    variant="outline"
+                    size="sm"
+                    className="border-slate-400 dark:border-slate-500 text-slate-700 dark:text-slate-200 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={deleteCustomLink}
+                    size="sm"
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+            <div className="space-y-3">
+              <div className="border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
+                <InputField
                   value={customLabel}
-                  onChange={(e) => setCustomLabel(e.target.value)}
-                  placeholder="e.g., Design Specs"
-                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={setCustomLabel}
+                  placeholder="Label"
+                  width="fill"
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                  Link
-                </label>
-                <input
-                  type="text"
+              <div className="border border-slate-200 dark:border-slate-700 rounded-md overflow-hidden">
+                <InputField
                   value={customUrl}
-                  onChange={(e) => setCustomUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  onChange={setCustomUrl}
+                  placeholder="Link"
+                  width="fill"
                 />
               </div>
-
-              {editingCustomLink && (
-                <Button
-                  onClick={() => confirmDelete(editingCustomLink.id)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-900/20"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Link
-                </Button>
-              )}
             </div>
 
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="flex justify-between items-center gap-2 mt-6 pb-6">
+              {editingCustomLink && (
+                <button
+                  onClick={() => confirmDelete(editingCustomLink.id)}
+                  className="p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors flex items-center"
+                >
+                  <Trash2 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+                </button>
+              )}
+              <div className={`flex ${editingCustomLink ? 'ml-auto' : 'w-full justify-end'} gap-2`}>
               <Button
                 onClick={() => {
                   setCustomModalOpen(false);
@@ -332,50 +356,26 @@ export function LinkManager({
                 }}
                 variant="outline"
                 size="sm"
+                className="border-slate-400 dark:border-slate-500 text-slate-700 dark:text-slate-200 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 Cancel
               </Button>
               <Button
                 onClick={saveCustomLink}
                 size="sm"
-                disabled={!customLabel || !customUrl}
+                disabled={!customLabel || !customUrl || (editingCustomLink && customLabel === originalLabel && customUrl === originalUrl)}
+                className={`min-w-[73px] ${
+                  !customLabel || !customUrl || (editingCustomLink && customLabel === originalLabel && customUrl === originalUrl)
+                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 cursor-not-allowed'
+                    : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 border border-slate-400 dark:border-slate-500 text-slate-700 dark:text-slate-200'
+                }`}
               >
                 Save
               </Button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteConfirmOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
-              Delete Link
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-              Are you sure you want to delete this link? This action cannot be undone.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button
-                onClick={() => {
-                  setDeleteConfirmOpen(false);
-                  setLinkToDelete(null);
-                }}
-                variant="outline"
-                size="sm"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={deleteCustomLink}
-                size="sm"
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
-                Delete
-              </Button>
-            </div>
+              </>
+            )}
           </div>
         </div>
       )}
