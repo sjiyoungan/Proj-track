@@ -16,11 +16,11 @@ export interface Project {
   id: string;
   priority: number;
   name: string;
-  plan: 'Prime' | 'Free' | 'Pre-account';
+  plan: 'Prime' | 'Free' | 'Pre-account' | 'select';
   initiative: string;
   selectedKRs: string[];
-  designStatus: 'Not started' | 'In progress' | 'On hold' | 'Done' | 'Future';
-  buildStatus: 'Not started' | 'In progress' | 'On hold' | 'Done' | 'Future';
+  designStatus: 'Not started' | 'In progress' | 'On hold' | 'Done' | 'Future' | 'select';
+  buildStatus: 'Not started' | 'In progress' | 'On hold' | 'Done' | 'Future' | 'select';
   problemStatement: string;
   solution: string;
   successMetric: string;
