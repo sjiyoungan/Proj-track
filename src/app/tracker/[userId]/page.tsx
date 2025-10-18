@@ -51,10 +51,31 @@ export default function TrackerPage({ params }: TrackerPageProps) {
 
   // Handle tracker switching
   const handleTrackerChange = async (trackerId: string, accessLevel: string) => {
+    console.log('🔄 Switching trackers:', { from: currentTrackerId, to: trackerId });
+    
+    // Set flag to prevent auto-save during switch
+    setIsSwitchingTrackers(true);
+    
+    // Save current tracker data before switching
+    if (currentTrackerId && currentTrackerId !== trackerId) {
+      console.log('💾 Saving current tracker data before switching...');
+      try {
+        await saveToSupabase();
+        console.log('✅ Current tracker data saved successfully');
+      } catch (error) {
+        console.error('❌ Error saving current tracker data:', error);
+      }
+    }
+    
     setCurrentTrackerId(trackerId);
     setCurrentAccessLevel(accessLevel);
     // Reload data for the new tracker
     await loadTrackerData(trackerId);
+    
+    // Re-enable auto-save after a short delay
+    setTimeout(() => {
+      setIsSwitchingTrackers(false);
+    }, 1000);
   };
 
 
@@ -341,13 +362,14 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   // Auto-save when data changes (but not on initial load)
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [hasLoadedData, setHasLoadedData] = useState(false);
+  const [isSwitchingTrackers, setIsSwitchingTrackers] = useState(false);
   
   useEffect(() => {
     if (!mounted || !user || !userIdLoaded || !userId) return;
     
     // Skip auto-save on initial load or if we haven't loaded data yet
-    if (isInitialLoad || !hasLoadedData) {
-      if (hasLoadedData) {
+    if (isInitialLoad || !hasLoadedData || isSwitchingTrackers) {
+      if (hasLoadedData && !isSwitchingTrackers) {
         setIsInitialLoad(false);
       }
       return;
@@ -355,7 +377,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     
     console.log('💾 Auto-save triggered, trackerName:', trackerName);
     saveToSupabase();
-  }, [projects, trackerName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData]);
+  }, [projects, trackerName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData, currentTrackerId, isSwitchingTrackers]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
