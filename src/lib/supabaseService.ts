@@ -389,26 +389,47 @@ export async function saveBoardById(boardId: string, data: {
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   
+  console.log('💾 saveBoardById called with:', {
+    boardId,
+    boardName: data.boardName,
+    projectsCount: data.projects.length,
+    globalKRsCount: data.globalKRs.length,
+    userId: user?.id
+  });
+  
   if (!user) {
+    console.log('❌ No user found for saveBoardById');
     throw new Error('User not authenticated');
   }
 
+  const updateData = {
+    projects: data.projects,
+    global_krs: data.globalKRs,
+    filter_state: data.filterState,
+    board_name: data.boardName,
+    updated_at: new Date().toISOString()
+  };
+
+  console.log('💾 Updating board with data:', updateData);
+
   const { error } = await supabase
     .from('boards')
-    .update({
-      projects: data.projects,
-      global_krs: data.globalKRs,
-      filter_state: data.filterState,
-      board_name: data.boardName,
-      updated_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('id', boardId)
     .eq('user_id', user.id); // Ensure user owns the board
 
   if (error) {
     console.error('❌ Error saving board by ID:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
+
+  console.log('✅ Board saved successfully by ID');
 }
 
 // Share a board with someone
