@@ -5,16 +5,16 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { shareTracker } from '@/lib/supabaseService';
+import { shareBoard } from '@/lib/supabaseService';
 
-interface ShareTrackerModalProps {
+interface ShareBoardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  trackerId: string;
-  trackerName: string;
+  boardId: string;
+  boardName: string;
 }
 
-export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: ShareTrackerModalProps) {
+export function ShareBoardModal({ isOpen, onClose, boardId, boardName }: ShareBoardModalProps) {
   const [sharedWithName, setSharedWithName] = useState('');
   const [sharedWithEmail, setSharedWithEmail] = useState('');
   const [accessLevel, setAccessLevel] = useState<'view' | 'edit'>('edit');
@@ -36,7 +36,7 @@ export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: S
       setLoading(true);
       setError('');
       
-      await shareTracker(trackerId, sharedWithEmail.trim(), sharedWithName.trim(), accessLevel);
+      await shareBoard(boardId, sharedWithEmail.trim(), sharedWithName.trim(), accessLevel);
       
       // Reset form
       setSharedWithName('');
@@ -47,11 +47,11 @@ export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: S
       onClose();
       
       // Show success message (you could add a toast notification here)
-      alert(`Successfully shared "${trackerName}" with ${sharedWithName}!`);
+      alert(`Successfully shared "${boardName}" with ${sharedWithName}!`);
       
     } catch (error) {
-      console.error('❌ Error sharing tracker:', error);
-      setError('Failed to share tracker. Please try again.');
+      console.error('❌ Error sharing board:', error);
+      setError('Failed to share board. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,7 @@ export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: S
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-            Share Tracker
+            Share Board
           </h2>
           <Button
             variant="ghost"
@@ -85,10 +85,10 @@ export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: S
           </Button>
         </div>
 
-        {/* Tracker Info */}
+        {/* Board Info */}
         <div className="mb-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Sharing: <span className="font-medium text-slate-900 dark:text-slate-100">{trackerName}</span>
+            Sharing: <span className="font-medium text-slate-900 dark:text-slate-100">{boardName}</span>
           </p>
         </div>
 
@@ -183,3 +183,6 @@ export function ShareTrackerModal({ isOpen, onClose, trackerId, trackerName }: S
     </div>
   );
 }
+
+// Legacy export for backward compatibility
+export const ShareTrackerModal = ShareBoardModal;

@@ -6,26 +6,26 @@ import { Button } from '@/components/ui/button';
 import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
-import { TrackerName } from '@/components/TrackerName';
+import { BoardName } from '@/components/TrackerName';
 import { EditableCell } from '@/components/EditableCell';
 import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveTracker, loadTracker, getShareData, getUserTrackers, loadTrackerById, saveTrackerById } from '@/lib/supabaseService';
+import { saveBoard, loadBoard, getShareData, getUserBoards, loadBoardById, saveBoardById } from '@/lib/supabaseService';
 
-interface TrackerPageProps {
+interface BoardPageProps {
   params: Promise<{
     userId: string;
   }>;
 }
 
-export default function TrackerPage({ params }: TrackerPageProps) {
+export default function BoardPage({ params }: BoardPageProps) {
   const [userId, setUserId] = useState<string>('');
   const [userIdLoaded, setUserIdLoaded] = useState<boolean>(false);
-  const [currentTrackerId, setCurrentTrackerId] = useState<string>('');
+  const [currentBoardId, setCurrentBoardId] = useState<string>('');
   const [showShareModal, setShowShareModal] = useState(false);
-  const [shareTrackerId, setShareTrackerId] = useState<string>('');
+  const [shareBoardId, setShareBoardId] = useState<string>('');
   const [currentAccessLevel, setCurrentAccessLevel] = useState<string>('edit');
   
   useEffect(() => {
@@ -38,20 +38,20 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   const mounted = useMounted();
   const { user, loading: authLoading } = useAuth();
   
-  console.log('🏠 Tracker component rendered:', { mounted, user: !!user, authLoading, urlUserId: userId });
+  console.log('🏠 Board component rendered:', { mounted, user: !!user, authLoading, urlUserId: userId });
   
-  // Initialize current tracker ID when user loads
+  // Initialize current board ID when user loads
   useEffect(() => {
-    if (mounted && user && userIdLoaded && !currentTrackerId) {
-      // For now, we'll use the user's ID as the tracker ID
-      // Later we'll implement proper tracker selection
-      setCurrentTrackerId(user.id);
+    if (mounted && user && userIdLoaded && !currentBoardId) {
+      // For now, we'll use the user's ID as the board ID
+      // Later we'll implement proper board selection
+      setCurrentBoardId(user.id);
     }
-  }, [mounted, user, userIdLoaded, currentTrackerId]);
+  }, [mounted, user, userIdLoaded, currentBoardId]);
 
-  // Handle tracker switching
-  const handleTrackerChange = async (trackerId: string, accessLevel: string) => {
-    console.log('🔄 Switching trackers:', { from: currentTrackerId, to: trackerId });
+  // Handle board switching
+  const handleBoardChange = async (boardId: string, accessLevel: string) => {
+    console.log('🔄 Switching boards:', { from: currentBoardId, to: boardId });
     
     // Set flag to prevent auto-save during switch
     setIsSwitchingTrackers(true);

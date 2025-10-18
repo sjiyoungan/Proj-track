@@ -33,11 +33,19 @@ export default function ProjectsPage() {
     if (!mounted) return;
     const autoSave = async () => {
       try {
+        console.log('🔄 Starting auto-save...', { 
+          projectsCount: projects.length, 
+          globalKRsCount: globalKRs.length,
+          filterState: filterState 
+        });
+        
         await Promise.all([
           saveProjects(projects),
           saveGlobalKRs(globalKRs),
           saveFilterState(filterState)
         ]);
+        
+        console.log('✅ Auto-save completed successfully');
       } catch (error) {
         console.error('❌ Auto-save failed:', error);
       }

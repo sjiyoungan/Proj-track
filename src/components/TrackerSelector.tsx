@@ -10,27 +10,27 @@ import {
   DropdownMenuSeparator 
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { getUserTrackers, createTracker } from '@/lib/supabaseService';
+import { getUserBoards, createBoard } from '@/lib/supabaseService';
 import { ManageAccessModal } from '@/components/ManageAccessModal';
 
-interface Tracker {
-  tracker_id: string;
-  tracker_name: string;
-  tracker_display_name: string;
+interface Board {
+  board_id: string;
+  board_name: string;
+  board_display_name: string;
   is_owner: boolean;
   access_level: string;
   owner_email: string;
   owner_name: string;
 }
 
-interface TrackerSelectorProps {
-  currentTrackerId: string;
-  onTrackerChange: (trackerId: string, accessLevel: string) => void;
-  trackerName: string;
+interface BoardSelectorProps {
+  currentBoardId: string;
+  onBoardChange: (boardId: string, accessLevel: string) => void;
+  boardName: string;
 }
 
-export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName }: TrackerSelectorProps) {
-  const [trackers, setTrackers] = useState<Tracker[]>([]);
+export function BoardSelector({ currentBoardId, onBoardChange, boardName }: BoardSelectorProps) {
+  const [boards, setBoards] = useState<Board[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [menuWidth, setMenuWidth] = useState(192); // Default width in pixels
@@ -38,18 +38,18 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
 
   const calculateMenuWidth = () => {
     const strings = [
-      'Your Trackers',
-      'Trackers shared with you',
-      'Add tracker',
-      'Manage trackers',
-      'No shared trackers yet'
+      'My boards',
+      'Shared boards',
+      'Add board',
+      'Manage boards',
+      'No shared boards yet'
     ];
     
-    // Add tracker names
-    trackers.forEach(tracker => {
-      strings.push(tracker.tracker_display_name);
-      if (!tracker.is_owner) {
-        strings.push(`by ${tracker.owner_name || tracker.owner_email}`);
+    // Add board names
+    boards.forEach(board => {
+      strings.push(board.board_display_name);
+      if (!board.is_owner) {
+        strings.push(`by ${board.owner_name || board.owner_email}`);
       }
     });
     
@@ -61,57 +61,57 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
     setMenuWidth(Math.min(calculatedWidth, 320)); // Cap at 320px max
   };
 
-  const loadTrackers = async () => {
+  const loadBoards = async () => {
     try {
       setLoading(true);
-      console.log('🔄 Loading trackers...');
-      const userTrackers = await getUserTrackers();
-      console.log('✅ Loaded trackers:', userTrackers);
-      setTrackers(userTrackers);
+      console.log('🔄 Loading boards...');
+      const userBoards = await getUserBoards();
+      console.log('✅ Loaded boards:', userBoards);
+      setBoards(userBoards);
     } catch (error) {
-      console.error('❌ Error loading trackers:', error);
+      console.error('❌ Error loading boards:', error);
       // If the database functions don't exist yet, show empty state
-      setTrackers([]);
+      setBoards([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadTrackers();
+    loadBoards();
   }, []);
 
   useEffect(() => {
     calculateMenuWidth();
-  }, [trackers]);
+  }, [boards]);
 
-  const handleCreateTracker = async () => {
+  const handleCreateBoard = async () => {
     try {
-      const trackerCount = trackers.filter(t => t.is_owner).length + 1;
-      const displayName = `Tracker ${trackerCount}`;
+      const boardCount = boards.filter(b => b.is_owner).length + 1;
+      const displayName = `New Board`;
       
-      console.log('🔄 Creating new tracker:', displayName);
-      const newTracker = await createTracker(displayName);
-      console.log('✅ New tracker created:', newTracker);
+      console.log('🔄 Creating new board:', displayName);
+      const newBoard = await createBoard(displayName);
+      console.log('✅ New board created:', newBoard);
       
-      // Reload trackers to include the new one
-      console.log('🔄 Reloading trackers...');
-      await loadTrackers();
-      console.log('✅ Trackers reloaded');
+      // Reload boards to include the new one
+      console.log('🔄 Reloading boards...');
+      await loadBoards();
+      console.log('✅ Boards reloaded');
       
-      // Switch to the new tracker
-      console.log('🔄 Switching to new tracker:', newTracker.tracker_id);
-      onTrackerChange(newTracker.tracker_id, 'edit');
+      // Switch to the new board
+      console.log('🔄 Switching to new board:', newBoard.board_id);
+      onBoardChange(newBoard.board_id, 'edit');
       setIsOpen(false);
     } catch (error) {
-      console.error('❌ Error creating tracker:', error);
-      alert('Failed to create tracker. Please run the database setup first.');
+      console.error('❌ Error creating board:', error);
+      alert('Failed to create board. Please run the database setup first.');
     }
   };
 
-  const ownedTrackers = trackers.filter(t => t.is_owner);
-  const sharedTrackers = trackers.filter(t => !t.is_owner);
-  const currentTracker = trackers.find(t => t.tracker_id === currentTrackerId);
+  const ownedBoards = boards.filter(b => b.is_owner);
+  const sharedBoards = boards.filter(b => !b.is_owner);
+  const currentBoard = boards.find(b => b.board_id === currentBoardId);
 
   if (loading) {
     return (
@@ -145,66 +145,66 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="start" style={{ width: `${menuWidth}px` }} className="p-2">
-        {/* Your Trackers Section */}
+        {/* Your Boards Section */}
         <div className="px-0 py-1">
           <div className="font-medium text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wide px-2 pb-2" style={{ fontSize: '10px' }}>
-            Your Trackers
+            My boards
           </div>
           
-          {/* Show all owned trackers */}
-          {ownedTrackers.map((tracker) => (
-            <div key={tracker.tracker_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${tracker.tracker_id === currentTrackerId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+          {/* Show all owned boards */}
+          {ownedBoards.map((board) => (
+            <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${board.board_id === currentBoardId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
               <DropdownMenuItem 
                 onClick={() => {
-                  console.log('🔄 Switching to tracker:', tracker.tracker_id, tracker.tracker_display_name);
-                  onTrackerChange(tracker.tracker_id, tracker.access_level);
+                  console.log('🔄 Switching to board:', board.board_id, board.board_display_name);
+                  onBoardChange(board.board_id, board.access_level);
                   setIsOpen(false);
                 }}
                 className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
               >
-                <span className="text-sm">{tracker.tracker_display_name}</span>
+                <span className="text-sm">{board.board_display_name}</span>
               </DropdownMenuItem>
             </div>
           ))}
           
-          {/* Add Tracker Button */}
+          {/* Add Board Button */}
           <DropdownMenuItem 
-            onClick={handleCreateTracker}
+            onClick={handleCreateBoard}
             className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add tracker
+            Add board
           </DropdownMenuItem>
         </div>
         
         {/* Separator */}
         <DropdownMenuSeparator />
         
-        {/* Trackers Shared With You Section */}
+        {/* Boards Shared With You Section */}
         <div className="px-0 py-1">
           <div className="font-medium text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wide px-2 pb-2" style={{ fontSize: '10px' }}>
-            Trackers shared with you
+            Shared boards
           </div>
           
-          {sharedTrackers.length === 0 ? (
+          {sharedBoards.length === 0 ? (
             <div className="text-slate-500 dark:text-slate-400 py-2 px-2" style={{ fontSize: '12px' }}>
-              No shared trackers yet
+              No shared boards yet
             </div>
           ) : (
-            sharedTrackers.map((tracker) => (
-              <div key={tracker.tracker_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${tracker.tracker_id === currentTrackerId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+            sharedBoards.map((board) => (
+              <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${board.board_id === currentBoardId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
                 <DropdownMenuItem 
                   onClick={() => {
-                    console.log('🔄 Switching to shared tracker:', tracker.tracker_id, tracker.tracker_display_name);
-                    onTrackerChange(tracker.tracker_id, tracker.access_level);
+                    console.log('🔄 Switching to shared board:', board.board_id, board.board_display_name);
+                    onBoardChange(board.board_id, board.access_level);
                     setIsOpen(false);
                   }}
                   className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
                 >
                   <div className="flex flex-col">
-                    <span className="text-sm">{tracker.tracker_display_name}</span>
+                    <span className="text-sm">{board.board_display_name}</span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
-                      by {tracker.owner_name || tracker.owner_email}
+                      by {board.owner_name || board.owner_email}
                     </span>
                   </div>
                 </DropdownMenuItem>
@@ -216,7 +216,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
         {/* Separator */}
         <DropdownMenuSeparator />
         
-        {/* Manage Trackers Option */}
+        {/* Manage Boards Option */}
         <DropdownMenuItem 
           onClick={() => {
             setShowManageModal(true);
@@ -225,7 +225,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
           className="cursor-pointer py-1 px-2"
         >
           <Settings className="h-4 w-4 mr-2" />
-          Manage trackers
+          Manage boards
         </DropdownMenuItem>
       </DropdownMenuContent>
       
@@ -237,3 +237,6 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
     </DropdownMenu>
   );
 }
+
+// Legacy export for backward compatibility
+export const TrackerSelector = BoardSelector;
