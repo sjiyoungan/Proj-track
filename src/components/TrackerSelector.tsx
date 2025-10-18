@@ -16,7 +16,6 @@ import { ManageAccessModal } from '@/components/ManageAccessModal';
 interface Board {
   board_id: string;
   board_name: string;
-  board_display_name: string;
   is_owner: boolean;
   access_level: string;
   owner_email: string;
@@ -47,7 +46,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
     
     // Add board names
     boards.forEach(board => {
-      strings.push(board.board_display_name);
+      strings.push(board.board_name);
       if (!board.is_owner) {
         strings.push(`by ${board.owner_name || board.owner_email}`);
       }
@@ -69,7 +68,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
       console.log('✅ Loaded boards:', userBoards);
       console.log('🔍 Board details:', userBoards.map((b: Board) => ({
         id: b.board_id,
-        name: b.board_display_name,
+        name: b.board_name,
         isOwner: b.is_owner,
         ownerEmail: b.owner_email
       })));
@@ -177,7 +176,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
                     : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}>
-                  <span className="text-sm">{board.board_display_name}</span>
+                  <span className="text-sm">{board.board_name}</span>
                 </div>
               </DropdownMenuItem>
             </div>
@@ -222,7 +221,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                       ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
                       : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}>
-                    <span className="text-sm">{board.board_display_name}</span>
+                    <span className="text-sm">{board.board_name}</span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
                       by {board.owner_name || board.owner_email}
                     </span>

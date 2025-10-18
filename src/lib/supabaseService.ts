@@ -212,22 +212,6 @@ export async function saveBoardName(boardName: string) {
     ...boardData,
     boardName
   });
-  
-  // Also update board_display_name to keep them in sync
-  const { data: { user } } = await supabase.auth.getUser();
-  if (user) {
-    const { error } = await supabase
-      .from('boards')
-      .update({ 
-        board_display_name: boardName,
-        updated_at: new Date().toISOString()
-      })
-      .eq('user_id', user.id);
-    
-    if (error) {
-      console.error('❌ Error updating board_display_name:', error);
-    }
-  }
 }
 
 export async function loadBoardName(): Promise<string> {
@@ -287,7 +271,7 @@ export async function createBoard(displayName: string) {
   console.log('🔄 Creating board with data:', {
     user_id: user.id,
     owner_email: user.email,
-    board_display_name: displayName
+    board_name: displayName
   });
 
   const { data, error } = await supabase
@@ -295,8 +279,7 @@ export async function createBoard(displayName: string) {
     .insert({
       user_id: user.id,
       owner_email: user.email,
-      board_display_name: displayName,
-      board_name: 'New Board',
+      board_name: displayName,
       projects: [{
         id: '1',
         name: '',
