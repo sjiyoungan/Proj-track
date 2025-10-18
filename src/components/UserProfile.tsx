@@ -99,7 +99,7 @@ export function UserProfile() {
         
         <DropdownMenuItem onClick={handleManageAccess} className="cursor-pointer">
           <UserCog className="mr-2 h-4 w-4" />
-          Manage access
+          Manage trackers
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-black dark:text-white">
           <LogOut className="mr-2 h-4 w-4" />

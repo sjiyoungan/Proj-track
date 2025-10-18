@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Ban, Eye, Edit3 } from 'lucide-react';
+import { X, Ban, Eye, Edit3, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getUserTrackers, getTrackerPermissions, revokeTrackerAccess, updateTrackerAccess } from '@/lib/supabaseService';
+import { getUserTrackers, getTrackerPermissions, revokeTrackerAccess, updateTrackerAccess, deleteTracker } from '@/lib/supabaseService';
 
 interface Tracker {
   tracker_id: string;
@@ -36,6 +36,10 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
   const [revoking, setRevoking] = useState<string | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [permissionToRevoke, setPermissionToRevoke] = useState<{id: string, trackerId: string, email: string, name: string} | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [trackerToShare, setTrackerToShare] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [trackerToDelete, setTrackerToDelete] = useState<{id: string, name: string} | null>(null);
 
   const loadData = async () => {
     try {
@@ -117,6 +121,42 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
     }
   };
 
+  const handleDeleteClick = (tracker: Tracker) => {
+    setTrackerToDelete({
+      id: tracker.tracker_id,
+      name: tracker.tracker_display_name
+    });
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!trackerToDelete) return;
+    
+    try {
+      await deleteTracker(trackerToDelete.id);
+      
+      // Reload data to reflect changes
+      await loadData();
+      
+      // Close confirmation dialog
+      setShowDeleteConfirm(false);
+      setTrackerToDelete(null);
+    } catch (error) {
+      console.error('❌ Error deleting tracker:', error);
+      alert('Failed to delete tracker. Please try again.');
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setTrackerToDelete(null);
+  };
+
+  const handleShareClick = (trackerId: string) => {
+    setTrackerToShare(trackerId);
+    setShowShareModal(true);
+  };
+
   const ownedTrackers = trackers.filter(t => t.is_owner);
   const sharedTrackers = trackers.filter(t => !t.is_owner);
 
@@ -128,7 +168,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-            Manage Access
+            Manage Trackers
           </h2>
           <Button
             variant="ghost"

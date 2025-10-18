@@ -25,6 +25,7 @@ export async function saveTracker(data: {
 
   const upsertData: any = {
     user_id: user.id,
+    owner_email: user.email,
     projects: data.projects,
     global_krs: data.globalKRs,
     filter_state: data.filterState,
@@ -227,6 +228,7 @@ export async function createTracker(displayName: string) {
     .from('trackers')
     .insert({
       user_id: user.id,
+      owner_email: user.email,
       tracker_display_name: displayName,
       tracker_name: '',
       projects: [],
@@ -249,6 +251,28 @@ export async function createTracker(displayName: string) {
   }
 
   return data;
+}
+
+// Delete a tracker
+export async function deleteTracker(trackerId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('trackers')
+    .delete()
+    .eq('tracker_id', trackerId)
+    .eq('user_id', user.id); // Ensure user can only delete their own trackers
+
+  if (error) {
+    console.error('❌ Error deleting tracker:', error);
+    throw error;
+  }
+
+  return true;
 }
 
 // Load a specific tracker by ID
