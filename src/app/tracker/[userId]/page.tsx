@@ -228,18 +228,10 @@ export default function BoardPage({ params }: BoardPageProps) {
       console.log('✅ Save completed successfully');
     } catch (error) {
       console.error('❌ Save failed with new system:', error);
-      // Fall back to the old system if new system isn't set up yet
-      try {
-        await saveBoard({
-          projects,
-          globalKRs,
-          filterState,
-          boardName
-        });
-        console.log('✅ Save completed successfully with old system');
-      } catch (fallbackError) {
-        console.error('❌ Save failed with old system:', fallbackError);
-      }
+      console.error('❌ Board ID that failed:', currentBoardId);
+      console.error('❌ Error details:', error);
+      // Don't fall back to old system - this could cause data corruption
+      // The old system doesn't support multiple boards properly
     }
   };
 
