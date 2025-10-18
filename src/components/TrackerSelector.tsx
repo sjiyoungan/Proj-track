@@ -159,7 +159,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="h-7 w-7 p-0 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none flex items-center justify-center" 
+          className="h-7 w-7 p-0 hover:bg-slate-25 dark:hover:bg-slate-775 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none flex items-center justify-center" 
           style={{ 
             marginTop: '6px',
             outline: 'none',
