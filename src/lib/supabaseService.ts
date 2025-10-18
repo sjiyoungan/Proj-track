@@ -133,30 +133,39 @@ export async function loadFilterState(): Promise<FilterState | null> {
 
 // Header Title
 export async function saveHeaderTitle(title: string) {
-  const { error } = await supabase
-    .from('header_title')
-    .upsert({
-      id: 'default',
-      title: title,
-      updated_at: new Date().toISOString()
-    });
-  
-  if (error) throw error;
+  try {
+    const { error } = await supabase
+      .from('header_title')
+      .upsert({
+        id: 'default',
+        title: title,
+        updated_at: new Date().toISOString()
+      });
+    
+    if (error) throw error;
+  } catch (error) {
+    console.error('Failed to save header title to database:', error);
+    // Fallback: save to localStorage
+    localStorage.setItem('headerTitle', title);
+  }
 }
 
 export async function loadHeaderTitle(): Promise<string> {
-  const { data, error } = await supabase
-    .from('header_title')
-    .select('title')
-    .eq('id', 'default')
-    .single();
-  
-  if (error) {
-    console.error('Error loading header title:', error);
-    return '';
+  try {
+    const { data, error } = await supabase
+      .from('header_title')
+      .select('title')
+      .eq('id', 'default')
+      .single();
+    
+    if (error) throw error;
+    
+    return data?.title || '';
+  } catch (error) {
+    console.error('Failed to load header title from database:', error);
+    // Fallback: load from localStorage
+    return localStorage.getItem('headerTitle') || '';
   }
-  
-  return data?.title || '';
 }
 
 // Sharing functions
