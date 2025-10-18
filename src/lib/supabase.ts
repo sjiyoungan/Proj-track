@@ -55,7 +55,7 @@ if (supabaseClient && supabaseClient.auth) {
 if (typeof window !== 'undefined') {
   const originalFetch = window.fetch;
   window.fetch = async (input, init) => {
-    const url = typeof input === 'string' ? input : input.url;
+    const url = typeof input === 'string' ? input : (input as Request).url;
     
     // Block any logout requests
     if (url.includes('/auth/v1/logout')) {
