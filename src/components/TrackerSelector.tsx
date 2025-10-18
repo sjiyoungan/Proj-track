@@ -77,8 +77,8 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
     } catch (error) {
       console.error('❌ Error loading boards:', error);
       console.error('❌ Error details:', {
-        message: error.message,
-        stack: error.stack
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
       });
       // If the database functions don't exist yet, show empty state
       setBoards([]);
