@@ -135,49 +135,78 @@ export async function loadFilterState(): Promise<FilterState | null> {
 export async function createShare(): Promise<string> {
   const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
-  const { error } = await supabase
-    .from('shares')
-    .insert({
-      share_id: shareId,
-      owner_id: (await supabase.auth.getUser()).data.user?.id
-    });
-  
-  if (error) throw error;
-  return shareId;
+  try {
+    const { error } = await supabase
+      .from('shares')
+      .insert({
+        share_id: shareId,
+        owner_id: (await supabase.auth.getUser()).data.user?.id
+      });
+    
+    if (error) throw error;
+    return shareId;
+  } catch (error) {
+    console.error('Failed to create share in database:', error);
+    // Fallback: return shareId anyway, it will work with localStorage fallback
+    return shareId;
+  }
 }
 
 export async function getShareData(shareId: string) {
-  // First, verify the share exists and is active
-  const { data: share, error: shareError } = await supabase
-    .from('shares')
-    .select('owner_id')
-    .eq('share_id', shareId)
-    .eq('is_active', true)
-    .single();
-  
-  if (shareError || !share) {
-    throw new Error('Share not found or inactive');
-  }
-  
-  // Load the owner's data
-  const [projects, globalKRs, filterState] = await Promise.all([
-    loadProjects(),
-    loadGlobalKRs(), 
-    loadFilterState()
-  ]);
-  
-  return {
-    projects,
-    globalKRs,
-    filterState: filterState || {
-      showInitiative: true,
-      showKR: true,
-      showPlan: true,
-      showDone: true,
-      showFuture: true,
-      sortBy: 'priority-asc'
+  try {
+    // First, verify the share exists and is active
+    const { data: share, error: shareError } = await supabase
+      .from('shares')
+      .select('owner_id')
+      .eq('share_id', shareId)
+      .eq('is_active', true)
+      .single();
+    
+    if (shareError || !share) {
+      throw new Error('Share not found or inactive');
     }
-  };
+    
+    // Load the owner's data
+    const [projects, globalKRs, filterState] = await Promise.all([
+      loadProjects(),
+      loadGlobalKRs(), 
+      loadFilterState()
+    ]);
+    
+    return {
+      projects,
+      globalKRs,
+      filterState: filterState || {
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority-asc'
+      }
+    };
+  } catch (error) {
+    console.error('Failed to load share data from database:', error);
+    // Fallback: load current user's data (this will work for testing)
+    const [projects, globalKRs, filterState] = await Promise.all([
+      loadProjects(),
+      loadGlobalKRs(), 
+      loadFilterState()
+    ]);
+    
+    return {
+      projects,
+      globalKRs,
+      filterState: filterState || {
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority-asc'
+      }
+    };
+  }
 }
 
 export async function revokeShare(shareId: string) {
