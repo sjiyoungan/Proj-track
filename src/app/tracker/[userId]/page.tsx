@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ProjectTable } from '@/components/ProjectTable';
 import { FilterBar } from '@/components/FilterBar';
 import { TabSystem } from '@/components/TabSystem';
-import { EditableHeader } from '@/components/EditableHeader';
+import { TrackerName } from '@/components/TrackerName';
 import { EditableCell } from '@/components/EditableCell';
 import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
@@ -54,12 +54,13 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     sortBy: 'priority-asc'
   });
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
-  const [headerTitle, setHeaderTitle] = useState<string>('');
+  const [trackerName, setTrackerName] = useState<string>('');
   const [showHoverRow, setShowHoverRow] = useState(false);
   const [hoverRowLocked, setHoverRowLocked] = useState(false);
 
-  const handleHeaderTitleChange = (newTitle: string) => {
-    setHeaderTitle(newTitle);
+  const handleTrackerNameChange = (newName: string) => {
+    console.log('🔄 Tracker name changing from:', trackerName, 'to:', newName);
+    setTrackerName(newName);
   };
 
   const handleGlobalKRChange = (newKRs: KRItem[]) => {
@@ -69,12 +70,14 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   // Save to Supabase
   const saveToSupabase = async () => {
     try {
+      console.log('💾 Saving to Supabase with trackerName:', trackerName);
       await saveTracker({
         projects,
         globalKRs,
         filterState,
-        headerTitle
+        trackerName
       });
+      console.log('✅ Save completed successfully');
     } catch (error) {
       console.error('❌ Save failed:', error);
     }
@@ -134,13 +137,13 @@ export default function TrackerPage({ params }: TrackerPageProps) {
           projects: trackerData.projects.length,
           krs: trackerData.globalKRs.length,
           hasFilterState: !!trackerData.filterState,
-          headerTitle: trackerData.headerTitle
+          trackerName: trackerData.trackerName
         });
         
         setProjects(trackerData.projects);
         setGlobalKRs(trackerData.globalKRs);
         setFilterState(trackerData.filterState);
-        setHeaderTitle(trackerData.headerTitle);
+        setTrackerName(trackerData.trackerName);
         
         // If no projects exist, create an empty one automatically
         if (trackerData.projects.length === 0) {
@@ -200,8 +203,9 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   // Auto-save when data changes
   useEffect(() => {
     if (!mounted) return;
+    console.log('💾 Auto-save triggered, trackerName:', trackerName);
     saveToSupabase();
-  }, [projects, headerTitle, globalKRs, filterState, mounted]);
+  }, [projects, trackerName, globalKRs, filterState, mounted]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
@@ -309,7 +313,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
           showFuture: true,
           sortBy: 'priority-asc'
         },
-        headerTitle: ''
+        trackerName: ''
       });
       
       // Create an empty project just like on first load
@@ -333,7 +337,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
       };
       
       setProjects([emptyProject]);
-    setHeaderTitle('');
+      setTrackerName('');
       setGlobalKRs([]);
       setFilterState({
         showInitiative: true,
@@ -394,8 +398,8 @@ export default function TrackerPage({ params }: TrackerPageProps) {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8 w-fit">
-            <div className="cursor-text hover:bg-slate-50 dark:hover:bg-slate-800 rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors" style={{lineHeight:"1.2",paddingTop:"2px",paddingBottom:"2px",paddingLeft:"8px",paddingRight:"8px",height:"auto",minHeight:"40px",maxWidth:"fit-content",boxSizing:"border-box",display:"flex",alignItems:"center"}}>
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">Tracker name</span>
+            <div className="animate-pulse">
+              <div className="h-10 w-48 bg-slate-200 dark:bg-slate-700 rounded"></div>
             </div>
           </div>
           <div className="animate-pulse">
@@ -443,9 +447,9 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <EditableHeader
-          title={headerTitle}
-          onTitleChange={handleHeaderTitleChange}
+        <TrackerName
+          trackerName={trackerName}
+          onTrackerNameChange={handleTrackerNameChange}
         />
 
         {/* Tab System and Filter Bar */}

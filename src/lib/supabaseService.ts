@@ -7,7 +7,7 @@ export async function saveTracker(data: {
   projects: Project[];
   globalKRs: KRItem[];
   filterState: FilterState;
-  headerTitle: string;
+  trackerName: string;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
   console.log('💾 Saving tracker for user:', user?.id, user?.email);
@@ -24,7 +24,7 @@ export async function saveTracker(data: {
       projects: data.projects,
       global_krs: data.globalKRs,
       filter_state: data.filterState,
-      header_title: data.headerTitle,
+      tracker_name: data.trackerName,
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' });
   
@@ -40,7 +40,7 @@ export async function loadTracker(): Promise<{
   projects: Project[];
   globalKRs: KRItem[];
   filterState: FilterState;
-  headerTitle: string;
+  trackerName: string;
 }> {
   const { data: { user } } = await supabase.auth.getUser();
   console.log('🔍 Loading tracker for user:', user?.id, user?.email);
@@ -58,7 +58,7 @@ export async function loadTracker(): Promise<{
         showFuture: true,
         sortBy: 'priority-asc'
       },
-      headerTitle: ''
+      trackerName: ''
     };
   }
 
@@ -82,7 +82,7 @@ export async function loadTracker(): Promise<{
         showFuture: true,
         sortBy: 'priority-asc'
       },
-      headerTitle: ''
+      trackerName: ''
     };
   }
   
@@ -99,7 +99,7 @@ export async function loadTracker(): Promise<{
       showFuture: true,
       sortBy: 'priority'
     },
-    headerTitle: data.header_title || ''
+    trackerName: data.tracker_name || ''
   };
 }
 
@@ -143,17 +143,17 @@ export async function loadFilterState(): Promise<FilterState> {
   return trackerData.filterState;
 }
 
-export async function saveHeaderTitle(headerTitle: string) {
+export async function saveTrackerName(trackerName: string) {
   const trackerData = await loadTracker();
   await saveTracker({
     ...trackerData,
-    headerTitle
+    trackerName
   });
 }
 
-export async function loadHeaderTitle(): Promise<string> {
+export async function loadTrackerName(): Promise<string> {
   const trackerData = await loadTracker();
-  return trackerData.headerTitle;
+  return trackerData.trackerName;
 }
 
 // Share functionality
@@ -217,6 +217,6 @@ export async function getShareData(shareId: string) {
       showFuture: true,
       sortBy: 'priority'
     },
-    headerTitle: data.trackers.header_title || ''
+    trackerName: data.trackers.header_title || ''
   };
 }
