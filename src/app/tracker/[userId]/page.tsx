@@ -137,6 +137,12 @@ export default function BoardPage({ params }: BoardPageProps) {
 
   // Load board data by ID
   const loadBoardData = async (boardId: string) => {
+    // Don't load if boardId is empty
+    if (!boardId) {
+      console.log('⏸️ Skipping loadBoardData - boardId is empty');
+      return;
+    }
+    
     try {
       // Try to load from the new boards table first
       const boardData = await loadBoardById(boardId);
@@ -297,6 +303,13 @@ export default function BoardPage({ params }: BoardPageProps) {
         }
 
         console.log('📥 Loading board data...');
+        
+        // Don't load if currentBoardId is empty
+        if (!currentBoardId) {
+          console.log('⏸️ Skipping load - currentBoardId is empty');
+          return;
+        }
+        
         try {
           const boardData = await loadBoardById(currentBoardId);
           
