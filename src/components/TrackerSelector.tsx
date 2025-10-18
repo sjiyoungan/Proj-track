@@ -255,16 +255,16 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
         <DropdownMenuSeparator />
         
         {/* Manage Boards Option */}
-        <DropdownMenuItem 
+        <div
           onClick={() => {
             setShowManageModal(true);
             setIsOpen(false);
           }}
-          className="cursor-pointer py-1 px-2"
+          className="cursor-pointer py-1 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center"
         >
-          <Settings className="h-4 w-4 mr-2" />
+          <Settings className="h-3 w-3 mr-2" />
           Manage boards
-        </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
       
       {/* Manage Access Modal */}
