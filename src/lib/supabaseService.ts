@@ -26,7 +26,7 @@ export async function saveTracker(data: {
       filter_state: data.filterState,
       header_title: data.headerTitle,
       updated_at: new Date().toISOString()
-    });
+    }, { onConflict: 'user_id' });
   
   if (error) {
     console.error('❌ Error saving tracker:', error);
