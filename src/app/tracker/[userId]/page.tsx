@@ -54,40 +54,40 @@ export default function BoardPage({ params }: BoardPageProps) {
     console.log('🔄 Switching boards:', { from: currentBoardId, to: boardId });
     
     // Set flag to prevent auto-save during switch
-    setIsSwitchingTrackers(true);
+    setIsSwitchingBoards(true);
     
-    // Save current tracker data before switching
-    if (currentTrackerId && currentTrackerId !== trackerId) {
-      console.log('💾 Saving current tracker data before switching...');
+    // Save current board data before switching
+    if (currentBoardId && currentBoardId !== boardId) {
+      console.log('💾 Saving current board data before switching...');
       try {
         await saveToSupabase();
-        console.log('✅ Current tracker data saved successfully');
+        console.log('✅ Current board data saved successfully');
       } catch (error) {
-        console.error('❌ Error saving current tracker data:', error);
+        console.error('❌ Error saving current board data:', error);
       }
     }
     
-    setCurrentTrackerId(trackerId);
+    setCurrentBoardId(boardId);
     setCurrentAccessLevel(accessLevel);
-    // Reload data for the new tracker
-    await loadTrackerData(trackerId);
+    // Reload data for the new board
+    await loadBoardData(boardId);
     
     // Re-enable auto-save after a short delay
     setTimeout(() => {
-      setIsSwitchingTrackers(false);
+      setIsSwitchingBoards(false);
     }, 1000);
   };
 
 
-  // Load tracker data by ID
-  const loadTrackerData = async (trackerId: string) => {
+  // Load board data by ID
+  const loadBoardData = async (boardId: string) => {
     try {
-      // Try to load from the new trackers table first
-      const trackerData = await loadTrackerById(trackerId);
-      setProjects(trackerData.projects);
-      setGlobalKRs(trackerData.globalKRs);
-      setFilterState(trackerData.filterState);
-      setTrackerName(trackerData.trackerName);
+      // Try to load from the new boards table first
+      const boardData = await loadBoardById(boardId);
+      setProjects(boardData.projects);
+      setGlobalKRs(boardData.globalKRs);
+      setFilterState(boardData.filterState);
+      setBoardName(boardData.boardName);
     } catch (error) {
       console.error('❌ Failed to load tracker data from new system:', error);
       // Fall back to the old system if new system isn't set up yet
@@ -96,7 +96,7 @@ export default function BoardPage({ params }: BoardPageProps) {
         setProjects(oldTrackerData.projects);
         setGlobalKRs(oldTrackerData.globalKRs);
         setFilterState(oldTrackerData.filterState);
-        setTrackerName(oldTrackerData.trackerName);
+        setBoardName(oldTrackerData.boardName);
       } catch (fallbackError) {
         console.error('❌ Failed to load tracker data from old system:', fallbackError);
         // Create empty project if both fail
@@ -133,13 +133,13 @@ export default function BoardPage({ params }: BoardPageProps) {
     sortBy: 'priority-asc'
   });
   const [activeTab, setActiveTab] = useState<TabFilter>('all');
-  const [trackerName, setTrackerName] = useState<string>('');
+  const [boardName, setBoardName] = useState<string>('');
   const [showHoverRow, setShowHoverRow] = useState(false);
   const [hoverRowLocked, setHoverRowLocked] = useState(false);
 
   const handleTrackerNameChange = (newName: string) => {
-    console.log('🔄 Tracker name changing from:', trackerName, 'to:', newName);
-    setTrackerName(newName);
+    console.log('🔄 Tracker name changing from:', boardName, 'to:', newName);
+    setBoardName(newName);
   };
 
   const handleGlobalKRChange = (newKRs: KRItem[]) => {
@@ -149,12 +149,12 @@ export default function BoardPage({ params }: BoardPageProps) {
   // Save to Supabase
   const saveToSupabase = async () => {
     try {
-      console.log('💾 Saving to Supabase with trackerName:', trackerName);
-      await saveTrackerById(currentTrackerId, {
+      console.log('💾 Saving to Supabase with boardName:', boardName);
+      await saveBoardById(currentBoardId, {
         projects,
         globalKRs,
         filterState,
-        trackerName
+        boardName
       });
       console.log('✅ Save completed successfully');
     } catch (error) {
@@ -165,7 +165,7 @@ export default function BoardPage({ params }: BoardPageProps) {
           projects,
           globalKRs,
           filterState,
-          trackerName
+          boardName
         });
         console.log('✅ Save completed successfully with old system');
       } catch (fallbackError) {
@@ -223,19 +223,19 @@ export default function BoardPage({ params }: BoardPageProps) {
 
         console.log('📥 Loading tracker data...');
         try {
-          const trackerData = await loadTrackerById(currentTrackerId);
+          const trackerData = await loadBoardById(currentBoardId);
           
           console.log('📊 Loaded data:', {
             projects: trackerData.projects.length,
             krs: trackerData.globalKRs.length,
             hasFilterState: !!trackerData.filterState,
-            trackerName: trackerData.trackerName
+            boardName: trackerData.boardName
           });
           
           setProjects(trackerData.projects);
           setGlobalKRs(trackerData.globalKRs);
           setFilterState(trackerData.filterState);
-          setTrackerName(trackerData.trackerName);
+          setBoardName(trackerData.boardName);
           setHasLoadedData(true); // Mark that we've loaded data
           
           // If no projects exist, create an empty one automatically
@@ -270,13 +270,13 @@ export default function BoardPage({ params }: BoardPageProps) {
               projects: oldTrackerData.projects.length,
               krs: oldTrackerData.globalKRs.length,
               hasFilterState: !!oldTrackerData.filterState,
-              trackerName: oldTrackerData.trackerName
+              boardName: oldTrackerData.boardName
             });
             
             setProjects(oldTrackerData.projects);
             setGlobalKRs(oldTrackerData.globalKRs);
             setFilterState(oldTrackerData.filterState);
-            setTrackerName(oldTrackerData.trackerName);
+            setBoardName(oldTrackerData.boardName);
             setHasLoadedData(true); // Mark that we've loaded data
             
             // If no projects exist, create an empty one automatically
@@ -352,7 +352,7 @@ export default function BoardPage({ params }: BoardPageProps) {
     };
     
     loadData();
-  }, [mounted, user, authLoading, userIdLoaded, userId, currentTrackerId]);
+  }, [mounted, user, authLoading, userIdLoaded, userId, currentBoardId]);
   
   // Debug user state
   useEffect(() => {
@@ -362,22 +362,22 @@ export default function BoardPage({ params }: BoardPageProps) {
   // Auto-save when data changes (but not on initial load)
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [hasLoadedData, setHasLoadedData] = useState(false);
-  const [isSwitchingTrackers, setIsSwitchingTrackers] = useState(false);
+  const [isSwitchingBoards, setIsSwitchingBoards] = useState(false);
   
   useEffect(() => {
     if (!mounted || !user || !userIdLoaded || !userId) return;
     
     // Skip auto-save on initial load or if we haven't loaded data yet
-    if (isInitialLoad || !hasLoadedData || isSwitchingTrackers) {
-      if (hasLoadedData && !isSwitchingTrackers) {
+    if (isInitialLoad || !hasLoadedData || isSwitchingBoards) {
+      if (hasLoadedData && !isSwitchingBoards) {
         setIsInitialLoad(false);
       }
       return;
     }
     
-    console.log('💾 Auto-save triggered, trackerName:', trackerName);
+    console.log('💾 Auto-save triggered, boardName:', boardName);
     saveToSupabase();
-  }, [projects, trackerName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData, currentTrackerId, isSwitchingTrackers]);
+  }, [projects, boardName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData, currentBoardId, isSwitchingBoards]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
@@ -485,7 +485,7 @@ export default function BoardPage({ params }: BoardPageProps) {
           showFuture: true,
           sortBy: 'priority-asc'
         },
-        trackerName: ''
+        boardName: ''
       });
       
       // Create an empty project just like on first load
@@ -509,7 +509,7 @@ export default function BoardPage({ params }: BoardPageProps) {
       };
       
       setProjects([emptyProject]);
-      setTrackerName('');
+      setBoardName('');
       setGlobalKRs([]);
       setFilterState({
         showInitiative: true,
@@ -620,9 +620,9 @@ export default function BoardPage({ params }: BoardPageProps) {
       <div className="container mx-auto px-4 py-8">
                 {/* Header */}
                 <TrackerName
-                  trackerName={trackerName}
+                  boardName={boardName}
                   onTrackerNameChange={handleTrackerNameChange}
-                  currentTrackerId={currentTrackerId}
+                  currentBoardId={currentBoardId}
                   onTrackerChange={handleTrackerChange}
                 />
 
