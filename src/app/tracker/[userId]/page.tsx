@@ -20,8 +20,12 @@ interface TrackerPageProps {
   }>;
 }
 
-export default async function TrackerPage({ params }: TrackerPageProps) {
-  const { userId } = await params;
+export default function TrackerPage({ params }: TrackerPageProps) {
+  const [userId, setUserId] = useState<string>('');
+  
+  useEffect(() => {
+    params.then(({ userId }) => setUserId(userId));
+  }, [params]);
   const mounted = useMounted();
   const { user, loading: authLoading } = useAuth();
   
