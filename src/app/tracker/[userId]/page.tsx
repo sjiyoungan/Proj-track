@@ -43,15 +43,31 @@ export default function BoardPage({ params }: BoardPageProps) {
   // Initialize current board ID when user loads
   useEffect(() => {
     if (mounted && user && userIdLoaded && !currentBoardId) {
-      // Load user's boards and set current board ID to the first one
+      // Load user's boards and set current board ID to the last active one
       const initializeBoard = async () => {
         try {
           const userBoards = await getUserBoards();
           if (userBoards.length > 0) {
-            const firstBoard = userBoards[0];
-            console.log('🔄 Setting current board ID to:', firstBoard.board_id);
-            setCurrentBoardId(firstBoard.board_id);
-            setCurrentAccessLevel(firstBoard.access_level);
+            // Check for last active board in localStorage
+            const lastActiveBoardId = localStorage.getItem(`lastActiveBoard_${user.id}`);
+            let targetBoard = userBoards[0]; // Default to first board
+            
+            if (lastActiveBoardId) {
+              // Find the last active board in the user's boards
+              const lastActiveBoard = userBoards.find(board => board.board_id === lastActiveBoardId);
+              if (lastActiveBoard) {
+                targetBoard = lastActiveBoard;
+                console.log('🔄 Restoring last active board:', targetBoard.board_name);
+              } else {
+                console.log('🔄 Last active board not found, using first board');
+              }
+            } else {
+              console.log('🔄 No last active board found, using first board');
+            }
+            
+            console.log('🔄 Setting current board ID to:', targetBoard.board_id);
+            setCurrentBoardId(targetBoard.board_id);
+            setCurrentAccessLevel(targetBoard.access_level);
           } else {
             // Fallback to user ID if no boards exist
             console.log('🔄 No boards found, using user ID as fallback');
@@ -63,7 +79,7 @@ export default function BoardPage({ params }: BoardPageProps) {
           setCurrentBoardId(user.id);
         }
       };
-      
+
       initializeBoard();
     }
   }, [mounted, user, userIdLoaded, currentBoardId]);
@@ -88,6 +104,13 @@ export default function BoardPage({ params }: BoardPageProps) {
     
     setCurrentBoardId(boardId);
     setCurrentAccessLevel(accessLevel);
+    
+    // Save the last active board to localStorage
+    if (user) {
+      localStorage.setItem(`lastActiveBoard_${user.id}`, boardId);
+      console.log('💾 Saved last active board:', boardId);
+    }
+    
     // Reload data for the new board
     await loadBoardData(boardId);
     
