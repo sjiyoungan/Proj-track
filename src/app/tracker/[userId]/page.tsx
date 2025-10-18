@@ -12,7 +12,7 @@ import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState, getShareData, saveHeaderTitle, loadHeaderTitle } from '@/lib/supabaseService';
+import { saveTracker, loadTracker, getShareData } from '@/lib/supabaseService';
 
 interface TrackerPageProps {
   params: Promise<{
@@ -69,12 +69,12 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   // Save to Supabase
   const saveToSupabase = async () => {
     try {
-      await Promise.all([
-        saveProjects(projects),
-        saveGlobalKRs(globalKRs),
-        saveFilterState(filterState),
-        saveHeaderTitle(headerTitle)
-      ]);
+      await saveTracker({
+        projects,
+        globalKRs,
+        filterState,
+        headerTitle
+      });
     } catch (error) {
       console.error('❌ Save failed:', error);
     }
@@ -127,41 +127,23 @@ export default function TrackerPage({ params }: TrackerPageProps) {
           return;
         }
 
-        console.log('📥 Loading user data...');
-        const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
-          loadProjects(),
-          loadGlobalKRs(),
-          loadFilterState()
-        ]);
+        console.log('📥 Loading tracker data...');
+        const trackerData = await loadTracker();
         
         console.log('📊 Loaded data:', {
-          projects: loadedProjects.length,
-          krs: loadedGlobalKRs.length,
-          hasFilterState: !!loadedFilterState
+          projects: trackerData.projects.length,
+          krs: trackerData.globalKRs.length,
+          hasFilterState: !!trackerData.filterState,
+          headerTitle: trackerData.headerTitle
         });
         
-        setProjects(loadedProjects);
-        setGlobalKRs(loadedGlobalKRs);
-        
-        if (loadedFilterState) {
-          setFilterState(loadedFilterState);
-        }
-        
-        // Load header title separately to avoid hydration issues
-        try {
-          const loadedHeaderTitle = await loadHeaderTitle();
-          setHeaderTitle(loadedHeaderTitle);
-      } catch (error) {
-          console.error('Failed to load header title:', error);
-          // Fallback to localStorage
-          if (typeof window !== 'undefined') {
-            const fallbackTitle = localStorage.getItem('headerTitle') || '';
-            setHeaderTitle(fallbackTitle);
-          }
-        }
+        setProjects(trackerData.projects);
+        setGlobalKRs(trackerData.globalKRs);
+        setFilterState(trackerData.filterState);
+        setHeaderTitle(trackerData.headerTitle);
         
         // If no projects exist, create an empty one automatically
-        if (loadedProjects.length === 0) {
+        if (trackerData.projects.length === 0) {
           const emptyProject: Project = {
             id: `project-1`,
             priority: 1,
@@ -181,8 +163,6 @@ export default function TrackerPage({ params }: TrackerPageProps) {
             updatedAt: new Date().toISOString()
           };
           setProjects([emptyProject]);
-        } else {
-          setProjects(loadedProjects);
         }
       } catch (error) {
         console.error('❌ Failed to load data:', error);
@@ -318,18 +298,19 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   const clearAllData = async () => {
     try {
       // Clear all data from Supabase
-      await Promise.all([
-        saveProjects([]),
-        saveGlobalKRs([]),
-        saveFilterState({
+      await saveTracker({
+        projects: [],
+        globalKRs: [],
+        filterState: {
           showInitiative: true,
           showKR: true,
           showPlan: true,
           showDone: true,
           showFuture: true,
           sortBy: 'priority-asc'
-        })
-      ]);
+        },
+        headerTitle: ''
+      });
       
       // Create an empty project just like on first load
       const emptyProject: Project = {
@@ -369,7 +350,11 @@ export default function TrackerPage({ params }: TrackerPageProps) {
 
   const resetKRData = async () => {
     try {
-      await saveGlobalKRs([]);
+      const trackerData = await loadTracker();
+      await saveTracker({
+        ...trackerData,
+        globalKRs: []
+      });
       setGlobalKRs([]);
     } catch (error) {
       console.error('❌ Failed to reset KR data:', error);
@@ -410,7 +395,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8 w-fit">
             <div className="cursor-text hover:bg-slate-50 dark:hover:bg-slate-800 rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors" style={{lineHeight:"1.2",paddingTop:"2px",paddingBottom:"2px",paddingLeft:"8px",paddingRight:"8px",height:"auto",minHeight:"40px",maxWidth:"fit-content",boxSizing:"border-box",display:"flex",alignItems:"center"}}>
-              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">Proj-tracker (rename)</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">Tracker name</span>
             </div>
           </div>
           <div className="animate-pulse">

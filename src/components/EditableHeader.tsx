@@ -18,7 +18,7 @@ export function EditableHeader({ title, onTitleChange }: EditableHeaderProps) {
         <InputField
           value={title}
           onChange={onTitleChange}
-          placeholder={hasTitle ? "Enter project title..." : "Proj-tracker (rename)"}
+          placeholder={hasTitle ? "Enter tracker name..." : "Tracker name"}
           textSize="lg"
           width="hug"
           className={hasTitle ? "text-slate-900 dark:text-slate-100" : ""}
