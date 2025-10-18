@@ -410,6 +410,21 @@ export async function saveBoardById(boardId: string, data: {
     updated_at: new Date().toISOString()
   };
 
+  // First verify the board exists and belongs to the user
+  const { data: existingBoard, error: checkError } = await supabase
+    .from('boards')
+    .select('id, board_name')
+    .eq('id', boardId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (checkError || !existingBoard) {
+    console.error('❌ Board not found or access denied:', { boardId, userId: user.id, error: checkError });
+    throw new Error(`Board not found or access denied: ${boardId}`);
+  }
+
+  console.log('✅ Board verified:', existingBoard.board_name);
+
   console.log('💾 Updating board with data:', updateData);
 
   const { error } = await supabase
@@ -429,7 +444,7 @@ export async function saveBoardById(boardId: string, data: {
     throw error;
   }
 
-  console.log('✅ Board saved successfully by ID');
+  console.log('✅ Board saved successfully by ID:', boardId);
 }
 
 // Share a board with someone
