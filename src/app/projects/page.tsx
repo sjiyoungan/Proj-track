@@ -258,7 +258,7 @@ export default function ProjectsPage() {
               activeTab={activeTab}
               onProjectUpdate={handleProjectUpdate}
               onProjectReorder={handleProjectReorder}
-              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
+              onSortChange={(sortOption: SortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
               onProjectDelete={handleProjectDelete}
               onAddNewProject={addNewProject}
               showHoverRow={false}

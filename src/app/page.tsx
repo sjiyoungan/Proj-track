@@ -447,7 +447,7 @@ export default function Home() {
               showHoverRow={showHoverRow}
               hoverRowLocked={hoverRowLocked}
               onHoverRowLocked={setHoverRowLocked}
-              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
+              onSortChange={(sortOption: SortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
             />
 
               {/* Hover row - appears inside the table when hovering below (only on "all" tab) */}
@@ -567,7 +567,7 @@ export default function Home() {
               showHoverRow={showHoverRow}
               hoverRowLocked={hoverRowLocked}
               onHoverRowLocked={setHoverRowLocked}
-              onSortChange={(sortOption: string) => setFilterState({ ...filterState, sortBy: sortOption as SortOption })}
+              onSortChange={(sortOption: SortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
             />
 
             {/* Empty state messages */}

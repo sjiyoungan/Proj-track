@@ -29,7 +29,7 @@ interface ProjectTableProps {
   showHoverRow: boolean;
   hoverRowLocked: boolean;
   onHoverRowLocked: (locked: boolean) => void;
-  onSortChange?: (sortOption: string) => void;
+  onSortChange: (sortOption: SortOption) => void;
 }
 
 export function ProjectTable({ 
