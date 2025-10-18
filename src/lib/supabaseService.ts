@@ -223,18 +223,40 @@ export async function loadBoardName(): Promise<string> {
 export async function getUserBoards() {
   const { data: { user } } = await supabase.auth.getUser();
   
+  console.log('🔍 getUserBoards: Current user:', {
+    id: user?.id,
+    email: user?.email,
+    hasUser: !!user
+  });
+  
   if (!user) {
+    console.log('❌ getUserBoards: No user found');
     throw new Error('User not authenticated');
   }
 
+  console.log('🔄 getUserBoards: Calling RPC function with email:', user.email);
+  
   const { data, error } = await supabase
     .rpc('get_user_boards', { user_email: user.email });
 
+  console.log('🔍 getUserBoards: RPC response:', {
+    data,
+    error,
+    dataLength: data?.length || 0
+  });
+
   if (error) {
     console.error('❌ Error loading user boards:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
 
+  console.log('✅ getUserBoards: Returning boards:', data || []);
   return data || [];
 }
 

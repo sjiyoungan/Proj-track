@@ -67,9 +67,19 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
       console.log('🔄 Loading boards...');
       const userBoards = await getUserBoards();
       console.log('✅ Loaded boards:', userBoards);
+      console.log('🔍 Board details:', userBoards.map(b => ({
+        id: b.board_id,
+        name: b.board_display_name,
+        isOwner: b.is_owner,
+        ownerEmail: b.owner_email
+      })));
       setBoards(userBoards);
     } catch (error) {
       console.error('❌ Error loading boards:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        stack: error.stack
+      });
       // If the database functions don't exist yet, show empty state
       setBoards([]);
     } finally {
