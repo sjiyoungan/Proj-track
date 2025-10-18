@@ -20,6 +20,7 @@ interface Board {
   access_level: string;
   owner_email: string;
   owner_name: string;
+  created_at: string;
 }
 
 interface BoardSelectorProps {
@@ -71,9 +72,16 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
         id: b.board_id,
         name: b.board_name,
         isOwner: b.is_owner,
-        ownerEmail: b.owner_email
+        ownerEmail: b.owner_email,
+        createdAt: b.created_at
       })));
-      setBoards(userBoards);
+      
+      // Sort boards by creation date (oldest first) as backup
+      const sortedBoards = userBoards.sort((a: Board, b: Board) => {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      });
+      
+      setBoards(sortedBoards);
     } catch (error) {
       console.error('❌ Error loading boards:', error);
       console.error('❌ Error details:', {
