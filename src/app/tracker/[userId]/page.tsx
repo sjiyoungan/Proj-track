@@ -167,8 +167,13 @@ export default function BoardPage({ params }: BoardPageProps) {
 
   // Save to Supabase
   const saveToSupabase = async () => {
+    if (!currentBoardId) {
+      console.log('⏸️ Skipping save - currentBoardId not set yet');
+      return;
+    }
+    
     try {
-      console.log('💾 Saving to Supabase with boardName:', boardName);
+      console.log('💾 Saving to Supabase with boardName:', boardName, 'currentBoardId:', currentBoardId);
       await saveBoardById(currentBoardId, {
         projects,
         globalKRs,
@@ -394,7 +399,12 @@ export default function BoardPage({ params }: BoardPageProps) {
       return;
     }
     
-    console.log('💾 Auto-save triggered, boardName:', boardName);
+    console.log('💾 Auto-save triggered:', {
+      boardName,
+      currentBoardId,
+      projectsCount: projects.length,
+      globalKRsCount: globalKRs.length
+    });
     saveToSupabase();
   }, [projects, boardName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData, currentBoardId, isSwitchingBoards]);
 
