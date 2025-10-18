@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-    }).catch((error) => {
+    }).catch((error: any) => {
       console.error('🔐 AuthProvider: Error getting initial session:', error);
       clearTimeout(timeoutId);
       setLoading(false);
