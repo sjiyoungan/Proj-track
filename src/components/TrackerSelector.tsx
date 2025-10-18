@@ -67,7 +67,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
       console.log('🔄 Loading boards...');
       const userBoards = await getUserBoards();
       console.log('✅ Loaded boards:', userBoards);
-      console.log('🔍 Board details:', userBoards.map(b => ({
+      console.log('🔍 Board details:', userBoards.map((b: Board) => ({
         id: b.board_id,
         name: b.board_display_name,
         isOwner: b.is_owner,
@@ -97,7 +97,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
 
   const handleCreateBoard = async () => {
     try {
-      const boardCount = boards.filter(b => b.is_owner).length + 1;
+      const boardCount = boards.filter((b: Board) => b.is_owner).length + 1;
       const displayName = `New Board`;
       
       console.log('🔄 Creating new board:', displayName);
@@ -119,9 +119,9 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
     }
   };
 
-  const ownedBoards = boards.filter(b => b.is_owner);
-  const sharedBoards = boards.filter(b => !b.is_owner);
-  const currentBoard = boards.find(b => b.board_id === currentBoardId);
+  const ownedBoards = boards.filter((b: Board) => b.is_owner);
+  const sharedBoards = boards.filter((b: Board) => !b.is_owner);
+  const currentBoard = boards.find((b: Board) => b.board_id === currentBoardId);
 
   if (loading) {
     return (
