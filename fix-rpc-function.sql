@@ -1,36 +1,65 @@
--- Test and fix the get_user_trackers function
--- First, let's check if the tracker_id column exists and has data
-SELECT column_name, data_type 
-FROM information_schema.columns 
-WHERE table_name = 'trackers' AND column_name = 'tracker_id';
+-- Fix the get_user_boards RPC function
+-- Run this in Supabase SQL Editor
 
--- Check if there are any trackers with tracker_id
-SELECT tracker_id, user_id, tracker_name FROM trackers LIMIT 5;
+-- 1. Drop the existing function if it exists
+DROP FUNCTION IF EXISTS get_user_boards(text);
 
--- Create a simpler version of the function for testing
-CREATE OR REPLACE FUNCTION get_user_trackers(user_email TEXT)
+-- 2. Create the corrected function
+CREATE OR REPLACE FUNCTION get_user_boards(user_email text)
 RETURNS TABLE (
-  tracker_id UUID,
-  tracker_name TEXT,
-  tracker_display_name TEXT,
-  is_owner BOOLEAN,
-  access_level TEXT,
-  owner_email TEXT,
-  owner_name TEXT
-) AS $$
+  board_id uuid,
+  board_name text,
+  board_display_name text,
+  is_owner boolean,
+  access_level text,
+  owner_email text,
+  owner_name text
+) 
+SECURITY DEFINER -- This ensures the function runs with the privileges of the function owner
+AS $$
 BEGIN
+  -- Return boards owned by the user
   RETURN QUERY
-  -- Get trackers owned by the user
-  SELECT 
-    COALESCE(t.tracker_id, gen_random_uuid()) as tracker_id,
-    COALESCE(t.tracker_name, '') as tracker_name,
-    COALESCE(t.tracker_display_name, t.tracker_name, 'My Tracker') as tracker_display_name,
-    TRUE as is_owner,
-    'edit'::TEXT as access_level,
-    u.email as owner_email,
-    COALESCE(u.raw_user_meta_data->>'name', u.email) as owner_name
-  FROM trackers t
-  JOIN auth.users u ON t.user_id = u.id
-  WHERE u.email = user_email;
+  SELECT
+    b.id as board_id,
+    COALESCE(b.board_name, 'New Board') as board_name,
+    COALESCE(b.board_display_name, 'New Board') as board_display_name,
+    true as is_owner,
+    'edit'::text as access_level,
+    COALESCE(b.owner_email, au.email) as owner_email,
+    COALESCE(au.raw_user_meta_data->>'full_name', au.email) as owner_name
+  FROM boards b
+  JOIN auth.users au ON b.user_id = au.id
+  WHERE COALESCE(b.owner_email, au.email) = user_email;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
+
+-- 3. Grant execute permission to authenticated users
+GRANT EXECUTE ON FUNCTION get_user_boards(text) TO authenticated;
+
+-- 4. Grant execute permission to anon users (if needed)
+GRANT EXECUTE ON FUNCTION get_user_boards(text) TO anon;
+
+-- 5. Test the function
+SELECT 
+  'Function test' as test_type,
+  COUNT(*) as boards_found
+FROM get_user_boards(
+  (SELECT email FROM auth.users ORDER BY created_at DESC LIMIT 1)
+);
+
+-- 6. Show all boards that should be returned for the most recent user
+SELECT 
+  'Expected results' as test_type,
+  b.id as board_id,
+  COALESCE(b.board_name, 'New Board') as board_name,
+  COALESCE(b.board_display_name, 'New Board') as board_display_name,
+  true as is_owner,
+  'edit' as access_level,
+  COALESCE(b.owner_email, au.email) as owner_email,
+  COALESCE(au.raw_user_meta_data->>'full_name', au.email) as owner_name
+FROM boards b
+JOIN auth.users au ON b.user_id = au.id
+WHERE COALESCE(b.owner_email, au.email) = (
+  SELECT email FROM auth.users ORDER BY created_at DESC LIMIT 1
+);
