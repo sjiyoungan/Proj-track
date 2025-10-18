@@ -9,14 +9,12 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, UserCog } from 'lucide-react';
-import { ManageAccessModal } from '@/components/ManageAccessModal';
+import { User, LogOut } from 'lucide-react';
 
 export function UserProfile() {
   const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownWidth, setDropdownWidth] = useState<string>('auto');
-  const [showManageAccess, setShowManageAccess] = useState(false);
   const emailRef = useRef<HTMLDivElement>(null);
 
   // Calculate dropdown width based on email text
@@ -40,10 +38,6 @@ export function UserProfile() {
     }
   };
 
-  const handleManageAccess = () => {
-    setShowManageAccess(true);
-    setIsOpen(false);
-  };
 
   return (
     <>
@@ -97,22 +91,11 @@ export function UserProfile() {
         {/* Spacer div to create white space between line and menu items */}
         <div style={{ height: '4px' }}></div>
         
-        <DropdownMenuItem onClick={handleManageAccess} className="cursor-pointer">
-          <UserCog className="mr-2 h-4 w-4" />
-          Manage trackers
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-black dark:text-white">
           <LogOut className="mr-2 h-4 w-4" />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-    
-    {/* Manage Access Modal */}
-    <ManageAccessModal
-      isOpen={showManageAccess}
-      onClose={() => setShowManageAccess(false)}
-    />
-  </>
   );
 }

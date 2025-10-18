@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, Settings } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { getUserTrackers, createTracker } from '@/lib/supabaseService';
+import { ManageAccessModal } from '@/components/ManageAccessModal';
 
 interface Tracker {
   tracker_id: string;
@@ -33,6 +34,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [menuWidth, setMenuWidth] = useState(192); // Default width in pixels
+  const [showManageModal, setShowManageModal] = useState(false);
 
   const calculateMenuWidth = () => {
     const strings = [
@@ -148,7 +150,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
           </div>
           
           {/* Show "My tracker" as the first option */}
-          <div className={`flex items-center justify-between py-1 px-2 rounded-md ${currentTrackerId === currentTrackerId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+          <div className="flex items-center justify-between py-1 px-2 rounded-md">
             <DropdownMenuItem 
               onClick={() => {
                 onTrackerChange(currentTrackerId, 'edit');
@@ -220,7 +222,28 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
             ))
           )}
         </div>
+        
+        {/* Separator */}
+        <DropdownMenuSeparator />
+        
+        {/* Manage Trackers Option */}
+        <DropdownMenuItem 
+          onClick={() => {
+            setShowManageModal(true);
+            setIsOpen(false);
+          }}
+          className="cursor-pointer py-1 px-2"
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Manage trackers
+        </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      {/* Manage Access Modal */}
+      <ManageAccessModal
+        isOpen={showManageModal}
+        onClose={() => setShowManageModal(false)}
+      />
     </DropdownMenu>
   );
 }
