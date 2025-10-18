@@ -430,9 +430,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
           setTrackerToShare(null);
         }}
         trackerId={trackerToShare || ''}
-        onShareSuccess={() => {
-          loadData(); // Reload data to show updated sharing info
-        }}
+        trackerName={trackers.find(t => t.tracker_id === trackerToShare)?.tracker_display_name || ''}
       />
     </div>
   );
