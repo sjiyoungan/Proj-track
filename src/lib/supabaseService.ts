@@ -219,6 +219,106 @@ export async function loadBoardName(): Promise<string> {
   return boardData.boardName;
 }
 
+// Get all boards accessible to the current user
+export async function getUserBoards() {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data, error } = await supabase
+    .rpc('get_user_boards', { user_email: user.email });
+
+  if (error) {
+    console.error('❌ Error loading user boards:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+// Create a new board
+export async function createBoard(displayName: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  console.log('🔄 Creating board with data:', {
+    user_id: user.id,
+    owner_email: user.email,
+    board_display_name: displayName
+  });
+
+  const { data, error } = await supabase
+    .from('boards')
+    .insert({
+      user_id: user.id,
+      owner_email: user.email,
+      board_display_name: displayName,
+      board_name: 'New Board',
+      projects: [{
+        id: '1',
+        name: '',
+        status: 'Initiative',
+        priority: 'Medium',
+        kr: '',
+        plan: '',
+        hyperlink: '',
+        notes: ''
+      }],
+      global_krs: [],
+      filter_state: {
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority-asc'
+      }
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('❌ Error creating board:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
+    throw error;
+  }
+
+  console.log('✅ Board created successfully:', data);
+  return data;
+}
+
+// Delete a board
+export async function deleteBoard(boardId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('boards')
+    .delete()
+    .eq('id', boardId)
+    .eq('user_id', user.id); // Ensure user can only delete their own boards
+
+  if (error) {
+    console.error('❌ Error deleting board:', error);
+    throw error;
+  }
+
+  return true;
+}
+
 // Load a specific board by ID
 export async function loadBoardById(boardId: string) {
   const { data: { user } } = await supabase.auth.getUser();
