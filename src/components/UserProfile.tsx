@@ -39,7 +39,8 @@ export function UserProfile() {
       setIsOpen(false);
     } catch (error) {
       console.error('Failed to create share:', error);
-      alert(`Failed to create share link: ${error.message || error}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      alert(`Failed to create share link: ${errorMessage}`);
     }
   };
 
