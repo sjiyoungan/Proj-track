@@ -35,21 +35,21 @@ const getStatusColor = (value: string, type: 'design' | 'build' | 'plan') => {
   
   if (type === 'plan') {
     switch (value) {
-      case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950';
-      case 'Free': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-50 dark:hover:bg-green-950';
-      case 'Pre-account': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-950';
+      case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-25 dark:hover:bg-blue-975';
+      case 'Free': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-25 dark:hover:bg-green-975';
+      case 'Pre-account': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-25 dark:hover:bg-purple-975';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
     }
   } else {
     // Design and Build status colors - shared between both columns
     switch (value) {
-      case 'Not started': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-950';
-      case 'In progress': return 'bg-[#CBE0FC] text-[#224777] hover:bg-[#E8F2FF]';
-      case 'On hold': return 'bg-[#F4DD90] text-[#4D462F] hover:bg-[#F9E8B8]';
-      case 'Blocked': return 'bg-[#FFD1D2] text-[#732A33] hover:bg-[#FFE8E9]';
-      case 'Done': return 'bg-[#cce2e2] text-[#0B4F51] hover:bg-[#E6F5F5]';
-      case 'Future': return 'bg-[#DCDBDC] text-[#777680] hover:bg-[#F0F0F0]';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-950';
+      case 'Not started': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
+      case 'In progress': return 'bg-[#CBE0FC] text-[#224777] hover:bg-[#F0F8FF]';
+      case 'On hold': return 'bg-[#F4DD90] text-[#4D462F] hover:bg-[#FDF7E8]';
+      case 'Blocked': return 'bg-[#FFD1D2] text-[#732A33] hover:bg-[#FFF5F5]';
+      case 'Done': return 'bg-[#cce2e2] text-[#0B4F51] hover:bg-[#F0FDFD]';
+      case 'Future': return 'bg-[#DCDBDC] text-[#777680] hover:bg-[#FAFAFA]';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
     }
   }
 };

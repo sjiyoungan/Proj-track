@@ -169,23 +169,20 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
           
           {/* Show all owned boards */}
           {ownedBoards.map((board) => (
-            <div key={board.board_id} className="flex items-center justify-between py-1 px-2 rounded-md">
-              <DropdownMenuItem 
-                onClick={() => {
-                  console.log('🔄 Switching to board:', board.board_id, board.board_name);
-                  onBoardChange(board.board_id, board.access_level);
-                  setIsOpen(false);
-                }}
-                className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
-              >
-                <div className={`flex items-center px-2 py-1 rounded-full transition-colors ${
-                  board.board_id === currentBoardId 
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-                }`}>
-                  <span className="text-sm">{board.board_name}</span>
-                </div>
-              </DropdownMenuItem>
+            <div 
+              key={board.board_id} 
+              onClick={() => {
+                console.log('🔄 Switching to board:', board.board_id, board.board_name);
+                onBoardChange(board.board_id, board.access_level);
+                setIsOpen(false);
+              }}
+              className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
+                board.board_id === currentBoardId 
+                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              <span className="text-sm">{board.board_name}</span>
             </div>
           ))}
           
@@ -194,7 +191,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
             onClick={handleCreateBoard}
             className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-3 w-3 mr-2" />
             Add board
           </DropdownMenuItem>
         </div>
@@ -214,26 +211,25 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
             </div>
           ) : (
             sharedBoards.map((board) => (
-              <div key={board.board_id} className="flex items-center justify-between py-1 px-2 rounded-md">
-                <DropdownMenuItem 
-                  onClick={() => {
-                    console.log('🔄 Switching to shared board:', board.board_id, board.board_name);
-                    onBoardChange(board.board_id, board.access_level);
-                    setIsOpen(false);
-                  }}
-                  className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
-                >
-                  <div className={`flex flex-col px-2 py-1 rounded-full transition-colors ${
-                    board.board_id === currentBoardId 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-                  }`}>
-                    <span className="text-sm">{board.board_name}</span>
-                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                      by {board.owner_name || board.owner_email}
-                    </span>
-                  </div>
-                </DropdownMenuItem>
+              <div 
+                key={board.board_id} 
+                onClick={() => {
+                  console.log('🔄 Switching to shared board:', board.board_id, board.board_name);
+                  onBoardChange(board.board_id, board.access_level);
+                  setIsOpen(false);
+                }}
+                className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
+                  board.board_id === currentBoardId 
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+                }`}
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm">{board.board_name}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    by {board.owner_name || board.owner_email}
+                  </span>
+                </div>
               </div>
             ))
           )}
