@@ -344,6 +344,12 @@ export async function deleteBoard(boardId: string) {
 export async function loadBoardById(boardId: string) {
   const { data: { user } } = await supabase.auth.getUser();
   
+  console.log('🔍 loadBoardById called with:', {
+    boardId,
+    userId: user?.id,
+    userEmail: user?.email
+  });
+  
   if (!user) {
     throw new Error('User not authenticated');
   }
@@ -351,7 +357,15 @@ export async function loadBoardById(boardId: string) {
   const { data, error } = await supabase
     .from('boards')
     .select('*')
-    .eq('id', boardId);
+    .eq('id', boardId)
+    .eq('user_id', user.id); // CRITICAL: Ensure user owns this board
+
+  console.log('🔍 loadBoardById database response:', {
+    boardId,
+    userId: user.id,
+    dataLength: data?.length || 0,
+    error: error?.message || null
+  });
 
   if (error) {
     console.error('❌ Error loading board by ID:', error);
@@ -361,8 +375,16 @@ export async function loadBoardById(boardId: string) {
   const boardData = data && data.length > 0 ? data[0] : null;
   
   if (!boardData) {
-    throw new Error('Board not found');
+    console.error('❌ Board not found or access denied:', { boardId, userId: user.id });
+    throw new Error('Board not found or access denied');
   }
+
+  console.log('✅ loadBoardById success:', {
+    boardId,
+    boardName: boardData.board_name,
+    projectsCount: boardData.projects?.length || 0,
+    userId: user.id
+  });
 
   return {
     projects: boardData.projects || [],

@@ -52,17 +52,27 @@ export default function BoardPage({ params }: BoardPageProps) {
             const lastActiveBoardId = localStorage.getItem(`lastActiveBoard_${user.id}`);
             let targetBoard = userBoards[0]; // Default to first board
             
+            console.log('🔍 Board initialization debug:', {
+              userId: user.id,
+              lastActiveBoardId: lastActiveBoardId,
+              availableBoards: userBoards.map((b: any) => ({ id: b.board_id, name: b.board_name })),
+              localStorageKey: `lastActiveBoard_${user.id}`
+            });
+            
             if (lastActiveBoardId) {
               // Find the last active board in the user's boards
               const lastActiveBoard = userBoards.find((board: any) => board.board_id === lastActiveBoardId);
               if (lastActiveBoard) {
                 targetBoard = lastActiveBoard;
-                console.log('🔄 Restoring last active board:', targetBoard.board_name);
+                console.log('🔄 Restoring last active board:', {
+                  boardId: targetBoard.board_id,
+                  boardName: targetBoard.board_name
+                });
               } else {
-                console.log('🔄 Last active board not found, using first board');
+                console.log('🔄 Last active board not found in user boards, using first board');
               }
             } else {
-              console.log('🔄 No last active board found, using first board');
+              console.log('🔄 No last active board found in localStorage, using first board');
             }
             
             console.log('🔄 Setting current board ID to:', targetBoard.board_id);
@@ -108,7 +118,11 @@ export default function BoardPage({ params }: BoardPageProps) {
     // Save the last active board to localStorage
     if (user) {
       localStorage.setItem(`lastActiveBoard_${user.id}`, boardId);
-      console.log('💾 Saved last active board:', boardId);
+      console.log('💾 Saved last active board to localStorage:', {
+        userId: user.id,
+        boardId: boardId,
+        localStorageKey: `lastActiveBoard_${user.id}`
+      });
     }
     
     // Reload data for the new board
