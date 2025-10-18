@@ -67,7 +67,10 @@ export function UserProfile() {
             onError={(e) => {
               console.log('Profile icon failed to load, using fallback');
               e.currentTarget.style.display = 'none';
-              e.currentTarget.nextElementSibling.style.display = 'flex';
+              const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+              if (nextElement) {
+                nextElement.style.display = 'flex';
+              }
             }}
             onLoad={() => console.log('Profile icon loaded successfully')}
           />
