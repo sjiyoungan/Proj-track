@@ -171,9 +171,9 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                 }}
                 className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
               >
-                <div className={`flex items-center px-2 py-1 rounded-full transition-colors ${
+                <div className={`flex items-center px-2 py-1 rounded-full transition-opacity ${
                   board.board_id === currentBoardId 
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:opacity-90' 
                     : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                 }`}>
                   <span className="text-sm">{board.board_name}</span>
@@ -216,9 +216,9 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                   }}
                   className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
                 >
-                  <div className={`flex flex-col px-2 py-1 rounded-full transition-colors ${
+                  <div className={`flex flex-col px-2 py-1 rounded-full transition-opacity ${
                     board.board_id === currentBoardId 
-                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:opacity-90' 
                       : 'hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}>
                     <span className="text-sm">{board.board_name}</span>
