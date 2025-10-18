@@ -22,9 +22,14 @@ interface TrackerPageProps {
 
 export default function TrackerPage({ params }: TrackerPageProps) {
   const [userId, setUserId] = useState<string>('');
+  const [userIdLoaded, setUserIdLoaded] = useState<boolean>(false);
   
   useEffect(() => {
-    params.then(({ userId }) => setUserId(userId));
+    params.then(({ userId }) => {
+      console.log('🔗 Extracted userId from params:', userId);
+      setUserId(userId);
+      setUserIdLoaded(true);
+    });
   }, [params]);
   const mounted = useMounted();
   const { user, loading: authLoading } = useAuth();
@@ -85,9 +90,9 @@ export default function TrackerPage({ params }: TrackerPageProps) {
 
   // Load from Supabase on mount
   useEffect(() => {
-    console.log('🔄 useEffect triggered, mounted:', mounted, 'authLoading:', authLoading);
-    if (!mounted) {
-      console.log('❌ Not mounted yet, skipping data load');
+    console.log('🔄 useEffect triggered:', { mounted, authLoading, userIdLoaded, hasUser: !!user, userId });
+    if (!mounted || authLoading || !userIdLoaded || !user || !userId) {
+      console.log('❌ Not ready for data load:', { mounted, authLoading, userIdLoaded, hasUser: !!user, userId });
       return;
     }
     
@@ -144,6 +149,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
         setGlobalKRs(trackerData.globalKRs);
         setFilterState(trackerData.filterState);
         setTrackerName(trackerData.trackerName);
+        setHasLoadedData(true); // Mark that we've loaded data
         
         // If no projects exist, create an empty one automatically
         if (trackerData.projects.length === 0) {
@@ -193,19 +199,31 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     };
     
     loadData();
-  }, [mounted, user]);
+  }, [mounted, user, authLoading, userIdLoaded, userId]);
   
   // Debug user state
   useEffect(() => {
     console.log('👤 User state changed:', { user: !!user, userId: user?.id, email: user?.email });
   }, [user]);
 
-  // Auto-save when data changes
+  // Auto-save when data changes (but not on initial load)
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [hasLoadedData, setHasLoadedData] = useState(false);
+  
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !user || !userIdLoaded || !userId) return;
+    
+    // Skip auto-save on initial load or if we haven't loaded data yet
+    if (isInitialLoad || !hasLoadedData) {
+      if (hasLoadedData) {
+        setIsInitialLoad(false);
+      }
+      return;
+    }
+    
     console.log('💾 Auto-save triggered, trackerName:', trackerName);
     saveToSupabase();
-  }, [projects, trackerName, globalKRs, filterState, mounted]);
+  }, [projects, trackerName, globalKRs, filterState, mounted, user, userIdLoaded, userId, hasLoadedData]);
 
   const handleProjectUpdate = (updatedProject: Project) => {
     setProjects(prev => prev.map(p => 
@@ -393,7 +411,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     });
   };
 
-  if (!mounted) {
+  if (!mounted || !userIdLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <div className="container mx-auto px-4 py-8">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
@@ -15,6 +15,18 @@ import { createShare } from '@/lib/supabaseService';
 export function UserProfile() {
   const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownWidth, setDropdownWidth] = useState<string>('auto');
+  const emailRef = useRef<HTMLDivElement>(null);
+
+  // Calculate dropdown width based on email text
+  useEffect(() => {
+    if (emailRef.current && user?.email) {
+      const emailWidth = emailRef.current.offsetWidth;
+      // Add some padding for the menu items and icons
+      const menuItemWidth = Math.max(emailWidth, 120); // Minimum width for menu items
+      setDropdownWidth(`${menuItemWidth + 32}px`); // Add padding
+    }
+  }, [user?.email]);
 
   const handleSignOut = async () => {
     console.log('Sign out button clicked');
@@ -79,11 +91,27 @@ export function UserProfile() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-64">
+      <DropdownMenuContent align="end" style={{ width: dropdownWidth }}>
         {/* Email address display - non-interactive */}
-        <div className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-outline border-b-1">
+        <div className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-outline border-b-1" style={{ paddingTop: '6px', paddingBottom: '8px' }}>
+          <div 
+            ref={emailRef}
+            className="font-medium text-gray-900 dark:text-gray-100"
+            style={{ 
+              visibility: 'hidden', 
+              position: 'absolute', 
+              whiteSpace: 'nowrap',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            {user?.email}
+          </div>
           <div className="font-medium text-gray-900 dark:text-gray-100">{user?.email}</div>
         </div>
+        
+        {/* Spacer div to create white space between line and menu items */}
+        <div style={{ height: '4px' }}></div>
         
         <DropdownMenuItem onClick={handleShare} className="cursor-pointer">
           <Share2 className="mr-2 h-4 w-4" />

@@ -24,7 +24,9 @@ export function InputField({
 }: InputFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
+  const [inputWidth, setInputWidth] = useState<string>('auto');
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const displayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -59,6 +61,14 @@ export function InputField({
   };
 
   const handleClick = () => {
+    // Store the width before entering edit mode
+    if (width === 'fill') {
+      setInputWidth('100%');
+    } else if (displayRef.current) {
+      setInputWidth(`${displayRef.current.offsetWidth}px`);
+    } else {
+      setInputWidth('auto');
+    }
     setIsEditing(true);
   };
 
@@ -94,7 +104,7 @@ export function InputField({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             className={cn(
-              "w-full bg-transparent border-none outline-none resize-none text-slate-900 dark:text-slate-100"
+              "bg-transparent border-none outline-none text-slate-900 dark:text-slate-100"
             )}
             style={{
               paddingTop: '2px',
@@ -105,7 +115,10 @@ export function InputField({
               minHeight: textSize === 'lg' ? '40px' : '32px',
               lineHeight: textSize === 'lg' ? '1.2' : 'normal',
               fontSize: textSize === 'lg' ? '24px' : '14px',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              width: width === 'fill' ? '100%' : 'auto',
+              minWidth: width === 'fill' ? '100%' : '0',
+              maxWidth: width === 'fill' ? '100%' : 'none'
             }}
             placeholder={placeholder.replace('...', '')}
           />
@@ -117,7 +130,7 @@ export function InputField({
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             className={cn(
-              "w-full bg-transparent border-none outline-none text-slate-900 dark:text-slate-100"
+              "bg-transparent border-none outline-none text-slate-900 dark:text-slate-100"
             )}
             style={{
               paddingTop: '2px',
@@ -127,16 +140,18 @@ export function InputField({
               height: textSize === 'lg' ? '40px' : '32px',
               lineHeight: textSize === 'lg' ? '1.2' : 'normal',
               fontSize: textSize === 'lg' ? '24px' : '14px',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              width: inputWidth
             }}
             placeholder={placeholder.replace('...', '')}
           />
         )
       ) : (
         <div
+          ref={displayRef}
           onClick={handleClick}
           className={cn(
-            "cursor-text w-full",
+            "cursor-text w-fit",
             !value && "text-slate-400 dark:text-slate-500"
           )}
           style={{

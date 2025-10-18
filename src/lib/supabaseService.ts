@@ -10,23 +10,33 @@ export async function saveTracker(data: {
   trackerName: string;
 }) {
   const { data: { user } } = await supabase.auth.getUser();
-  console.log('💾 Saving tracker for user:', user?.id, user?.email);
+  console.log('💾 Saving tracker data:', {
+    user_id: user.id,
+    projects_count: data.projects.length,
+    globalKRs_count: data.globalKRs.length,
+    trackerName: data.trackerName,
+    filterState: data.filterState
+  });
   
   if (!user) {
     console.log('❌ No user found for saving tracker');
     throw new Error('User not authenticated');
   }
 
+  const upsertData = {
+    user_id: user.id,
+    projects: data.projects,
+    global_krs: data.globalKRs,
+    filter_state: data.filterState,
+    tracker_name: data.trackerName,
+    updated_at: new Date().toISOString()
+  };
+  
+  console.log('🔍 Upsert data being sent:', upsertData);
+  
   const { error } = await supabase
     .from('trackers')
-    .upsert({
-      user_id: user.id,
-      projects: data.projects,
-      global_krs: data.globalKRs,
-      filter_state: data.filterState,
-      header_title: data.trackerName,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'user_id' });
+    .upsert(upsertData, { onConflict: 'user_id' });
   
   if (error) {
     console.error('❌ Error saving tracker:', error);
@@ -68,11 +78,16 @@ export async function loadTracker(): Promise<{
     };
   }
 
+  console.log('🔍 Loading tracker data for user:', user?.id, user?.email);
+  
   const { data, error } = await supabase
     .from('trackers')
-    .select('projects, global_krs, filter_state, header_title')
+    .select('projects, global_krs, filter_state, tracker_name')
     .eq('user_id', user.id)
     .single();
+  
+  console.log('🔍 Database response:', { data, error });
+  console.log('🔍 Raw tracker_name value:', data?.tracker_name);
   
   if (error) {
     console.error('❌ Error loading tracker:', error);
@@ -111,7 +126,7 @@ export async function loadTracker(): Promise<{
       showFuture: true,
       sortBy: 'priority'
     },
-    trackerName: data.header_title || ''
+    trackerName: data.tracker_name || ''
   };
 }
 
@@ -206,7 +221,7 @@ export async function getShareData(shareId: string) {
         projects,
         global_krs,
         filter_state,
-        header_title
+        tracker_name
       )
     `)
     .eq('share_id', shareId)
@@ -229,6 +244,6 @@ export async function getShareData(shareId: string) {
       showFuture: true,
       sortBy: 'priority'
     },
-    trackerName: data.trackers.header_title || ''
+    trackerName: data.trackers.tracker_name || ''
   };
 }
