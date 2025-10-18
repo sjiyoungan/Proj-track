@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import AuthForm from '@/components/AuthForm';
+import { AuthForm } from '@/components/AuthForm';
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
