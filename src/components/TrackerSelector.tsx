@@ -165,7 +165,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
             <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50`}>
               <DropdownMenuItem 
                 onClick={() => {
-                  console.log('🔄 Switching to board:', board.board_id, board.board_display_name);
+                  console.log('🔄 Switching to board:', board.board_id, board.board_name);
                   onBoardChange(board.board_id, board.access_level);
                   setIsOpen(false);
                 }}
@@ -210,7 +210,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
               <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50`}>
                 <DropdownMenuItem 
                   onClick={() => {
-                    console.log('🔄 Switching to shared board:', board.board_id, board.board_display_name);
+                    console.log('🔄 Switching to shared board:', board.board_id, board.board_name);
                     onBoardChange(board.board_id, board.access_level);
                     setIsOpen(false);
                   }}
