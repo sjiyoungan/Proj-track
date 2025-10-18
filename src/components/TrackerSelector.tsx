@@ -192,7 +192,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
                 onBoardChange(board.board_id, board.access_level);
                 setIsOpen(false);
               }}
-              className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
+              className={`cursor-pointer py-2 px-2 rounded-md transition-colors flex items-center ${
                 board.board_id === currentBoardId 
                   ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
                   : 'hover:bg-slate-50 dark:hover:bg-slate-750'
@@ -205,7 +205,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
           {/* Add Board Button */}
           <div 
             onClick={handleCreateBoard}
-            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750"
+            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center"
           >
             <Plus className="h-3 w-3 mr-2" />
             Add board
