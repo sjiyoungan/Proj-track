@@ -79,7 +79,12 @@ export function UserProfile() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-auto min-w-fit">
+      <DropdownMenuContent align="end" className="w-64">
+        {/* Email address display - non-interactive */}
+        <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-200 dark:border-blue-800">
+          <div className="font-medium text-gray-900 dark:text-gray-100">{user?.email}</div>
+        </div>
+        
         <DropdownMenuItem onClick={handleShare} className="cursor-pointer">
           <Share2 className="mr-2 h-4 w-4" />
           Share
