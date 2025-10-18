@@ -119,7 +119,7 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
                 className={`px-2 py-1.5 cursor-pointer text-sm rounded-sm ${
                   option.value === value 
                     ? 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100' 
-                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-750'
+                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-25 dark:hover:bg-slate-775'
                 }`}
               >
                 {option.label}

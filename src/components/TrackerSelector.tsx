@@ -195,7 +195,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
               className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                 board.board_id === currentBoardId 
                   ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
-                  : 'hover:bg-slate-50 dark:hover:bg-slate-750'
+                  : 'hover:bg-slate-25 dark:hover:bg-slate-775'
               }`}
             >
               <span className="text-sm">{board.board_name}</span>
@@ -203,13 +203,13 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
           ))}
           
           {/* Add Board Button */}
-          <DropdownMenuItem 
+          <div 
             onClick={handleCreateBoard}
-            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2"
+            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-25 dark:hover:bg-slate-775"
           >
             <Plus className="h-3 w-3 mr-2" />
             Add board
-          </DropdownMenuItem>
+          </div>
         </div>
         
         {/* Separator */}
@@ -237,7 +237,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
                 className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                   board.board_id === currentBoardId 
                     ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-750'
+                    : 'hover:bg-slate-25 dark:hover:bg-slate-775'
                 }`}
               >
                 <div className="flex flex-col">
