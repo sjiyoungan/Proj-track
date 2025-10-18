@@ -156,33 +156,7 @@ export async function loadHeaderTitle(): Promise<string> {
   return trackerData.headerTitle;
 }
 
-// Share functionality
-export async function createShare(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  if (!user) {
-    throw new Error('User not authenticated');
-  }
-
-  const shareId = Math.random().toString(36).substring(2, 15);
-  
-  const { error } = await supabase
-    .from('shares')
-    .insert({
-      share_id: shareId,
-      user_id: user.id,
-      owner_id: user.id,
-      is_active: true
-    });
-
-  if (error) {
-    console.error('❌ Error creating share:', error);
-    throw error;
-  }
-
-  return shareId;
-}
-
+// Share functionality (keeping existing for now)
 export async function getShareData(shareId: string) {
   const { data, error } = await supabase
     .from('shares')

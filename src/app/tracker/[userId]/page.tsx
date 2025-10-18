@@ -15,20 +15,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState, getShareData, saveHeaderTitle, loadHeaderTitle } from '@/lib/supabaseService';
 
 interface TrackerPageProps {
-  params: {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 }
 
-export default function TrackerPage({ params }: TrackerPageProps) {
+export default async function TrackerPage({ params }: TrackerPageProps) {
+  const { userId } = await params;
   const mounted = useMounted();
   const { user, loading: authLoading } = useAuth();
   
-  console.log('🏠 Tracker component rendered:', { mounted, user: !!user, authLoading, urlUserId: params.userId });
+  console.log('🏠 Tracker component rendered:', { mounted, user: !!user, authLoading, urlUserId: userId });
   
   // Validate that the user is accessing their own tracker page
-  if (mounted && user && user.id !== params.userId) {
-    console.log('❌ User trying to access different user\'s tracker:', { currentUser: user.id, requestedUser: params.userId });
+  if (mounted && user && user.id !== userId) {
+    console.log('❌ User trying to access different user\'s tracker:', { currentUser: user.id, requestedUser: userId });
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
