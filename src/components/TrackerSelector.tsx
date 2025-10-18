@@ -122,6 +122,13 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
   const sharedBoards = boards.filter((b: Board) => !b.is_owner);
   const currentBoard = boards.find((b: Board) => b.board_id === currentBoardId);
 
+  console.log('🔍 BoardSelector debug:', {
+    currentBoardId,
+    boardsCount: boards.length,
+    ownedBoardsCount: ownedBoards.length,
+    currentBoard: currentBoard ? { id: currentBoard.board_id, name: currentBoard.board_name } : null
+  });
+
   if (loading) {
     return (
       <div className="flex items-center gap-2">

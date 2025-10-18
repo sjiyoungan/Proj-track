@@ -43,9 +43,28 @@ export default function BoardPage({ params }: BoardPageProps) {
   // Initialize current board ID when user loads
   useEffect(() => {
     if (mounted && user && userIdLoaded && !currentBoardId) {
-      // For now, we'll use the user's ID as the board ID
-      // Later we'll implement proper board selection
-      setCurrentBoardId(user.id);
+      // Load user's boards and set current board ID to the first one
+      const initializeBoard = async () => {
+        try {
+          const userBoards = await getUserBoards();
+          if (userBoards.length > 0) {
+            const firstBoard = userBoards[0];
+            console.log('🔄 Setting current board ID to:', firstBoard.board_id);
+            setCurrentBoardId(firstBoard.board_id);
+            setCurrentAccessLevel(firstBoard.access_level);
+          } else {
+            // Fallback to user ID if no boards exist
+            console.log('🔄 No boards found, using user ID as fallback');
+            setCurrentBoardId(user.id);
+          }
+        } catch (error) {
+          console.error('❌ Error loading user boards:', error);
+          // Fallback to user ID
+          setCurrentBoardId(user.id);
+        }
+      };
+      
+      initializeBoard();
     }
   }, [mounted, user, userIdLoaded, currentBoardId]);
 
