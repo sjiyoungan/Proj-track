@@ -133,6 +133,9 @@ export async function loadFilterState(): Promise<FilterState | null> {
 
 // Header Title
 export async function saveHeaderTitle(title: string) {
+  // Only run on client side
+  if (typeof window === 'undefined') return;
+  
   try {
     console.log('🔄 Attempting to save header title to database:', title);
     console.log('🔄 Supabase client:', supabase);
@@ -163,6 +166,9 @@ export async function saveHeaderTitle(title: string) {
 }
 
 export async function loadHeaderTitle(): Promise<string> {
+  // Only run on client side
+  if (typeof window === 'undefined') return '';
+  
   try {
     console.log('🔄 Attempting to load header title from database');
     console.log('🔄 Supabase client:', supabase);

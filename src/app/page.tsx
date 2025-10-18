@@ -95,11 +95,10 @@ export default function Home() {
           return;
         }
 
-        const [loadedProjects, loadedGlobalKRs, loadedFilterState, loadedHeaderTitle] = await Promise.all([
+        const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
           loadProjects(),
           loadGlobalKRs(),
-          loadFilterState(),
-          loadHeaderTitle()
+          loadFilterState()
         ]);
         
         setProjects(loadedProjects);
@@ -109,7 +108,18 @@ export default function Home() {
           setFilterState(loadedFilterState);
         }
         
-        setHeaderTitle(loadedHeaderTitle);
+        // Load header title separately to avoid hydration issues
+        try {
+          const loadedHeaderTitle = await loadHeaderTitle();
+          setHeaderTitle(loadedHeaderTitle);
+      } catch (error) {
+          console.error('Failed to load header title:', error);
+          // Fallback to localStorage
+          if (typeof window !== 'undefined') {
+            const fallbackTitle = localStorage.getItem('headerTitle') || '';
+            setHeaderTitle(fallbackTitle);
+          }
+        }
         
         // If no projects exist, create an empty one automatically
         if (loadedProjects.length === 0) {
