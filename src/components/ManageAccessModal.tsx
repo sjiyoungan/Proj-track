@@ -60,7 +60,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
           const trackerPermissions = await getTrackerPermissions(tracker.tracker_id);
           console.log(`🔄 ManageAccessModal: Loaded permissions for ${tracker.tracker_display_name}:`, trackerPermissions);
           // Attach tracker_display_name to each permission for easier rendering
-          const permissionsWithTrackerName = trackerPermissions.map(p => ({
+          const permissionsWithTrackerName = trackerPermissions.map((p: Permission) => ({
             ...p,
             tracker_display_name: tracker.tracker_display_name
           }));
