@@ -40,7 +40,6 @@ export function UserProfile() {
 
 
   return (
-    <>
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild className="focus:outline-none focus:ring-0 focus:ring-offset-0">
         <Button
