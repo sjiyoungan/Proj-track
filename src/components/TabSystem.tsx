@@ -11,19 +11,19 @@ interface TabSystemProps {
 }
 
 export function TabSystem({ activeTab, onTabChange, projects }: TabSystemProps) {
-  // Calculate counts based on design status
+  // Calculate counts based on design status only
   const getTabCount = (tabId: TabFilter): number => {
     switch (tabId) {
       case 'all':
         return projects.length;
       case 'in-progress':
-        return projects.filter(p => p.designStatus === 'In progress' || p.buildStatus === 'In progress').length;
+        return projects.filter(p => p.designStatus === 'In progress').length;
       case 'not-started':
-        return projects.filter(p => p.designStatus === 'Not started' && p.buildStatus === 'Not started').length;
+        return projects.filter(p => p.designStatus === 'Not started').length;
       case 'on-hold':
-        return projects.filter(p => p.designStatus === 'On hold' || p.buildStatus === 'On hold').length;
+        return projects.filter(p => p.designStatus === 'On hold').length;
       case 'done':
-        return projects.filter(p => p.designStatus === 'Done' && p.buildStatus === 'Done').length;
+        return projects.filter(p => p.designStatus === 'Done').length;
       case 'future':
         return projects.filter(p => p.designStatus === 'Future').length;
       default:

@@ -62,22 +62,22 @@ export function ProjectTable({
     return sortedProjects[currentIndex - 1].id;
   };
 
-  // Filter projects based on active tab and filter state
+  // Filter projects based on active tab and filter state (Design status only)
   const filteredProjects = projects.filter(project => {
-    // First apply tab filter
+    // First apply tab filter based on Design status only
     let passesTabFilter = true;
     switch (activeTab) {
       case 'in-progress':
-        passesTabFilter = project.designStatus === 'In progress' || project.buildStatus === 'In progress';
+        passesTabFilter = project.designStatus === 'In progress';
         break;
       case 'not-started':
-        passesTabFilter = project.designStatus === 'Not started' && project.buildStatus === 'Not started';
+        passesTabFilter = project.designStatus === 'Not started';
         break;
       case 'on-hold':
-        passesTabFilter = project.designStatus === 'On hold' || project.buildStatus === 'On hold';
+        passesTabFilter = project.designStatus === 'On hold';
         break;
       case 'done':
-        passesTabFilter = project.designStatus === 'Done' && project.buildStatus === 'Done';
+        passesTabFilter = project.designStatus === 'Done';
         break;
       case 'future':
         passesTabFilter = project.designStatus === 'Future';
