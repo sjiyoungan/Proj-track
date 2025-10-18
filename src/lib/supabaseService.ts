@@ -134,7 +134,10 @@ export async function loadFilterState(): Promise<FilterState | null> {
 // Header Title
 export async function saveHeaderTitle(title: string) {
   try {
-    const { error } = await supabase
+    console.log('🔄 Attempting to save header title to database:', title);
+    console.log('🔄 Supabase client:', supabase);
+    
+    const { data, error } = await supabase
       .from('header_title')
       .upsert({
         id: 'default',
@@ -142,25 +145,40 @@ export async function saveHeaderTitle(title: string) {
         updated_at: new Date().toISOString()
       });
     
-    if (error) throw error;
+    console.log('🔄 Supabase response:', { data, error });
+    
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      throw error;
+    }
+    
     console.log('✅ Header title saved to database');
   } catch (error) {
     console.error('Failed to save header title to database:', error);
     console.log('📝 Falling back to localStorage');
     // Fallback: save to localStorage
     localStorage.setItem('headerTitle', title);
+    console.log('✅ Header title saved to localStorage');
   }
 }
 
 export async function loadHeaderTitle(): Promise<string> {
   try {
+    console.log('🔄 Attempting to load header title from database');
+    console.log('🔄 Supabase client:', supabase);
+    
     const { data, error } = await supabase
       .from('header_title')
       .select('title')
       .eq('id', 'default')
       .single();
     
-    if (error) throw error;
+    console.log('🔄 Supabase response:', { data, error });
+    
+    if (error) {
+      console.error('❌ Supabase error:', error);
+      throw error;
+    }
     
     console.log('✅ Header title loaded from database:', data?.title);
     return data?.title || '';
