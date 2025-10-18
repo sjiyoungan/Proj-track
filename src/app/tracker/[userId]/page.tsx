@@ -132,36 +132,39 @@ export default function BoardPage({ params }: BoardPageProps) {
       setBoardName(boardData.boardName);
     } catch (error) {
       console.error('❌ Failed to load board data from new system:', error);
-      // Fall back to the old system if new system isn't set up yet
-      try {
-        const oldBoardData = await loadBoard();
-        setProjects(oldBoardData.projects);
-        setGlobalKRs(oldBoardData.globalKRs);
-        setFilterState(oldBoardData.filterState);
-        setBoardName(oldBoardData.boardName);
-      } catch (fallbackError) {
-        console.error('❌ Failed to load board data from old system:', fallbackError);
-        // Create empty project if both fail
-        const emptyProject: Project = {
-          id: `project-1`,
-          priority: 1,
-          name: '',
-          plan: 'select',
-          initiative: '',
-          selectedKRs: [],
-          designStatus: 'select',
-          buildStatus: 'select',
-          problemStatement: '',
-          solution: '',
-          successMetric: '',
-          figmaLink: '',
-          prdLink: '',
-          customLinks: [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        setProjects([emptyProject]);
-      }
+      console.error('❌ Board ID that failed:', boardId);
+      // Don't fall back to a different board - this would cause data corruption
+      // Instead, create empty data for this specific board
+      console.log('🔄 Creating empty data for board:', boardId);
+      const emptyProject: Project = {
+        id: `project-1`,
+        priority: 1,
+        name: '',
+        plan: 'select',
+        initiative: '',
+        selectedKRs: [],
+        designStatus: 'select',
+        buildStatus: 'select',
+        problemStatement: '',
+        solution: '',
+        successMetric: '',
+        figmaLink: '',
+        prdLink: '',
+        customLinks: [],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      setProjects([emptyProject]);
+      setGlobalKRs([]);
+      setFilterState({
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority-asc'
+      });
+      setBoardName('New Board');
     }
   };
   const [projects, setProjects] = useState<Project[]>([]);
