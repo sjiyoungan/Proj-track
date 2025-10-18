@@ -3,10 +3,14 @@ import { Project, KRItem, FilterState } from '@/types/project';
 
 // Projects
 export async function saveProjects(projects: Project[]) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { error } = await supabase
     .from('projects')
     .upsert(projects.map(project => ({
       id: project.id,
+      user_id: user.id,
       priority: project.priority,
       name: project.name,
       plan: project.plan,
@@ -28,9 +32,13 @@ export async function saveProjects(projects: Project[]) {
 }
 
 export async function loadProjects(): Promise<Project[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('projects')
     .select('*')
+    .eq('user_id', user.id)
     .order('priority');
   
   if (error) throw error;
@@ -57,10 +65,14 @@ export async function loadProjects(): Promise<Project[]> {
 
 // Global KRs
 export async function saveGlobalKRs(krs: KRItem[]) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { error } = await supabase
     .from('global_krs')
     .upsert(krs.map(kr => ({
       id: kr.id,
+      user_id: user.id,
       text: kr.text,
       fill_color: kr.fillColor,
       text_color: kr.textColor,
@@ -71,9 +83,13 @@ export async function saveGlobalKRs(krs: KRItem[]) {
 }
 
 export async function loadGlobalKRs(): Promise<KRItem[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('global_krs')
     .select('*')
+    .eq('user_id', user.id)
     .order('order_index');
   
   if (error) throw error;
@@ -89,10 +105,14 @@ export async function loadGlobalKRs(): Promise<KRItem[]> {
 
 // Filter State
 export async function saveFilterState(filterState: FilterState) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { error } = await supabase
     .from('filter_state')
     .upsert({
       id: 'default',
+      user_id: user.id,
       show_initiative: filterState.showInitiative,
       show_kr: filterState.showKR,
       show_plan: filterState.showPlan,
@@ -106,10 +126,14 @@ export async function saveFilterState(filterState: FilterState) {
 }
 
 export async function loadFilterState(): Promise<FilterState | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('filter_state')
     .select('*')
-    .eq('id', 'default');
+    .eq('id', 'default')
+    .eq('user_id', user.id);
   
   if (error) {
     console.error('Error loading filter state:', error);
@@ -137,6 +161,9 @@ export async function saveHeaderTitle(title: string) {
   if (typeof window === 'undefined') return;
   
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     console.log('🔄 Attempting to save header title to database:', title);
     console.log('🔄 Supabase client:', supabase);
     
@@ -144,6 +171,7 @@ export async function saveHeaderTitle(title: string) {
       .from('header_title')
       .upsert({
         id: 'default',
+        user_id: user.id,
         title: title,
         updated_at: new Date().toISOString()
       });
@@ -170,6 +198,9 @@ export async function loadHeaderTitle(): Promise<string> {
   if (typeof window === 'undefined') return '';
   
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     console.log('🔄 Attempting to load header title from database');
     console.log('🔄 Supabase client:', supabase);
     
@@ -177,6 +208,7 @@ export async function loadHeaderTitle(): Promise<string> {
       .from('header_title')
       .select('title')
       .eq('id', 'default')
+      .eq('user_id', user.id)
       .single();
     
     console.log('🔄 Supabase response:', { data, error });
@@ -203,11 +235,15 @@ export async function createShare(): Promise<string> {
   const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const { error } = await supabase
       .from('shares')
       .insert({
         share_id: shareId,
-        owner_id: (await supabase.auth.getUser()).data.user?.id
+        user_id: user.id,
+        owner_id: user.id
       });
     
     if (error) throw error;
@@ -277,10 +313,14 @@ export async function getShareData(shareId: string) {
 }
 
 export async function revokeShare(shareId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
   const { error } = await supabase
     .from('shares')
     .update({ is_active: false })
-    .eq('share_id', shareId);
+    .eq('share_id', shareId)
+    .eq('user_id', user.id);
   
   if (error) throw error;
 }
