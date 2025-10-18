@@ -24,12 +24,18 @@ export async function saveTracker(data: {
       projects: data.projects,
       global_krs: data.globalKRs,
       filter_state: data.filterState,
-      tracker_name: data.trackerName,
+      header_title: data.trackerName,
       updated_at: new Date().toISOString()
     }, { onConflict: 'user_id' });
   
   if (error) {
     console.error('❌ Error saving tracker:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
   
@@ -70,6 +76,12 @@ export async function loadTracker(): Promise<{
   
   if (error) {
     console.error('❌ Error loading tracker:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     // Return empty data if no tracker exists yet
     return {
       projects: [],
@@ -99,7 +111,7 @@ export async function loadTracker(): Promise<{
       showFuture: true,
       sortBy: 'priority'
     },
-    trackerName: data.tracker_name || ''
+    trackerName: data.header_title || ''
   };
 }
 
