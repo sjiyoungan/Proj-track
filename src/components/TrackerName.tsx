@@ -10,13 +10,15 @@ interface BoardNameProps {
   onBoardNameChange: (boardName: string) => void;
   currentBoardId: string;
   onBoardChange: (boardId: string, accessLevel: string) => void;
+  refreshTrigger?: number;
 }
 
 export function BoardName({ 
   boardName, 
   onBoardNameChange, 
   currentBoardId,
-  onBoardChange
+  onBoardChange,
+  refreshTrigger
 }: BoardNameProps) {
   const hasName = boardName.trim().length > 0;
 
@@ -34,11 +36,12 @@ export function BoardName({
               className={hasName ? "text-slate-900 dark:text-slate-100" : ""}
             />
           </div>
-          <BoardSelector
-            currentBoardId={currentBoardId}
-            onBoardChange={onBoardChange}
-            boardName={boardName}
-          />
+                <BoardSelector
+                  currentBoardId={currentBoardId}
+                  onBoardChange={onBoardChange}
+                  boardName={boardName}
+                  refreshTrigger={refreshTrigger}
+                />
         </div>
       </div>
       <UserProfile />

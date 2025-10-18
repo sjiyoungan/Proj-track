@@ -155,10 +155,29 @@ export default function BoardPage({ params }: BoardPageProps) {
   const [boardName, setBoardName] = useState<string>('');
   const [showHoverRow, setShowHoverRow] = useState(false);
   const [hoverRowLocked, setHoverRowLocked] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-  const handleBoardNameChange = (newName: string) => {
+  const handleBoardNameChange = async (newName: string) => {
     console.log('🔄 Board name changing from:', boardName, 'to:', newName);
     setBoardName(newName);
+    
+    // Save the board name change immediately
+    if (currentBoardId) {
+      try {
+        await saveBoardById(currentBoardId, {
+          projects,
+          globalKRs,
+          filterState,
+          boardName: newName
+        });
+        console.log('✅ Board name saved successfully');
+        
+        // Trigger refresh of board selector
+        setRefreshTrigger(prev => prev + 1);
+      } catch (error) {
+        console.error('❌ Error saving board name:', error);
+      }
+    }
   };
 
   const handleGlobalKRChange = (newKRs: KRItem[]) => {
@@ -653,6 +672,7 @@ export default function BoardPage({ params }: BoardPageProps) {
                   onBoardNameChange={handleBoardNameChange}
                   currentBoardId={currentBoardId}
                   onBoardChange={handleBoardChange}
+                  refreshTrigger={refreshTrigger}
                 />
 
         {/* Tab System and Filter Bar */}

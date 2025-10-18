@@ -26,9 +26,10 @@ interface BoardSelectorProps {
   currentBoardId: string;
   onBoardChange: (boardId: string, accessLevel: string) => void;
   boardName: string;
+  refreshTrigger?: number; // Add this to trigger refresh when board name changes
 }
 
-export function BoardSelector({ currentBoardId, onBoardChange, boardName }: BoardSelectorProps) {
+export function BoardSelector({ currentBoardId, onBoardChange, boardName, refreshTrigger }: BoardSelectorProps) {
   const [boards, setBoards] = useState<Board[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -89,6 +90,13 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
   useEffect(() => {
     loadBoards();
   }, []);
+
+  // Refresh boards when refreshTrigger changes (e.g., when board name is updated)
+  useEffect(() => {
+    if (refreshTrigger !== undefined) {
+      loadBoards();
+    }
+  }, [refreshTrigger]);
 
   useEffect(() => {
     calculateMenuWidth();
