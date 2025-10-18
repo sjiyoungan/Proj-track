@@ -212,6 +212,22 @@ export async function saveBoardName(boardName: string) {
     ...boardData,
     boardName
   });
+  
+  // Also update board_display_name to keep them in sync
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { error } = await supabase
+      .from('boards')
+      .update({ 
+        board_display_name: boardName,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', user.id);
+    
+    if (error) {
+      console.error('❌ Error updating board_display_name:', error);
+    }
+  }
 }
 
 export async function loadBoardName(): Promise<string> {
