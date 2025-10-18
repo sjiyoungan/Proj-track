@@ -219,6 +219,116 @@ export async function loadBoardName(): Promise<string> {
   return boardData.boardName;
 }
 
+// Load a specific board by ID
+export async function loadBoardById(boardId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data, error } = await supabase
+    .from('boards')
+    .select('*')
+    .eq('id', boardId);
+
+  if (error) {
+    console.error('❌ Error loading board by ID:', error);
+    throw error;
+  }
+
+  const boardData = data && data.length > 0 ? data[0] : null;
+  
+  if (!boardData) {
+    throw new Error('Board not found');
+  }
+
+  return {
+    projects: boardData.projects || [],
+    globalKRs: boardData.global_krs || [],
+    filterState: boardData.filter_state || {
+      showInitiative: true,
+      showKR: true,
+      showPlan: true,
+      showDone: true,
+      showFuture: true,
+      sortBy: 'priority-asc'
+    },
+    boardName: boardData.board_name || 'New Board',
+    boardDisplayName: boardData.board_display_name || 'New Board'
+  };
+}
+
+// Save a specific board by ID
+export async function saveBoardById(boardId: string, data: {
+  projects: Project[];
+  globalKRs: KRItem[];
+  filterState: FilterState;
+  boardName: string;
+}) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('boards')
+    .update({
+      projects: data.projects,
+      global_krs: data.globalKRs,
+      filter_state: data.filterState,
+      board_name: data.boardName,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', boardId)
+    .eq('user_id', user.id); // Ensure user owns the board
+
+  if (error) {
+    console.error('❌ Error saving board by ID:', error);
+    throw error;
+  }
+}
+
+// Legacy share functionality (keeping for backward compatibility)
+export async function getShareData(shareId: string) {
+  const { data, error } = await supabase
+    .from('shares')
+    .select(`
+      share_id,
+      owner_id,
+      is_active,
+      boards!inner(
+        projects,
+        global_krs,
+        filter_state,
+        board_name
+      )
+    `)
+    .eq('share_id', shareId)
+    .eq('is_active', true)
+    .single();
+
+  if (error) {
+    console.error('❌ Error loading share data:', error);
+    throw error;
+  }
+
+  return {
+    projects: data.boards.projects || [],
+    globalKRs: data.boards.global_krs || [],
+    filterState: data.boards.filter_state || {
+      showInitiative: true,
+      showKR: true,
+      showPlan: true,
+      showDone: true,
+      showFuture: true,
+      sortBy: 'priority'
+    },
+    boardName: data.boards.board_name || ''
+  };
+}
+
 // Legacy functions for backward compatibility
 export const saveTracker = saveBoard;
 export const loadTracker = loadBoard;
