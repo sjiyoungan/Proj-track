@@ -143,8 +143,10 @@ export async function saveHeaderTitle(title: string) {
       });
     
     if (error) throw error;
+    console.log('✅ Header title saved to database');
   } catch (error) {
     console.error('Failed to save header title to database:', error);
+    console.log('📝 Falling back to localStorage');
     // Fallback: save to localStorage
     localStorage.setItem('headerTitle', title);
   }
@@ -160,11 +162,15 @@ export async function loadHeaderTitle(): Promise<string> {
     
     if (error) throw error;
     
+    console.log('✅ Header title loaded from database:', data?.title);
     return data?.title || '';
   } catch (error) {
     console.error('Failed to load header title from database:', error);
+    console.log('📝 Falling back to localStorage');
     // Fallback: load from localStorage
-    return localStorage.getItem('headerTitle') || '';
+    const fallbackTitle = localStorage.getItem('headerTitle') || '';
+    console.log('📝 Loaded from localStorage:', fallbackTitle);
+    return fallbackTitle;
   }
 }
 
