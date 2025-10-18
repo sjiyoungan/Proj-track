@@ -46,7 +46,7 @@ export function UserProfile() {
           style={{ outline: 'none', boxShadow: 'none' }}
         >
           <img 
-            src="/profile-icon-blue.svg"
+            src="/Profile-icon-Blue.svg"
             alt="Profile"
             className="w-full h-full rounded-full object-cover"
           />
