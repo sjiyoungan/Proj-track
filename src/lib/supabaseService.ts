@@ -390,6 +390,94 @@ export async function saveBoardById(boardId: string, data: {
   }
 }
 
+// Share a board with someone
+export async function shareBoard(boardId: string, sharedWithEmail: string, sharedWithName: string, accessLevel: 'view' | 'edit' = 'edit') {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('sharing_permissions')
+    .insert({
+      owner_id: user.id,
+      shared_with_email: sharedWithEmail,
+      shared_with_name: sharedWithName,
+      board_id: boardId,
+      access_level: accessLevel
+    });
+
+  if (error) {
+    console.error('❌ Error sharing board:', error);
+    throw error;
+  }
+}
+
+// Get sharing permissions for a board
+export async function getBoardPermissions(boardId: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { data, error } = await supabase
+    .from('sharing_permissions')
+    .select('*')
+    .eq('board_id', boardId)
+    .eq('owner_id', user.id);
+
+  if (error) {
+    console.error('❌ Error loading board permissions:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+// Revoke access to a board
+export async function revokeBoardAccess(boardId: string, sharedWithEmail: string) {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('sharing_permissions')
+    .delete()
+    .eq('board_id', boardId)
+    .eq('owner_id', user.id)
+    .eq('shared_with_email', sharedWithEmail);
+
+  if (error) {
+    console.error('❌ Error revoking board access:', error);
+    throw error;
+  }
+}
+
+// Update access level for a board
+export async function updateBoardAccess(boardId: string, sharedWithEmail: string, accessLevel: 'view' | 'edit') {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) {
+    throw new Error('User not authenticated');
+  }
+
+  const { error } = await supabase
+    .from('sharing_permissions')
+    .update({ access_level: accessLevel })
+    .eq('board_id', boardId)
+    .eq('owner_id', user.id)
+    .eq('shared_with_email', sharedWithEmail);
+
+  if (error) {
+    console.error('❌ Error updating board access:', error);
+    throw error;
+  }
+}
+
 // Legacy share functionality (keeping for backward compatibility)
 export async function getShareData(shareId: string) {
   const { data, error } = await supabase
