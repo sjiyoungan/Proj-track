@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { User, LogOut, Share2 } from 'lucide-react';
+import { createShare } from '@/lib/supabaseService';
 
 export function UserProfile() {
   const { user, signOut } = useAuth();
@@ -20,20 +21,26 @@ export function UserProfile() {
     setIsOpen(false);
   };
 
-  const handleShare = () => {
-    // Generate a unique share ID
-    const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const currentUrl = new URL(window.location.href);
-    currentUrl.searchParams.set('share', shareId);
-    const shareUrl = currentUrl.toString();
-    
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert('Shareable link copied to clipboard!');
-    }).catch(() => {
-      // Fallback if clipboard API fails
-      prompt('Copy this link to share:', shareUrl);
-    });
-    setIsOpen(false);
+  const handleShare = async () => {
+    try {
+      // Create a share in Supabase
+      const shareId = await createShare();
+      
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('share', shareId);
+      const shareUrl = currentUrl.toString();
+      
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        alert('Shareable link copied to clipboard! Anyone with an account can now edit your data.');
+      }).catch(() => {
+        // Fallback if clipboard API fails
+        prompt('Copy this link to share:', shareUrl);
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Failed to create share:', error);
+      alert('Failed to create share link. Please try again.');
+    }
   };
 
   return (

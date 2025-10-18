@@ -12,7 +12,7 @@ import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState } from '@/lib/supabaseService';
+import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState, getShareData } from '@/lib/supabaseService';
 
 export default function Home() {
   const mounted = useMounted();
@@ -43,16 +43,6 @@ export default function Home() {
   // Save to Supabase
   const saveToSupabase = async () => {
     try {
-      // If in share mode (no user), save to localStorage instead
-      const shareParam = new URLSearchParams(window.location.search).get('share');
-      if (!user && shareParam && shareParam.startsWith('share-')) {
-        localStorage.setItem(`shared-projects-${shareParam}`, JSON.stringify(projects));
-        localStorage.setItem(`shared-globalKRs-${shareParam}`, JSON.stringify(globalKRs));
-        localStorage.setItem(`shared-filterState-${shareParam}`, JSON.stringify(filterState));
-        localStorage.setItem(`shared-headerTitle-${shareParam}`, headerTitle);
-        return;
-      }
-      
       await Promise.all([
         saveProjects(projects),
         saveGlobalKRs(globalKRs),
@@ -69,29 +59,18 @@ export default function Home() {
     
     const loadData = async () => {
       try {
-        // If in share mode (no user), load from localStorage instead
+        // Check if we're in share mode
         const shareParam = new URLSearchParams(window.location.search).get('share');
-        if (!user && shareParam && shareParam.startsWith('share-')) {
-          const sharedProjects = localStorage.getItem(`shared-projects-${shareParam}`);
-          const sharedGlobalKRs = localStorage.getItem(`shared-globalKRs-${shareParam}`);
-          const sharedFilterState = localStorage.getItem(`shared-filterState-${shareParam}`);
-          const sharedHeaderTitle = localStorage.getItem(`shared-headerTitle-${shareParam}`);
-
-          if (sharedProjects) {
-            setProjects(JSON.parse(sharedProjects));
-          }
-          if (sharedGlobalKRs) {
-            setGlobalKRs(JSON.parse(sharedGlobalKRs));
-          }
-          if (sharedFilterState) {
-            setFilterState(JSON.parse(sharedFilterState));
-          }
-          if (sharedHeaderTitle) {
-            setHeaderTitle(sharedHeaderTitle);
-          }
-
-          // If no shared data exists, create empty project
-          if (!sharedProjects) {
+        
+        if (shareParam && shareParam.startsWith('share-')) {
+          // Load shared data from Supabase
+          const sharedData = await getShareData(shareParam);
+          setProjects(sharedData.projects);
+          setGlobalKRs(sharedData.globalKRs);
+          setFilterState(sharedData.filterState);
+          
+          // If no shared projects exist, create empty project
+          if (sharedData.projects.length === 0) {
             const emptyProject: Project = {
               id: `project-${Date.now()}`,
               priority: 1,
@@ -402,6 +381,23 @@ export default function Home() {
   const shareParam = new URLSearchParams(window.location.search).get('share');
   if (!user && !(shareParam && shareParam.startsWith('share-'))) {
     return <AuthForm />;
+  }
+  
+  // If in share mode but no user, show auth form with message
+  if (shareParam && shareParam.startsWith('share-') && !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+            Sign in to collaborate
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mb-8">
+            You need to sign in to view and edit this shared project.
+          </p>
+          <AuthForm />
+        </div>
+      </div>
+    );
   }
 
   return (

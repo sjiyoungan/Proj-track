@@ -130,3 +130,61 @@ export async function loadFilterState(): Promise<FilterState | null> {
     sortBy: filterData.sort_by
   };
 }
+
+// Sharing functions
+export async function createShare(): Promise<string> {
+  const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  
+  const { error } = await supabase
+    .from('shares')
+    .insert({
+      share_id: shareId,
+      owner_id: (await supabase.auth.getUser()).data.user?.id
+    });
+  
+  if (error) throw error;
+  return shareId;
+}
+
+export async function getShareData(shareId: string) {
+  // First, verify the share exists and is active
+  const { data: share, error: shareError } = await supabase
+    .from('shares')
+    .select('owner_id')
+    .eq('share_id', shareId)
+    .eq('is_active', true)
+    .single();
+  
+  if (shareError || !share) {
+    throw new Error('Share not found or inactive');
+  }
+  
+  // Load the owner's data
+  const [projects, globalKRs, filterState] = await Promise.all([
+    loadProjects(),
+    loadGlobalKRs(), 
+    loadFilterState()
+  ]);
+  
+  return {
+    projects,
+    globalKRs,
+    filterState: filterState || {
+      showInitiative: true,
+      showKR: true,
+      showPlan: true,
+      showDone: true,
+      showFuture: true,
+      sortBy: 'priority-asc'
+    }
+  };
+}
+
+export async function revokeShare(shareId: string) {
+  const { error } = await supabase
+    .from('shares')
+    .update({ is_active: false })
+    .eq('share_id', shareId);
+  
+  if (error) throw error;
+}
