@@ -3,7 +3,7 @@
 import React from 'react';
 import { InputField } from '@/components/InputField';
 import { UserProfile } from '@/components/UserProfile';
-import { BoardSelector } from '@/components/BoardSelector';
+import { BoardSelector } from '@/components/TrackerSelector';
 
 interface BoardNameProps {
   boardName: string;
