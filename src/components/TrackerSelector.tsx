@@ -159,7 +159,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
-          className="h-7 w-7 p-0 hover:bg-slate-25 dark:hover:bg-slate-775 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none flex items-center justify-center" 
+          className="h-7 w-7 p-0 hover:bg-slate-50 dark:hover:bg-slate-750 focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none flex items-center justify-center" 
           style={{ 
             marginTop: '6px',
             outline: 'none',
@@ -195,7 +195,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
               className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                 board.board_id === currentBoardId 
                   ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
-                  : 'hover:bg-slate-25 dark:hover:bg-slate-775'
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-750'
               }`}
             >
               <span className="text-sm">{board.board_name}</span>
@@ -205,7 +205,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
           {/* Add Board Button */}
           <div 
             onClick={handleCreateBoard}
-            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-25 dark:hover:bg-slate-775"
+            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750"
           >
             <Plus className="h-3 w-3 mr-2" />
             Add board
@@ -237,7 +237,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
                 className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                   board.board_id === currentBoardId 
                     ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
-                    : 'hover:bg-slate-25 dark:hover:bg-slate-775'
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-750'
                 }`}
               >
                 <div className="flex flex-col">
