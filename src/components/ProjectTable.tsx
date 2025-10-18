@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Project, FilterState, TabFilter, KRItem } from '@/types/project';
+import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronRight, ExternalLink, Trash2 } from 'lucide-react';
