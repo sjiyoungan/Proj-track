@@ -51,7 +51,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
       setBoards(userBoards);
       
       // Load permissions for all owned boards
-      const ownedBoards = userBoards.filter(b => b.is_owner);
+      const ownedBoards = userBoards.filter((b: Board) => b.is_owner);
       const allPermissions: Permission[] = [];
       
       for (const board of ownedBoards) {
@@ -93,7 +93,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
       await revokeBoardAccess(permissionToRevoke.boardId, permissionToRevoke.email);
       
       // Remove from local state
-      setPermissions(prev => prev.filter(p => p.id !== permissionToRevoke.id));
+      setPermissions(prev => prev.filter((p: Permission) => p.id !== permissionToRevoke.id));
       
       console.log('✅ Access revoked successfully');
     } catch (error) {
@@ -138,7 +138,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
       await deleteBoard(boardToDelete.id);
       
       // Remove from local state
-      setBoards(prev => prev.filter(b => b.board_id !== boardToDelete.id));
+      setBoards(prev => prev.filter((b: Board) => b.board_id !== boardToDelete.id));
       
       console.log('✅ Board deleted successfully');
     } catch (error) {
@@ -155,7 +155,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
     setShowShareModal(true);
   };
 
-  const ownedBoards = boards.filter(b => b.is_owner);
+  const ownedBoards = boards.filter((b: Board) => b.is_owner);
 
   if (!isOpen) return null;
 
