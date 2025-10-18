@@ -21,10 +21,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🔐 AuthProvider: Starting auth initialization');
+    
+    // Set a timeout to prevent hanging indefinitely
+    const timeoutId = setTimeout(() => {
+      console.log('🔐 AuthProvider: Timeout reached, setting loading to false');
+      setLoading(false);
+    }, 10000); // 10 second timeout
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
+      console.log('🔐 AuthProvider: Initial session loaded:', { 
+        hasSession: !!session, 
+        hasUser: !!session?.user,
+        userEmail: session?.user?.email 
+      });
+      clearTimeout(timeoutId);
       setSession(session);
       setUser(session?.user ?? null);
+      setLoading(false);
+    }).catch((error) => {
+      console.error('🔐 AuthProvider: Error getting initial session:', error);
+      clearTimeout(timeoutId);
       setLoading(false);
     });
 
@@ -38,7 +56,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeoutId);
+    };
   }, []);
 
   const signUp = async (email: string, password: string) => {
@@ -52,10 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
+    console.log('🔐 Attempting sign in for:', email);
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    console.log('🔐 Sign in result:', { data, error });
     return { error };
   };
 

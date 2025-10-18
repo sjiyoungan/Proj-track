@@ -12,7 +12,8 @@ import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveTracker, loadTracker, getShareData } from '@/lib/supabaseService';
+import { saveTracker, loadTracker, getShareData, getUserTrackers, loadTrackerById, saveTrackerById } from '@/lib/supabaseService';
+import { ShareTrackerModal } from '@/components/ShareTrackerModal';
 
 interface TrackerPageProps {
   params: Promise<{
@@ -23,6 +24,11 @@ interface TrackerPageProps {
 export default function TrackerPage({ params }: TrackerPageProps) {
   const [userId, setUserId] = useState<string>('');
   const [userIdLoaded, setUserIdLoaded] = useState<boolean>(false);
+  const [currentTrackerId, setCurrentTrackerId] = useState<string>('');
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareTrackerId, setShareTrackerId] = useState<string>('');
+  const [shareTrackerName, setShareTrackerName] = useState<string>('');
+  const [currentAccessLevel, setCurrentAccessLevel] = useState<string>('edit');
   
   useEffect(() => {
     params.then(({ userId }) => {
@@ -36,18 +42,73 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   
   console.log('🏠 Tracker component rendered:', { mounted, user: !!user, authLoading, urlUserId: userId });
   
-  // Validate that the user is accessing their own tracker page
-  if (mounted && user && user.id !== userId) {
-    console.log('❌ User trying to access different user\'s tracker:', { currentUser: user.id, requestedUser: userId });
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h1>
-          <p className="text-gray-600">You can only access your own tracker page.</p>
-        </div>
-      </div>
-    );
-  }
+  // Initialize current tracker ID when user loads
+  useEffect(() => {
+    if (mounted && user && userIdLoaded && !currentTrackerId) {
+      // For now, we'll use the user's ID as the tracker ID
+      // Later we'll implement proper tracker selection
+      setCurrentTrackerId(user.id);
+    }
+  }, [mounted, user, userIdLoaded, currentTrackerId]);
+
+  // Handle tracker switching
+  const handleTrackerChange = async (trackerId: string, accessLevel: string) => {
+    setCurrentTrackerId(trackerId);
+    setCurrentAccessLevel(accessLevel);
+    // Reload data for the new tracker
+    await loadTrackerData(trackerId);
+  };
+
+  // Handle sharing a tracker
+  const handleShareTracker = (trackerId: string) => {
+    setShareTrackerId(trackerId);
+    setShareTrackerName(trackerName); // Use current tracker name
+    setShowShareModal(true);
+  };
+
+  // Load tracker data by ID
+  const loadTrackerData = async (trackerId: string) => {
+    try {
+      // Try to load from the new trackers table first
+      const trackerData = await loadTrackerById(trackerId);
+      setProjects(trackerData.projects);
+      setGlobalKRs(trackerData.globalKRs);
+      setFilterState(trackerData.filterState);
+      setTrackerName(trackerData.trackerName);
+    } catch (error) {
+      console.error('❌ Failed to load tracker data from new system:', error);
+      // Fall back to the old system if new system isn't set up yet
+      try {
+        const oldTrackerData = await loadTracker();
+        setProjects(oldTrackerData.projects);
+        setGlobalKRs(oldTrackerData.globalKRs);
+        setFilterState(oldTrackerData.filterState);
+        setTrackerName(oldTrackerData.trackerName);
+      } catch (fallbackError) {
+        console.error('❌ Failed to load tracker data from old system:', fallbackError);
+        // Create empty project if both fail
+        const emptyProject: Project = {
+          id: `project-1`,
+          priority: 1,
+          name: '',
+          plan: 'select',
+          initiative: '',
+          selectedKRs: [],
+          designStatus: 'select',
+          buildStatus: 'select',
+          problemStatement: '',
+          solution: '',
+          successMetric: '',
+          figmaLink: '',
+          prdLink: '',
+          customLinks: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setProjects([emptyProject]);
+      }
+    }
+  };
   const [projects, setProjects] = useState<Project[]>([]);
   const [globalKRs, setGlobalKRs] = useState<KRItem[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
@@ -76,7 +137,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   const saveToSupabase = async () => {
     try {
       console.log('💾 Saving to Supabase with trackerName:', trackerName);
-      await saveTracker({
+      await saveTrackerById(currentTrackerId, {
         projects,
         globalKRs,
         filterState,
@@ -84,7 +145,19 @@ export default function TrackerPage({ params }: TrackerPageProps) {
       });
       console.log('✅ Save completed successfully');
     } catch (error) {
-      console.error('❌ Save failed:', error);
+      console.error('❌ Save failed with new system:', error);
+      // Fall back to the old system if new system isn't set up yet
+      try {
+        await saveTracker({
+          projects,
+          globalKRs,
+          filterState,
+          trackerName
+        });
+        console.log('✅ Save completed successfully with old system');
+      } catch (fallbackError) {
+        console.error('❌ Save failed with old system:', fallbackError);
+      }
     }
   };
 
@@ -136,42 +209,109 @@ export default function TrackerPage({ params }: TrackerPageProps) {
         }
 
         console.log('📥 Loading tracker data...');
-        const trackerData = await loadTracker();
-        
-        console.log('📊 Loaded data:', {
-          projects: trackerData.projects.length,
-          krs: trackerData.globalKRs.length,
-          hasFilterState: !!trackerData.filterState,
-          trackerName: trackerData.trackerName
-        });
-        
-        setProjects(trackerData.projects);
-        setGlobalKRs(trackerData.globalKRs);
-        setFilterState(trackerData.filterState);
-        setTrackerName(trackerData.trackerName);
-        setHasLoadedData(true); // Mark that we've loaded data
-        
-        // If no projects exist, create an empty one automatically
-        if (trackerData.projects.length === 0) {
-          const emptyProject: Project = {
-            id: `project-1`,
-            priority: 1,
-            name: '',
-            plan: 'select',
-            initiative: '',
-            selectedKRs: [],
-            designStatus: 'select',
-            buildStatus: 'select',
-            problemStatement: '',
-            solution: '',
-            successMetric: '',
-            figmaLink: '',
-            prdLink: '',
-            customLinks: [],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          };
-          setProjects([emptyProject]);
+        try {
+          const trackerData = await loadTrackerById(currentTrackerId);
+          
+          console.log('📊 Loaded data:', {
+            projects: trackerData.projects.length,
+            krs: trackerData.globalKRs.length,
+            hasFilterState: !!trackerData.filterState,
+            trackerName: trackerData.trackerName
+          });
+          
+          setProjects(trackerData.projects);
+          setGlobalKRs(trackerData.globalKRs);
+          setFilterState(trackerData.filterState);
+          setTrackerName(trackerData.trackerName);
+          setHasLoadedData(true); // Mark that we've loaded data
+          
+          // If no projects exist, create an empty one automatically
+          if (trackerData.projects.length === 0) {
+            const emptyProject: Project = {
+              id: `project-1`,
+              priority: 1,
+              name: '',
+              plan: 'select',
+              initiative: '',
+              selectedKRs: [],
+              designStatus: 'select',
+              buildStatus: 'select',
+              problemStatement: '',
+              solution: '',
+              successMetric: '',
+              figmaLink: '',
+              prdLink: '',
+              customLinks: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            setProjects([emptyProject]);
+          }
+        } catch (error) {
+          console.error('❌ Failed to load tracker data from new system:', error);
+          // Fall back to the old system if new system isn't set up yet
+          try {
+            const oldTrackerData = await loadTracker();
+            
+            console.log('📊 Loaded data from old system:', {
+              projects: oldTrackerData.projects.length,
+              krs: oldTrackerData.globalKRs.length,
+              hasFilterState: !!oldTrackerData.filterState,
+              trackerName: oldTrackerData.trackerName
+            });
+            
+            setProjects(oldTrackerData.projects);
+            setGlobalKRs(oldTrackerData.globalKRs);
+            setFilterState(oldTrackerData.filterState);
+            setTrackerName(oldTrackerData.trackerName);
+            setHasLoadedData(true); // Mark that we've loaded data
+            
+            // If no projects exist, create an empty one automatically
+            if (oldTrackerData.projects.length === 0) {
+              const emptyProject: Project = {
+                id: `project-1`,
+                priority: 1,
+                name: '',
+                plan: 'select',
+                initiative: '',
+                selectedKRs: [],
+                designStatus: 'select',
+                buildStatus: 'select',
+                problemStatement: '',
+                solution: '',
+                successMetric: '',
+                figmaLink: '',
+                prdLink: '',
+                customLinks: [],
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+              };
+              setProjects([emptyProject]);
+            }
+          } catch (fallbackError) {
+            console.error('❌ Failed to load tracker data from old system:', fallbackError);
+            // Create empty project if both fail
+            const emptyProject: Project = {
+              id: `project-1`,
+              priority: 1,
+              name: '',
+              plan: 'select',
+              initiative: '',
+              selectedKRs: [],
+              designStatus: 'select',
+              buildStatus: 'select',
+              problemStatement: '',
+              solution: '',
+              successMetric: '',
+              figmaLink: '',
+              prdLink: '',
+              customLinks: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            setProjects([emptyProject]);
+            setHasLoadedData(true);
+          }
         }
       } catch (error) {
         console.error('❌ Failed to load data:', error);
@@ -199,7 +339,7 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     };
     
     loadData();
-  }, [mounted, user, authLoading, userIdLoaded, userId]);
+  }, [mounted, user, authLoading, userIdLoaded, userId, currentTrackerId]);
   
   // Debug user state
   useEffect(() => {
@@ -464,11 +604,14 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <TrackerName
-          trackerName={trackerName}
-          onTrackerNameChange={handleTrackerNameChange}
-        />
+                {/* Header */}
+                <TrackerName
+                  trackerName={trackerName}
+                  onTrackerNameChange={handleTrackerNameChange}
+                  currentTrackerId={currentTrackerId}
+                  onTrackerChange={handleTrackerChange}
+                  onShareTracker={handleShareTracker}
+                />
 
         {/* Tab System and Filter Bar */}
         <div className="flex justify-between items-center mb-4">
@@ -570,6 +713,14 @@ export default function TrackerPage({ params }: TrackerPageProps) {
 
 
       </div>
+      
+      {/* Share Tracker Modal */}
+      <ShareTrackerModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        trackerId={shareTrackerId}
+        trackerName={shareTrackerName}
+      />
     </div>
   );
 }

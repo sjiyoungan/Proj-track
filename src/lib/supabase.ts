@@ -35,8 +35,8 @@ const createMockClient = () => ({
 const supabaseClient = supabaseUrl && supabaseAnonKey 
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        autoRefreshToken: true,
-        persistSession: true,
+        autoRefreshToken: false, // Disable auto refresh to prevent invalid token errors
+        persistSession: true,    // Enable session persistence so users stay logged in
         detectSessionInUrl: true
       }
     })

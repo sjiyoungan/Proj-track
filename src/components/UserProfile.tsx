@@ -9,13 +9,14 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Share2 } from 'lucide-react';
-import { createShare } from '@/lib/supabaseService';
+import { User, LogOut, UserCog } from 'lucide-react';
+import { ManageAccessModal } from '@/components/ManageAccessModal';
 
 export function UserProfile() {
   const { user, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [dropdownWidth, setDropdownWidth] = useState<string>('auto');
+  const [showManageAccess, setShowManageAccess] = useState(false);
   const emailRef = useRef<HTMLDivElement>(null);
 
   // Calculate dropdown width based on email text
@@ -39,30 +40,13 @@ export function UserProfile() {
     }
   };
 
-  const handleShare = async () => {
-    try {
-      // Create a share in Supabase
-      const shareId = await createShare();
-      
-      const currentUrl = new URL(window.location.href);
-      currentUrl.searchParams.set('share', shareId);
-      const shareUrl = currentUrl.toString();
-      
-      navigator.clipboard.writeText(shareUrl).then(() => {
-        alert('Shareable link copied to clipboard! Anyone with an account can now edit your data.');
-      }).catch(() => {
-        // Fallback if clipboard API fails
-        prompt('Copy this link to share:', shareUrl);
-      });
-      setIsOpen(false);
-    } catch (error) {
-      console.error('Failed to create share:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      alert(`Failed to create share link: ${errorMessage}`);
-    }
+  const handleManageAccess = () => {
+    setShowManageAccess(true);
+    setIsOpen(false);
   };
 
   return (
+    <>
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild className="focus:outline-none focus:ring-0 focus:ring-offset-0">
         <Button
@@ -91,7 +75,7 @@ export function UserProfile() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" style={{ width: dropdownWidth }}>
+      <DropdownMenuContent align="end" style={{ width: dropdownWidth }} className="p-2">
         {/* Email address display - non-interactive */}
         <div className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-outline border-b-1" style={{ paddingTop: '6px', paddingBottom: '8px' }}>
           <div 
@@ -113,9 +97,9 @@ export function UserProfile() {
         {/* Spacer div to create white space between line and menu items */}
         <div style={{ height: '4px' }}></div>
         
-        <DropdownMenuItem onClick={handleShare} className="cursor-pointer">
-          <Share2 className="mr-2 h-4 w-4" />
-          Share
+        <DropdownMenuItem onClick={handleManageAccess} className="cursor-pointer">
+          <UserCog className="mr-2 h-4 w-4" />
+          Manage access
         </DropdownMenuItem>
         <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-black dark:text-white">
           <LogOut className="mr-2 h-4 w-4" />
@@ -123,5 +107,12 @@ export function UserProfile() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    
+    {/* Manage Access Modal */}
+    <ManageAccessModal
+      isOpen={showManageAccess}
+      onClose={() => setShowManageAccess(false)}
+    />
+  </>
   );
 }

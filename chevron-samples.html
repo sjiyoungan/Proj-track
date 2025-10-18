@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arrow & Chevron Styles Sample</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #1e293b;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .chevron-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chevron-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .chevron-item:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .chevron-name {
+            font-weight: 500;
+            color: #475569;
+            font-size: 14px;
+        }
+        .chevron-icon {
+            color: #64748b;
+            flex-shrink: 0;
+        }
+        .section-title {
+            color: #1e293b;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .description {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lucide React Arrow & Chevron Styles</h1>
+        
+        <div class="description">
+            Here are all the arrow and chevron-related icons available in Lucide React. Each icon shows the name and visual representation.
+        </div>
+
+        <div class="section-title">Basic Chevrons</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="chevron-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronDown</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevron-up" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronUp</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevron-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevron-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronRight</span>
+            </div>
+        </div>
+
+        <div class="section-title">Double Chevrons</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="chevrons-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronsDown</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevrons-up" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronsUp</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevrons-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronsLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="chevrons-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ChevronsRight</span>
+            </div>
+        </div>
+
+        <div class="section-title">Basic Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="arrow-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowDown</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-up" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowUp</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowRight</span>
+            </div>
+        </div>
+
+        <div class="section-title">Double Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="arrows-up-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowsUpDown</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrows-left-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowsLeftRight</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrows-up-down-left-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowsUpDownLeftRight</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-up-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowUpDown</span>
+            </div>
+        </div>
+
+        <div class="section-title">Curved Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="arrow-up-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowUpLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-up-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowUpRight</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-down-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowDownLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-down-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowDownRight</span>
+            </div>
+        </div>
+
+        <div class="section-title">Special Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="arrow-down-to-line" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowDownToLine</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-up-from-line" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowUpFromLine</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-left-to-line" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowLeftToLine</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="arrow-right-to-line" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">ArrowRightToLine</span>
+            </div>
+        </div>
+
+        <div class="section-title">Rotate Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="rotate-ccw" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">RotateCcw</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="rotate-cw" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">RotateCw</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="refresh-cw" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">RefreshCw</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="refresh-ccw" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">RefreshCcw</span>
+            </div>
+        </div>
+
+        <div class="section-title">Navigation Arrows</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="skip-back" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">SkipBack</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="skip-forward" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">SkipForward</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="rewind" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">Rewind</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="fast-forward" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">FastForward</span>
+            </div>
+        </div>
+
+        <div class="section-title">Triangle Styles</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="triangle" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">Triangle</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="triangle-alert" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">TriangleAlert</span>
+            </div>
+        </div>
+
+        <div class="section-title">Other Directional Icons</div>
+        <div class="chevron-grid">
+            <div class="chevron-item">
+                <i data-lucide="caret-down" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">CaretDown</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="caret-up" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">CaretUp</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="caret-left" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">CaretLeft</span>
+            </div>
+            <div class="chevron-item">
+                <i data-lucide="caret-right" class="chevron-icon" width="20" height="20"></i>
+                <span class="chevron-name">CaretRight</span>
+            </div>
+        </div>
+
+        <div class="section-title">Usage Examples</div>
+        <div class="description">
+            <strong>Current Usage:</strong> Your tracker dropdown uses <code>ChevronDown</code> which is perfect for dropdown menus.<br><br>
+            <strong>Alternative Options for Dropdowns:</strong><br>
+            • <code>ChevronDown</code> - Current choice (perfect for dropdowns)<br>
+            • <code>ChevronsDown</code> - Double chevron for "show more" or "expand all"<br>
+            • <code>ArrowDown</code> - More pointed arrow for navigation<br>
+            • <code>CaretDown</code> - Smaller, more subtle indicator<br>
+            • <code>Triangle</code> - Simple triangle shape<br><br>
+            <strong>Other Arrow Uses:</strong><br>
+            • <code>ArrowUpDown</code> - For sortable columns<br>
+            • <code>ArrowsUpDown</code> - For drag-and-drop indicators<br>
+            • <code>RotateCw</code> - For refresh/reload buttons<br>
+            • <code>SkipForward</code> - For pagination or navigation
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
