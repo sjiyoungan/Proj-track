@@ -378,6 +378,3 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
     </div>
   );
 }
-
-// Legacy export for backward compatibility
-export const ManageAccessModal = ManageAccessModal;
