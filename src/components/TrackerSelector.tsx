@@ -163,7 +163,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
           
           {/* Show all owned boards */}
           {ownedBoards.map((board) => (
-            <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${board.board_id === currentBoardId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+            <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50`}>
               <DropdownMenuItem 
                 onClick={() => {
                   console.log('🔄 Switching to board:', board.board_id, board.board_display_name);
@@ -172,7 +172,13 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                 }}
                 className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
               >
-                <span className="text-sm">{board.board_display_name}</span>
+                <div className={`flex items-center px-2 py-1 rounded-full transition-colors ${
+                  board.board_id === currentBoardId 
+                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                    : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                }`}>
+                  <span className="text-sm">{board.board_display_name}</span>
+                </div>
               </DropdownMenuItem>
             </div>
           ))}
@@ -202,7 +208,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
             </div>
           ) : (
             sharedBoards.map((board) => (
-              <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${board.board_id === currentBoardId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+              <div key={board.board_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50`}>
                 <DropdownMenuItem 
                   onClick={() => {
                     console.log('🔄 Switching to shared board:', board.board_id, board.board_display_name);
@@ -211,7 +217,11 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName }: Boar
                   }}
                   className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
                 >
-                  <div className="flex flex-col">
+                  <div className={`flex flex-col px-2 py-1 rounded-full transition-colors ${
+                    board.board_id === currentBoardId 
+                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' 
+                      : 'hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}>
                     <span className="text-sm">{board.board_display_name}</span>
                     <span className="text-xs text-slate-500 dark:text-slate-400">
                       by {board.owner_name || board.owner_email}
