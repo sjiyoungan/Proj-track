@@ -23,7 +23,7 @@ export async function saveTracker(data: {
     throw new Error('User not authenticated');
   }
 
-  const upsertData = {
+  const upsertData: any = {
     user_id: user.id,
     projects: data.projects,
     global_krs: data.globalKRs,
