@@ -205,7 +205,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
           {/* Add Board Button */}
           <div 
             onClick={handleCreateBoard}
-            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center"
+            className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-sm py-2 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center"
           >
             <Plus className="h-3 w-3 mr-2" />
             Add board
@@ -260,7 +260,7 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
             setShowManageModal(true);
             setIsOpen(false);
           }}
-          className="cursor-pointer py-1 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center"
+          className="cursor-pointer py-1 px-2 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-slate-750 flex items-center text-sm"
         >
           <Settings className="h-3 w-3 mr-2" />
           Manage boards
