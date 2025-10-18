@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Plus, Share2 } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -25,11 +25,10 @@ interface Tracker {
 interface TrackerSelectorProps {
   currentTrackerId: string;
   onTrackerChange: (trackerId: string, accessLevel: string) => void;
-  onShareTracker: (trackerId: string) => void;
   trackerName: string;
 }
 
-export function TrackerSelector({ currentTrackerId, onTrackerChange, onShareTracker, trackerName }: TrackerSelectorProps) {
+export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName }: TrackerSelectorProps) {
   const [trackers, setTrackers] = useState<Tracker[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -61,7 +60,9 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, onShareTrac
   const loadTrackers = async () => {
     try {
       setLoading(true);
+      console.log('🔄 Loading trackers...');
       const userTrackers = await getUserTrackers();
+      console.log('✅ Loaded trackers:', userTrackers);
       setTrackers(userTrackers);
     } catch (error) {
       console.error('❌ Error loading trackers:', error);
@@ -85,13 +86,18 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, onShareTrac
       const trackerCount = trackers.filter(t => t.is_owner).length + 1;
       const displayName = `Tracker ${trackerCount}`;
       
+      console.log('🔄 Creating new tracker:', displayName);
       const newTracker = await createTracker(displayName);
+      console.log('✅ New tracker created:', newTracker);
       
       // Reload trackers to include the new one
+      console.log('🔄 Reloading trackers...');
       await loadTrackers();
+      console.log('✅ Trackers reloaded');
       
       // Switch to the new tracker
-      onTrackerChange(newTracker.id, 'edit');
+      console.log('🔄 Switching to new tracker:', newTracker.tracker_id);
+      onTrackerChange(newTracker.tracker_id, 'edit');
       setIsOpen(false);
     } catch (error) {
       console.error('❌ Error creating tracker:', error);
@@ -153,17 +159,6 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, onShareTrac
               <span className="text-sm">{trackerName || 'My tracker'}</span>
             </DropdownMenuItem>
             
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onShareTracker(currentTrackerId);
-              }}
-              className="h-8 w-8 p-0 hover:bg-transparent group"
-            >
-              <Share2 className="h-3 w-3 text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200" />
-            </Button>
           </div>
           
           {/* Show other owned trackers if any */}
@@ -179,17 +174,6 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, onShareTrac
                 <span className="text-sm">{tracker.tracker_display_name}</span>
               </DropdownMenuItem>
               
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onShareTracker(tracker.tracker_id);
-                }}
-                className="h-8 w-8 p-0 hover:bg-transparent group"
-              >
-                <Share2 className="h-3 w-3 text-slate-500 dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200" />
-              </Button>
             </div>
           ))}
           

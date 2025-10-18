@@ -13,7 +13,6 @@ import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/pro
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveTracker, loadTracker, getShareData, getUserTrackers, loadTrackerById, saveTrackerById } from '@/lib/supabaseService';
-import { ShareTrackerModal } from '@/components/ShareTrackerModal';
 
 interface TrackerPageProps {
   params: Promise<{
@@ -27,7 +26,6 @@ export default function TrackerPage({ params }: TrackerPageProps) {
   const [currentTrackerId, setCurrentTrackerId] = useState<string>('');
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareTrackerId, setShareTrackerId] = useState<string>('');
-  const [shareTrackerName, setShareTrackerName] = useState<string>('');
   const [currentAccessLevel, setCurrentAccessLevel] = useState<string>('edit');
   
   useEffect(() => {
@@ -59,12 +57,6 @@ export default function TrackerPage({ params }: TrackerPageProps) {
     await loadTrackerData(trackerId);
   };
 
-  // Handle sharing a tracker
-  const handleShareTracker = (trackerId: string) => {
-    setShareTrackerId(trackerId);
-    setShareTrackerName(trackerName); // Use current tracker name
-    setShowShareModal(true);
-  };
 
   // Load tracker data by ID
   const loadTrackerData = async (trackerId: string) => {
@@ -610,7 +602,6 @@ export default function TrackerPage({ params }: TrackerPageProps) {
                   onTrackerNameChange={handleTrackerNameChange}
                   currentTrackerId={currentTrackerId}
                   onTrackerChange={handleTrackerChange}
-                  onShareTracker={handleShareTracker}
                 />
 
         {/* Tab System and Filter Bar */}
@@ -714,13 +705,6 @@ export default function TrackerPage({ params }: TrackerPageProps) {
 
       </div>
       
-      {/* Share Tracker Modal */}
-      <ShareTrackerModal
-        isOpen={showShareModal}
-        onClose={() => setShowShareModal(false)}
-        trackerId={shareTrackerId}
-        trackerName={shareTrackerName}
-      />
     </div>
   );
 }

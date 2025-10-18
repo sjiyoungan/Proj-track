@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Ban, Eye, Edit3, Trash2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getUserTrackers, getTrackerPermissions, revokeTrackerAccess, updateTrackerAccess, deleteTracker } from '@/lib/supabaseService';
+import { ShareTrackerModal } from '@/components/ShareTrackerModal';
 
 interface Tracker {
   tracker_id: string;
@@ -44,21 +45,35 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
   const loadData = async () => {
     try {
       setLoading(true);
+      console.log('🔄 ManageAccessModal: Loading data...');
       const userTrackers = await getUserTrackers();
+      console.log('✅ ManageAccessModal: Loaded trackers:', userTrackers);
       setTrackers(userTrackers);
 
       // Load permissions for all owned trackers
       const ownedTrackers = userTrackers.filter((t: Tracker) => t.is_owner);
+      console.log('🔄 ManageAccessModal: Found owned trackers:', ownedTrackers);
       const allPermissions: Permission[] = [];
       
       for (const tracker of ownedTrackers) {
-        const trackerPermissions = await getTrackerPermissions(tracker.tracker_id);
-        allPermissions.push(...trackerPermissions);
+        try {
+          const trackerPermissions = await getTrackerPermissions(tracker.tracker_id);
+          console.log(`🔄 ManageAccessModal: Loaded permissions for ${tracker.tracker_display_name}:`, trackerPermissions);
+          // Attach tracker_display_name to each permission for easier rendering
+          const permissionsWithTrackerName = trackerPermissions.map(p => ({
+            ...p,
+            tracker_display_name: tracker.tracker_display_name
+          }));
+          allPermissions.push(...permissionsWithTrackerName);
+        } catch (error) {
+          console.log(`⚠️ ManageAccessModal: Could not load permissions for ${tracker.tracker_display_name}:`, error);
+        }
       }
       
+      console.log('✅ ManageAccessModal: All permissions:', allPermissions);
       setPermissions(allPermissions);
     } catch (error) {
-      console.error('❌ Error loading access data:', error);
+      console.error('❌ ManageAccessModal: Error loading access data:', error);
       // If database functions don't exist yet, show empty state
       setTrackers([]);
       setPermissions([]);
@@ -205,9 +220,27 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
                           <h4 className="font-medium text-slate-900 dark:text-slate-100">
                             {tracker.tracker_display_name}
                           </h4>
-                          <span className="text-sm text-slate-500 dark:text-slate-400">
-                            {trackerPermissions.length} shared
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-slate-500 dark:text-slate-400">
+                              {trackerPermissions.length} shared
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleShareClick(tracker.tracker_id)}
+                              className="h-8 w-8 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                            >
+                              <Share2 className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDeleteClick(tracker)}
+                              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                         
                         {trackerPermissions.length === 0 ? (
@@ -359,6 +392,48 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && trackerToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+          <div className="bg-white dark:bg-slate-900 rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
+              Are you sure you want to delete this tracker?
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              This will permanently delete "{trackerToDelete.name}" and all its data. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={handleCancelDelete}
+                className="px-4 py-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Tracker Modal */}
+      <ShareTrackerModal
+        isOpen={showShareModal}
+        onClose={() => {
+          setShowShareModal(false);
+          setTrackerToShare(null);
+        }}
+        trackerId={trackerToShare || ''}
+        onShareSuccess={() => {
+          loadData(); // Reload data to show updated sharing info
+        }}
+      />
     </div>
   );
 }

@@ -10,15 +10,13 @@ interface TrackerNameProps {
   onTrackerNameChange: (trackerName: string) => void;
   currentTrackerId: string;
   onTrackerChange: (trackerId: string, accessLevel: string) => void;
-  onShareTracker: (trackerId: string) => void;
 }
 
 export function TrackerName({ 
   trackerName, 
   onTrackerNameChange, 
   currentTrackerId,
-  onTrackerChange,
-  onShareTracker 
+  onTrackerChange
 }: TrackerNameProps) {
   const hasName = trackerName.trim().length > 0;
 
@@ -39,7 +37,6 @@ export function TrackerName({
           <TrackerSelector
             currentTrackerId={currentTrackerId}
             onTrackerChange={onTrackerChange}
-            onShareTracker={onShareTracker}
             trackerName={trackerName}
           />
         </div>

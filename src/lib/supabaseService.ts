@@ -224,6 +224,12 @@ export async function createTracker(displayName: string) {
     throw new Error('User not authenticated');
   }
 
+  console.log('🔄 Creating tracker with data:', {
+    user_id: user.id,
+    owner_email: user.email,
+    tracker_display_name: displayName
+  });
+
   const { data, error } = await supabase
     .from('trackers')
     .insert({
@@ -247,9 +253,16 @@ export async function createTracker(displayName: string) {
 
   if (error) {
     console.error('❌ Error creating tracker:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code
+    });
     throw error;
   }
 
+  console.log('✅ Tracker created successfully:', data);
   return data;
 }
 
