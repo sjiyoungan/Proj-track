@@ -86,10 +86,10 @@ export function ProjectTable({
         passesTabFilter = true;
     }
 
-    // Then apply done filter
+    // Then apply done filter (Design status only)
     let passesDoneFilter = true;
     if (!filterState.showDone) {
-      passesDoneFilter = project.designStatus !== 'Done' && project.buildStatus !== 'Done';
+      passesDoneFilter = project.designStatus !== 'Done';
     }
 
     // Then apply future filter
