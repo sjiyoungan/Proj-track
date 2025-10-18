@@ -131,6 +131,34 @@ export async function loadFilterState(): Promise<FilterState | null> {
   };
 }
 
+// Header Title
+export async function saveHeaderTitle(title: string) {
+  const { error } = await supabase
+    .from('header_title')
+    .upsert({
+      id: 'default',
+      title: title,
+      updated_at: new Date().toISOString()
+    });
+  
+  if (error) throw error;
+}
+
+export async function loadHeaderTitle(): Promise<string> {
+  const { data, error } = await supabase
+    .from('header_title')
+    .select('title')
+    .eq('id', 'default')
+    .single();
+  
+  if (error) {
+    console.error('Error loading header title:', error);
+    return '';
+  }
+  
+  return data?.title || '';
+}
+
 // Sharing functions
 export async function createShare(): Promise<string> {
   const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;

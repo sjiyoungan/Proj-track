@@ -113,9 +113,9 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
           {options
             .filter(option => option.value !== 'select')
             .map((option) => (
-              <div
+              <SelectItem
                 key={option.value}
-                onClick={() => onChange(option.value)}
+                value={option.value}
                 className={`px-2 py-1.5 cursor-pointer text-sm rounded-sm ${
                   option.value === value 
                     ? 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100' 
@@ -123,7 +123,7 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
                 }`}
               >
                 {option.label}
-              </div>
+              </SelectItem>
             ))}
         </SelectContent>
       </Select>

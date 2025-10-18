@@ -12,7 +12,7 @@ import { AuthForm } from '@/components/AuthForm';
 import { Project, FilterState, TabFilter, KRItem, SortOption } from '@/types/project';
 import { useMounted } from '@/hooks/useMounted';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState, getShareData } from '@/lib/supabaseService';
+import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterState, loadFilterState, getShareData, saveHeaderTitle, loadHeaderTitle } from '@/lib/supabaseService';
 
 export default function Home() {
   const mounted = useMounted();
@@ -46,7 +46,8 @@ export default function Home() {
       await Promise.all([
         saveProjects(projects),
         saveGlobalKRs(globalKRs),
-        saveFilterState(filterState)
+        saveFilterState(filterState),
+        saveHeaderTitle(headerTitle)
       ]);
     } catch (error) {
       console.error('❌ Save failed:', error);
@@ -94,10 +95,11 @@ export default function Home() {
           return;
         }
 
-        const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
+        const [loadedProjects, loadedGlobalKRs, loadedFilterState, loadedHeaderTitle] = await Promise.all([
           loadProjects(),
           loadGlobalKRs(),
-          loadFilterState()
+          loadFilterState(),
+          loadHeaderTitle()
         ]);
         
         setProjects(loadedProjects);
@@ -106,12 +108,8 @@ export default function Home() {
         if (loadedFilterState) {
           setFilterState(loadedFilterState);
         }
-
-        // Load header title
-        const savedTitle = localStorage.getItem('headerTitle');
-    if (savedTitle) {
-      setHeaderTitle(savedTitle);
-        }
+        
+        setHeaderTitle(loadedHeaderTitle);
         
         // If no projects exist, create an empty one automatically
         if (loadedProjects.length === 0) {
