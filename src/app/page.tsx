@@ -17,6 +17,8 @@ import { saveProjects, loadProjects, saveGlobalKRs, loadGlobalKRs, saveFilterSta
 export default function Home() {
   const mounted = useMounted();
   const { user, loading: authLoading } = useAuth();
+  
+  console.log('🏠 Home component rendered:', { mounted, user: !!user, authLoading });
   const [projects, setProjects] = useState<Project[]>([]);
   const [globalKRs, setGlobalKRs] = useState<KRItem[]>([]);
   const [filterState, setFilterState] = useState<FilterState>({
@@ -56,14 +58,20 @@ export default function Home() {
 
   // Load from Supabase on mount
   useEffect(() => {
-    if (!mounted) return;
+    console.log('🔄 useEffect triggered, mounted:', mounted, 'authLoading:', authLoading);
+    if (!mounted) {
+      console.log('❌ Not mounted yet, skipping data load');
+      return;
+    }
     
     const loadData = async () => {
+      console.log('🔄 Starting to load data...');
       try {
         // Check if we're in share mode
         const shareParam = new URLSearchParams(window.location.search).get('share');
         
         if (shareParam && shareParam.startsWith('share-')) {
+          console.log('📤 Loading shared data...');
           // Load shared data from Supabase
           const sharedData = await getShareData(shareParam);
           setProjects(sharedData.projects);
@@ -95,11 +103,18 @@ export default function Home() {
           return;
         }
 
+        console.log('📥 Loading user data...');
         const [loadedProjects, loadedGlobalKRs, loadedFilterState] = await Promise.all([
           loadProjects(),
           loadGlobalKRs(),
           loadFilterState()
         ]);
+        
+        console.log('📊 Loaded data:', {
+          projects: loadedProjects.length,
+          krs: loadedGlobalKRs.length,
+          hasFilterState: !!loadedFilterState
+        });
         
         setProjects(loadedProjects);
         setGlobalKRs(loadedGlobalKRs);
@@ -170,6 +185,11 @@ export default function Home() {
     
     loadData();
   }, [mounted, user]);
+  
+  // Debug user state
+  useEffect(() => {
+    console.log('👤 User state changed:', { user: !!user, userId: user?.id, email: user?.email });
+  }, [user]);
 
   // Auto-save when data changes
   useEffect(() => {

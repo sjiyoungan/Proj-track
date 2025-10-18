@@ -17,8 +17,14 @@ export function UserProfile() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSignOut = async () => {
-    await signOut();
-    setIsOpen(false);
+    console.log('Sign out button clicked');
+    try {
+      await signOut();
+      console.log('Sign out successful');
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Sign out failed:', error);
+    }
   };
 
   const handleShare = async () => {
@@ -52,12 +58,22 @@ export function UserProfile() {
           size="sm"
           className="h-12 w-12 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 p-0 overflow-hidden mr-1 focus:outline-none focus:ring-0 focus:ring-offset-0"
           style={{ outline: 'none', boxShadow: 'none' }}
+          onClick={() => console.log('Profile button clicked')}
         >
           <img 
             src="/Profile-icon-Blue.svg"
             alt="Profile"
             className="w-full h-full rounded-full object-cover"
+            onError={(e) => {
+              console.log('Profile icon failed to load, using fallback');
+              e.currentTarget.style.display = 'none';
+              e.currentTarget.nextElementSibling.style.display = 'flex';
+            }}
+            onLoad={() => console.log('Profile icon loaded successfully')}
           />
+          <div className="w-full h-full rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg" style={{ display: 'none' }}>
+            {user?.email?.charAt(0).toUpperCase() || 'U'}
+          </div>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-auto min-w-fit">

@@ -4,7 +4,12 @@ import { Project, KRItem, FilterState } from '@/types/project';
 // Projects
 export async function saveProjects(projects: Project[]) {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  console.log('💾 Saving projects for user:', user?.id, user?.email);
+  
+  if (!user) {
+    console.log('❌ No user found for saving projects');
+    throw new Error('User not authenticated');
+  }
 
   const { error } = await supabase
     .from('projects')
@@ -28,12 +33,22 @@ export async function saveProjects(projects: Project[]) {
       updated_at: project.updatedAt
     })));
   
-  if (error) throw error;
+  if (error) {
+    console.error('❌ Error saving projects:', error);
+    throw error;
+  }
+  
+  console.log('✅ Projects saved successfully for user:', user.id);
 }
 
 export async function loadProjects(): Promise<Project[]> {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  console.log('🔍 Loading projects for user:', user?.id, user?.email);
+  
+  if (!user) {
+    console.log('❌ No user found, returning empty array');
+    return [];
+  }
 
   const { data, error } = await supabase
     .from('projects')
@@ -41,7 +56,12 @@ export async function loadProjects(): Promise<Project[]> {
     .eq('user_id', user.id)
     .order('priority');
   
-  if (error) throw error;
+  if (error) {
+    console.error('❌ Error loading projects:', error);
+    throw error;
+  }
+  
+  console.log('✅ Loaded projects:', data?.length || 0, 'for user:', user.id);
   
   return data.map((row: any) => ({
     id: row.id,

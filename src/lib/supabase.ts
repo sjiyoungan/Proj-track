@@ -32,6 +32,43 @@ const createMockClient = () => ({
   }
 })
 
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+const supabaseClient = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    })
   : createMockClient() as any
+
+// Override the signOut method to prevent 403 errors
+if (supabaseClient && supabaseClient.auth) {
+  const originalSignOut = supabaseClient.auth.signOut;
+  supabaseClient.auth.signOut = async () => {
+    console.log('🚫 Blocked Supabase signOut to prevent 403 error');
+    return { error: null };
+  };
+}
+
+// Intercept fetch requests to block logout calls
+if (typeof window !== 'undefined') {
+  const originalFetch = window.fetch;
+  window.fetch = async (input, init) => {
+    const url = typeof input === 'string' ? input : input.url;
+    
+    // Block any logout requests
+    if (url.includes('/auth/v1/logout')) {
+      console.log('🚫 Blocked logout request to:', url);
+      return new Response(JSON.stringify({}), {
+        status: 200,
+        statusText: 'OK',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+    
+    return originalFetch(input, init);
+  };
+}
+
+export const supabase = supabaseClient

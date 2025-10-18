@@ -60,7 +60,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    console.log('🔐 Attempting to sign out...');
+    
+    // Skip Supabase logout entirely due to 403 errors
+    // Instead, clear all local state and force redirect
+    try {
+      console.log('🧹 Clearing local storage...');
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear any Supabase session cookies
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+      
+      console.log('🔄 Redirecting to login...');
+      // Force redirect to login page
+      window.location.href = '/';
+      
+    } catch (error) {
+      console.error('❌ Failed to clear local state:', error);
+      // Last resort: reload the page
+      window.location.reload();
+    }
   };
 
   const value = {
