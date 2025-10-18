@@ -186,8 +186,8 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
               }}
               className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                 board.board_id === currentBoardId 
-                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
-                  : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+                  ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
+                  : 'hover:bg-slate-50 dark:hover:bg-slate-750'
               }`}
             >
               <span className="text-sm">{board.board_name}</span>
@@ -228,8 +228,8 @@ export function BoardSelector({ currentBoardId, onBoardChange, boardName, refres
                 }}
                 className={`cursor-pointer py-2 px-2 rounded-md transition-colors ${
                   board.board_id === currentBoardId 
-                    ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950' 
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+                    ? 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200' 
+                    : 'hover:bg-slate-50 dark:hover:bg-slate-750'
                 }`}
               >
                 <div className="flex flex-col">

@@ -35,21 +35,21 @@ const getStatusColor = (value: string, type: 'design' | 'build' | 'plan') => {
   
   if (type === 'plan') {
     switch (value) {
-      case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 hover:bg-blue-25 dark:hover:bg-blue-975';
-      case 'Free': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 hover:bg-green-25 dark:hover:bg-green-975';
-      case 'Pre-account': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-25 dark:hover:bg-purple-975';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
+      case 'Prime': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'Free': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'Pre-account': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   } else {
     // Design and Build status colors - shared between both columns
     switch (value) {
-      case 'Not started': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
-      case 'In progress': return 'bg-[#CBE0FC] text-[#224777] hover:bg-[#F0F8FF]';
-      case 'On hold': return 'bg-[#F4DD90] text-[#4D462F] hover:bg-[#FDF7E8]';
-      case 'Blocked': return 'bg-[#FFD1D2] text-[#732A33] hover:bg-[#FFF5F5]';
-      case 'Done': return 'bg-[#cce2e2] text-[#0B4F51] hover:bg-[#F0FDFD]';
-      case 'Future': return 'bg-[#DCDBDC] text-[#777680] hover:bg-[#FAFAFA]';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 hover:bg-gray-25 dark:hover:bg-gray-975';
+      case 'Not started': return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case 'In progress': return 'bg-[#CBE0FC] text-[#224777]';
+      case 'On hold': return 'bg-[#F4DD90] text-[#4D462F]';
+      case 'Blocked': return 'bg-[#FFD1D2] text-[#732A33]';
+      case 'Done': return 'bg-[#cce2e2] text-[#0B4F51]';
+      case 'Future': return 'bg-[#DCDBDC] text-[#777680]';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   }
 };
@@ -119,7 +119,7 @@ export function PillDropdown({ value, onChange, type, variant }: PillDropdownPro
                 className={`px-2 py-1.5 cursor-pointer text-sm rounded-sm ${
                   option.value === value 
                     ? 'bg-slate-100 text-slate-900 dark:bg-slate-700 dark:text-slate-100' 
-                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-700'
+                    : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-750'
                 }`}
               >
                 {option.label}
