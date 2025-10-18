@@ -44,7 +44,7 @@ export function ManageAccessModal({ isOpen, onClose }: ManageAccessModalProps) {
       setTrackers(userTrackers);
 
       // Load permissions for all owned trackers
-      const ownedTrackers = userTrackers.filter(t => t.is_owner);
+      const ownedTrackers = userTrackers.filter((t: Tracker) => t.is_owner);
       const allPermissions: Permission[] = [];
       
       for (const tracker of ownedTrackers) {
