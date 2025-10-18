@@ -81,7 +81,7 @@ export function UserProfile() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-64">
         {/* Email address display - non-interactive */}
-        <div className="px-3 py-2 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-outline border-b-1">
+        <div className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 border-b border-blue-outline border-b-1">
           <div className="font-medium text-gray-900 dark:text-gray-100">{user?.email}</div>
         </div>
         
