@@ -54,7 +54,7 @@ export default function BoardPage({ params }: BoardPageProps) {
             
             if (lastActiveBoardId) {
               // Find the last active board in the user's boards
-              const lastActiveBoard = userBoards.find(board => board.board_id === lastActiveBoardId);
+              const lastActiveBoard = userBoards.find((board: any) => board.board_id === lastActiveBoardId);
               if (lastActiveBoard) {
                 targetBoard = lastActiveBoard;
                 console.log('🔄 Restoring last active board:', targetBoard.board_name);
