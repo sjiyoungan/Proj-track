@@ -89,16 +89,16 @@ export default function BoardPage({ params }: BoardPageProps) {
       setFilterState(boardData.filterState);
       setBoardName(boardData.boardName);
     } catch (error) {
-      console.error('❌ Failed to load tracker data from new system:', error);
+      console.error('❌ Failed to load board data from new system:', error);
       // Fall back to the old system if new system isn't set up yet
       try {
-        const oldTrackerData = await loadTracker();
-        setProjects(oldTrackerData.projects);
-        setGlobalKRs(oldTrackerData.globalKRs);
-        setFilterState(oldTrackerData.filterState);
-        setBoardName(oldTrackerData.boardName);
+        const oldBoardData = await loadBoard();
+        setProjects(oldBoardData.projects);
+        setGlobalKRs(oldBoardData.globalKRs);
+        setFilterState(oldBoardData.filterState);
+        setBoardName(oldBoardData.boardName);
       } catch (fallbackError) {
-        console.error('❌ Failed to load tracker data from old system:', fallbackError);
+        console.error('❌ Failed to load board data from old system:', fallbackError);
         // Create empty project if both fail
         const emptyProject: Project = {
           id: `project-1`,
@@ -137,8 +137,8 @@ export default function BoardPage({ params }: BoardPageProps) {
   const [showHoverRow, setShowHoverRow] = useState(false);
   const [hoverRowLocked, setHoverRowLocked] = useState(false);
 
-  const handleTrackerNameChange = (newName: string) => {
-    console.log('🔄 Tracker name changing from:', boardName, 'to:', newName);
+  const handleBoardNameChange = (newName: string) => {
+    console.log('🔄 Board name changing from:', boardName, 'to:', newName);
     setBoardName(newName);
   };
 
@@ -161,7 +161,7 @@ export default function BoardPage({ params }: BoardPageProps) {
       console.error('❌ Save failed with new system:', error);
       // Fall back to the old system if new system isn't set up yet
       try {
-        await saveTracker({
+        await saveBoard({
           projects,
           globalKRs,
           filterState,
@@ -221,25 +221,25 @@ export default function BoardPage({ params }: BoardPageProps) {
           return;
         }
 
-        console.log('📥 Loading tracker data...');
+        console.log('📥 Loading board data...');
         try {
-          const trackerData = await loadBoardById(currentBoardId);
+          const boardData = await loadBoardById(currentBoardId);
           
           console.log('📊 Loaded data:', {
-            projects: trackerData.projects.length,
-            krs: trackerData.globalKRs.length,
-            hasFilterState: !!trackerData.filterState,
-            boardName: trackerData.boardName
+            projects: boardData.projects.length,
+            krs: boardData.globalKRs.length,
+            hasFilterState: !!boardData.filterState,
+            boardName: boardData.boardName
           });
           
-          setProjects(trackerData.projects);
-          setGlobalKRs(trackerData.globalKRs);
-          setFilterState(trackerData.filterState);
-          setBoardName(trackerData.boardName);
+          setProjects(boardData.projects);
+          setGlobalKRs(boardData.globalKRs);
+          setFilterState(boardData.filterState);
+          setBoardName(boardData.boardName);
           setHasLoadedData(true); // Mark that we've loaded data
           
           // If no projects exist, create an empty one automatically
-          if (trackerData.projects.length === 0) {
+          if (boardData.projects.length === 0) {
             const emptyProject: Project = {
               id: `project-1`,
               priority: 1,
@@ -261,26 +261,26 @@ export default function BoardPage({ params }: BoardPageProps) {
             setProjects([emptyProject]);
           }
         } catch (error) {
-          console.error('❌ Failed to load tracker data from new system:', error);
+          console.error('❌ Failed to load board data from new system:', error);
           // Fall back to the old system if new system isn't set up yet
           try {
-            const oldTrackerData = await loadTracker();
+            const oldBoardData = await loadBoard();
             
             console.log('📊 Loaded data from old system:', {
-              projects: oldTrackerData.projects.length,
-              krs: oldTrackerData.globalKRs.length,
-              hasFilterState: !!oldTrackerData.filterState,
-              boardName: oldTrackerData.boardName
+              projects: oldBoardData.projects.length,
+              krs: oldBoardData.globalKRs.length,
+              hasFilterState: !!oldBoardData.filterState,
+              boardName: oldBoardData.boardName
             });
             
-            setProjects(oldTrackerData.projects);
-            setGlobalKRs(oldTrackerData.globalKRs);
-            setFilterState(oldTrackerData.filterState);
-            setBoardName(oldTrackerData.boardName);
+            setProjects(oldBoardData.projects);
+            setGlobalKRs(oldBoardData.globalKRs);
+            setFilterState(oldBoardData.filterState);
+            setBoardName(oldBoardData.boardName);
             setHasLoadedData(true); // Mark that we've loaded data
             
             // If no projects exist, create an empty one automatically
-            if (oldTrackerData.projects.length === 0) {
+            if (oldBoardData.projects.length === 0) {
               const emptyProject: Project = {
                 id: `project-1`,
                 priority: 1,
@@ -302,7 +302,7 @@ export default function BoardPage({ params }: BoardPageProps) {
               setProjects([emptyProject]);
             }
           } catch (fallbackError) {
-            console.error('❌ Failed to load tracker data from old system:', fallbackError);
+            console.error('❌ Failed to load board data from old system:', fallbackError);
             // Create empty project if both fail
             const emptyProject: Project = {
               id: `project-1`,
@@ -474,7 +474,7 @@ export default function BoardPage({ params }: BoardPageProps) {
   const clearAllData = async () => {
     try {
       // Clear all data from Supabase
-      await saveTracker({
+      await saveBoard({
         projects: [],
         globalKRs: [],
         filterState: {
@@ -526,9 +526,9 @@ export default function BoardPage({ params }: BoardPageProps) {
 
   const resetKRData = async () => {
     try {
-      const trackerData = await loadTracker();
-      await saveTracker({
-        ...trackerData,
+      const boardData = await loadBoard();
+      await saveBoard({
+        ...boardData,
         globalKRs: []
       });
       setGlobalKRs([]);
@@ -619,11 +619,11 @@ export default function BoardPage({ params }: BoardPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       <div className="container mx-auto px-4 py-8">
                 {/* Header */}
-                <TrackerName
+                <BoardName
                   boardName={boardName}
-                  onTrackerNameChange={handleTrackerNameChange}
+                  onBoardNameChange={handleBoardNameChange}
                   currentBoardId={currentBoardId}
-                  onTrackerChange={handleTrackerChange}
+                  onBoardChange={handleBoardChange}
                 />
 
         {/* Tab System and Filter Bar */}
