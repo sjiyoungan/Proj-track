@@ -56,7 +56,7 @@ export async function loadTracker(): Promise<{
         showPlan: true,
         showDone: true,
         showFuture: true,
-        sortBy: 'priority'
+        sortBy: 'priority-asc'
       },
       headerTitle: ''
     };
@@ -80,7 +80,7 @@ export async function loadTracker(): Promise<{
         showPlan: true,
         showDone: true,
         showFuture: true,
-        sortBy: 'priority'
+        sortBy: 'priority-asc'
       },
       headerTitle: ''
     };
