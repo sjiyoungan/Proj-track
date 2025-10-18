@@ -38,17 +38,19 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
 
   const calculateMenuWidth = () => {
     const strings = [
-      trackerName || 'My tracker',
       'Your Trackers',
       'Trackers shared with you',
       'Add tracker',
+      'Manage trackers',
       'No shared trackers yet'
     ];
     
-    // Add other tracker names
+    // Add tracker names
     trackers.forEach(tracker => {
       strings.push(tracker.tracker_display_name);
-      strings.push(`by ${tracker.owner_name || tracker.owner_email}`);
+      if (!tracker.is_owner) {
+        strings.push(`by ${tracker.owner_name || tracker.owner_email}`);
+      }
     });
     
     // Calculate approximate width based on character count
@@ -81,7 +83,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
 
   useEffect(() => {
     calculateMenuWidth();
-  }, [trackers, trackerName]);
+  }, [trackers]);
 
   const handleCreateTracker = async () => {
     try {
@@ -143,43 +145,29 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
       </DropdownMenuTrigger>
       
       <DropdownMenuContent align="start" style={{ width: `${menuWidth}px` }} className="p-2">
-        {/* Owned Trackers Section */}
+        {/* Your Trackers Section */}
         <div className="px-0 py-1">
           <div className="font-medium text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wide px-2 pb-2" style={{ fontSize: '10px' }}>
             Your Trackers
           </div>
           
-          {/* Show "My tracker" as the first option */}
-          <div className="flex items-center justify-between py-1 px-2 rounded-md">
-            <DropdownMenuItem 
-              onClick={() => {
-                onTrackerChange(currentTrackerId, 'edit');
-                setIsOpen(false);
-              }}
-              className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
-            >
-              <span className="text-sm">{trackerName || 'My tracker'}</span>
-            </DropdownMenuItem>
-            
-          </div>
-          
-          {/* Show other owned trackers if any */}
-          {ownedTrackers.filter(t => t.tracker_id !== currentTrackerId).map((tracker) => (
-            <div key={tracker.tracker_id} className="flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50">
+          {/* Show all owned trackers */}
+          {ownedTrackers.map((tracker) => (
+            <div key={tracker.tracker_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${tracker.tracker_id === currentTrackerId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
               <DropdownMenuItem 
                 onClick={() => {
+                  console.log('🔄 Switching to tracker:', tracker.tracker_id, tracker.tracker_display_name);
                   onTrackerChange(tracker.tracker_id, tracker.access_level);
                   setIsOpen(false);
                 }}
-                className="flex-1 cursor-pointer"
+                className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
               >
                 <span className="text-sm">{tracker.tracker_display_name}</span>
               </DropdownMenuItem>
-              
             </div>
           ))}
           
-          {/* Add Another Tracker Button */}
+          {/* Add Tracker Button */}
           <DropdownMenuItem 
             onClick={handleCreateTracker}
             className="cursor-pointer text-black dark:text-white hover:text-black dark:hover:text-white text-xs py-2 px-2"
@@ -192,7 +180,7 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
         {/* Separator */}
         <DropdownMenuSeparator />
         
-        {/* Shared Trackers Section */}
+        {/* Trackers Shared With You Section */}
         <div className="px-0 py-1">
           <div className="font-medium text-slate-600 dark:text-slate-300 mb-2 uppercase tracking-wide px-2 pb-2" style={{ fontSize: '10px' }}>
             Trackers shared with you
@@ -204,21 +192,23 @@ export function TrackerSelector({ currentTrackerId, onTrackerChange, trackerName
             </div>
           ) : (
             sharedTrackers.map((tracker) => (
-              <DropdownMenuItem 
-                key={tracker.tracker_id}
-                onClick={() => {
-                  onTrackerChange(tracker.tracker_id, tracker.access_level);
-                  setIsOpen(false);
-                }}
-                className="cursor-pointer px-2"
-              >
-                <div className="flex flex-col">
-                  <span className="text-sm">{tracker.tracker_display_name}</span>
-                  <span className="text-xs text-slate-500 dark:text-slate-400">
-                    by {tracker.owner_name || tracker.owner_email}
-                  </span>
-                </div>
-              </DropdownMenuItem>
+              <div key={tracker.tracker_id} className={`flex items-center justify-between py-1 px-2 rounded-md hover:bg-slate-50 dark:hover:bg-slate-800/50 ${tracker.tracker_id === currentTrackerId ? 'bg-slate-100 dark:bg-slate-800' : ''}`}>
+                <DropdownMenuItem 
+                  onClick={() => {
+                    console.log('🔄 Switching to shared tracker:', tracker.tracker_id, tracker.tracker_display_name);
+                    onTrackerChange(tracker.tracker_id, tracker.access_level);
+                    setIsOpen(false);
+                  }}
+                  className="flex-1 cursor-pointer bg-transparent hover:bg-transparent p-0"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm">{tracker.tracker_display_name}</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      by {tracker.owner_name || tracker.owner_email}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              </div>
             ))
           )}
         </div>

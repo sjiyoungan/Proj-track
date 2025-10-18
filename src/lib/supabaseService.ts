@@ -237,7 +237,16 @@ export async function createTracker(displayName: string) {
       owner_email: user.email,
       tracker_display_name: displayName,
       tracker_name: '',
-      projects: [],
+      projects: [{
+        id: '1',
+        name: '',
+        status: 'Initiative',
+        priority: 'Medium',
+        kr: '',
+        plan: '',
+        hyperlink: '',
+        notes: ''
+      }],
       global_krs: [],
       filter_state: {
         showInitiative: true,
