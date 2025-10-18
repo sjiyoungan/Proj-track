@@ -1,346 +1,196 @@
 import { supabase } from './supabase';
 import { Project, KRItem, FilterState } from '@/types/project';
 
-// Projects
-export async function saveProjects(projects: Project[]) {
+// New unified tracker service functions using the trackers table
+
+export async function saveTracker(data: {
+  projects: Project[];
+  globalKRs: KRItem[];
+  filterState: FilterState;
+  headerTitle: string;
+}) {
   const { data: { user } } = await supabase.auth.getUser();
-  console.log('💾 Saving projects for user:', user?.id, user?.email);
+  console.log('💾 Saving tracker for user:', user?.id, user?.email);
   
   if (!user) {
-    console.log('❌ No user found for saving projects');
+    console.log('❌ No user found for saving tracker');
     throw new Error('User not authenticated');
   }
 
   const { error } = await supabase
-    .from('projects')
-    .upsert(projects.map(project => ({
-      id: project.id,
-      user_id: user.id,
-      priority: project.priority,
-      name: project.name,
-      plan: project.plan,
-      initiative: project.initiative,
-      selected_krs: project.selectedKRs,
-      design_status: project.designStatus,
-      build_status: project.buildStatus,
-      problem_statement: project.problemStatement,
-      solution: project.solution,
-      success_metric: project.successMetric,
-      figma_link: project.figmaLink,
-      prd_link: project.prdLink,
-      custom_links: project.customLinks,
-      created_at: project.createdAt,
-      updated_at: project.updatedAt
-    })));
-  
-  if (error) {
-    console.error('❌ Error saving projects:', error);
-    throw error;
-  }
-  
-  console.log('✅ Projects saved successfully for user:', user.id);
-}
-
-export async function loadProjects(): Promise<Project[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  console.log('🔍 Loading projects for user:', user?.id, user?.email);
-  
-  if (!user) {
-    console.log('❌ No user found, returning empty array');
-    return [];
-  }
-
-  const { data, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('priority');
-  
-  if (error) {
-    console.error('❌ Error loading projects:', error);
-    throw error;
-  }
-  
-  console.log('✅ Loaded projects:', data?.length || 0, 'for user:', user.id);
-  
-  return data.map((row: any) => ({
-    id: row.id,
-    priority: row.priority,
-    name: row.name,
-    plan: row.plan,
-    initiative: row.initiative,
-    selectedKRs: row.selected_krs || [],
-    designStatus: row.design_status,
-    buildStatus: row.build_status,
-    problemStatement: row.problem_statement || '',
-    solution: row.solution || '',
-    successMetric: row.success_metric || '',
-    figmaLink: row.figma_link || '',
-    prdLink: row.prd_link || '',
-    customLinks: row.custom_links || [],
-    createdAt: row.created_at,
-    updatedAt: row.updated_at
-  }));
-}
-
-// Global KRs
-export async function saveGlobalKRs(krs: KRItem[]) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
-  const { error } = await supabase
-    .from('global_krs')
-    .upsert(krs.map(kr => ({
-      id: kr.id,
-      user_id: user.id,
-      text: kr.text,
-      fill_color: kr.fillColor,
-      text_color: kr.textColor,
-      order_index: kr.order
-    })));
-  
-  if (error) throw error;
-}
-
-export async function loadGlobalKRs(): Promise<KRItem[]> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
-  const { data, error } = await supabase
-    .from('global_krs')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('order_index');
-  
-  if (error) throw error;
-  
-  return data.map((row: any) => ({
-    id: row.id,
-    text: row.text,
-    fillColor: row.fill_color,
-    textColor: row.text_color,
-    order: row.order_index
-  }));
-}
-
-// Filter State
-export async function saveFilterState(filterState: FilterState) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
-  const { error } = await supabase
-    .from('filter_state')
+    .from('trackers')
     .upsert({
-      id: 'default',
       user_id: user.id,
-      show_initiative: filterState.showInitiative,
-      show_kr: filterState.showKR,
-      show_plan: filterState.showPlan,
-      show_done: filterState.showDone,
-      show_future: filterState.showFuture,
-      sort_by: filterState.sortBy,
+      projects: data.projects,
+      global_krs: data.globalKRs,
+      filter_state: data.filterState,
+      header_title: data.headerTitle,
       updated_at: new Date().toISOString()
     });
   
-  if (error) throw error;
+  if (error) {
+    console.error('❌ Error saving tracker:', error);
+    throw error;
+  }
+  
+  console.log('✅ Tracker saved successfully for user:', user.id);
 }
 
-export async function loadFilterState(): Promise<FilterState | null> {
+export async function loadTracker(): Promise<{
+  projects: Project[];
+  globalKRs: KRItem[];
+  filterState: FilterState;
+  headerTitle: string;
+}> {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
+  console.log('🔍 Loading tracker for user:', user?.id, user?.email);
+  
+  if (!user) {
+    console.log('❌ No user found, returning empty data');
+    return {
+      projects: [],
+      globalKRs: [],
+      filterState: {
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority'
+      },
+      headerTitle: ''
+    };
+  }
 
   const { data, error } = await supabase
-    .from('filter_state')
-    .select('*')
-    .eq('id', 'default')
-    .eq('user_id', user.id);
+    .from('trackers')
+    .select('projects, global_krs, filter_state, header_title')
+    .eq('user_id', user.id)
+    .single();
   
   if (error) {
-    console.error('Error loading filter state:', error);
-    return null;
+    console.error('❌ Error loading tracker:', error);
+    // Return empty data if no tracker exists yet
+    return {
+      projects: [],
+      globalKRs: [],
+      filterState: {
+        showInitiative: true,
+        showKR: true,
+        showPlan: true,
+        showDone: true,
+        showFuture: true,
+        sortBy: 'priority'
+      },
+      headerTitle: ''
+    };
   }
   
-  if (!data || data.length === 0) {
-    return null; // No filter state found
-  }
+  console.log('✅ Tracker loaded successfully for user:', user.id);
   
-  const filterData = data[0];
   return {
-    showInitiative: filterData.show_initiative,
-    showKR: filterData.show_kr,
-    showPlan: filterData.show_plan,
-    showDone: filterData.show_done,
-    showFuture: filterData.show_future,
-    sortBy: filterData.sort_by
+    projects: data.projects || [],
+    globalKRs: data.global_krs || [],
+    filterState: data.filter_state || {
+      showInitiative: true,
+      showKR: true,
+      showPlan: true,
+      showDone: true,
+      showFuture: true,
+      sortBy: 'priority'
+    },
+    headerTitle: data.header_title || ''
   };
 }
 
-// Header Title
-export async function saveHeaderTitle(title: string) {
-  // Only run on client side
-  if (typeof window === 'undefined') return;
-  
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+// Individual save functions for specific data types
+export async function saveProjects(projects: Project[]) {
+  const trackerData = await loadTracker();
+  await saveTracker({
+    ...trackerData,
+    projects
+  });
+}
 
-    console.log('🔄 Attempting to save header title to database:', title);
-    console.log('🔄 Supabase client:', supabase);
-    
-    const { data, error } = await supabase
-      .from('header_title')
-      .upsert({
-        id: 'default',
-        user_id: user.id,
-        title: title,
-        updated_at: new Date().toISOString()
-      });
-    
-    console.log('🔄 Supabase response:', { data, error });
-    
-    if (error) {
-      console.error('❌ Supabase error:', error);
-      throw error;
-    }
-    
-    console.log('✅ Header title saved to database');
-  } catch (error) {
-    console.error('Failed to save header title to database:', error);
-    console.log('📝 Falling back to localStorage');
-    // Fallback: save to localStorage
-    localStorage.setItem('headerTitle', title);
-    console.log('✅ Header title saved to localStorage');
-  }
+export async function loadProjects(): Promise<Project[]> {
+  const trackerData = await loadTracker();
+  return trackerData.projects;
+}
+
+export async function saveGlobalKRs(globalKRs: KRItem[]) {
+  const trackerData = await loadTracker();
+  await saveTracker({
+    ...trackerData,
+    globalKRs
+  });
+}
+
+export async function loadGlobalKRs(): Promise<KRItem[]> {
+  const trackerData = await loadTracker();
+  return trackerData.globalKRs;
+}
+
+export async function saveFilterState(filterState: FilterState) {
+  const trackerData = await loadTracker();
+  await saveTracker({
+    ...trackerData,
+    filterState
+  });
+}
+
+export async function loadFilterState(): Promise<FilterState> {
+  const trackerData = await loadTracker();
+  return trackerData.filterState;
+}
+
+export async function saveHeaderTitle(headerTitle: string) {
+  const trackerData = await loadTracker();
+  await saveTracker({
+    ...trackerData,
+    headerTitle
+  });
 }
 
 export async function loadHeaderTitle(): Promise<string> {
-  // Only run on client side
-  if (typeof window === 'undefined') return '';
-  
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    console.log('🔄 Attempting to load header title from database');
-    console.log('🔄 Supabase client:', supabase);
-    
-    const { data, error } = await supabase
-      .from('header_title')
-      .select('title')
-      .eq('id', 'default')
-      .eq('user_id', user.id)
-      .single();
-    
-    console.log('🔄 Supabase response:', { data, error });
-    
-    if (error) {
-      console.error('❌ Supabase error:', error);
-      throw error;
-    }
-    
-    console.log('✅ Header title loaded from database:', data?.title);
-    return data?.title || '';
-  } catch (error) {
-    console.error('Failed to load header title from database:', error);
-    console.log('📝 Falling back to localStorage');
-    // Fallback: load from localStorage
-    const fallbackTitle = localStorage.getItem('headerTitle') || '';
-    console.log('📝 Loaded from localStorage:', fallbackTitle);
-    return fallbackTitle;
-  }
+  const trackerData = await loadTracker();
+  return trackerData.headerTitle;
 }
 
-// Sharing functions
-export async function createShare(): Promise<string> {
-  const shareId = `share-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
-
-    const { error } = await supabase
-      .from('shares')
-      .insert({
-        share_id: shareId,
-        user_id: user.id,
-        owner_id: user.id
-      });
-    
-    if (error) throw error;
-    return shareId;
-  } catch (error) {
-    console.error('Failed to create share in database:', error);
-    // Fallback: return shareId anyway, it will work with localStorage fallback
-    return shareId;
-  }
-}
-
+// Share functionality (keeping existing for now)
 export async function getShareData(shareId: string) {
-  try {
-    // First, verify the share exists and is active
-    const { data: share, error: shareError } = await supabase
-      .from('shares')
-      .select('owner_id')
-      .eq('share_id', shareId)
-      .eq('is_active', true)
-      .single();
-    
-    if (shareError || !share) {
-      throw new Error('Share not found or inactive');
-    }
-    
-    // Load the owner's data
-    const [projects, globalKRs, filterState] = await Promise.all([
-      loadProjects(),
-      loadGlobalKRs(), 
-      loadFilterState()
-    ]);
-    
-    return {
-      projects,
-      globalKRs,
-      filterState: filterState || {
-        showInitiative: true,
-        showKR: true,
-        showPlan: true,
-        showDone: true,
-        showFuture: true,
-        sortBy: 'priority-asc'
-      }
-    };
-  } catch (error) {
-    console.error('Failed to load share data from database:', error);
-    // Fallback: load current user's data (this will work for testing)
-    const [projects, globalKRs, filterState] = await Promise.all([
-      loadProjects(),
-      loadGlobalKRs(), 
-      loadFilterState()
-    ]);
-    
-    return {
-      projects,
-      globalKRs,
-      filterState: filterState || {
-        showInitiative: true,
-        showKR: true,
-        showPlan: true,
-        showDone: true,
-        showFuture: true,
-        sortBy: 'priority-asc'
-      }
-    };
-  }
-}
-
-export async function revokeShare(shareId: string) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('User not authenticated');
-
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('shares')
-    .update({ is_active: false })
+    .select(`
+      share_id,
+      owner_id,
+      is_active,
+      trackers!inner(
+        projects,
+        global_krs,
+        filter_state,
+        header_title
+      )
+    `)
     .eq('share_id', shareId)
-    .eq('user_id', user.id);
-  
-  if (error) throw error;
+    .eq('is_active', true)
+    .single();
+
+  if (error) {
+    console.error('❌ Error loading share data:', error);
+    throw error;
+  }
+
+  return {
+    projects: data.trackers.projects || [],
+    globalKRs: data.trackers.global_krs || [],
+    filterState: data.trackers.filter_state || {
+      showInitiative: true,
+      showKR: true,
+      showPlan: true,
+      showDone: true,
+      showFuture: true,
+      sortBy: 'priority'
+    },
+    headerTitle: data.trackers.header_title || ''
+  };
 }
