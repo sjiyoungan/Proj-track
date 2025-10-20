@@ -396,6 +396,13 @@ export async function loadBoardById(boardId: string) {
 
   if (error) {
     console.error('❌ Error loading board by ID:', error);
+    
+    // Handle specific error cases
+    if (error.message?.includes('406') || error.message?.includes('Not Acceptable')) {
+      console.error('❌ HTTP 406 error - board may not exist or user lacks access');
+      throw new Error('Board not found or access denied');
+    }
+    
     throw error;
   }
 

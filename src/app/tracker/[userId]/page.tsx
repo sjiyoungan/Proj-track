@@ -69,7 +69,9 @@ export default function BoardPage({ params }: BoardPageProps) {
                   boardName: targetBoard.board_name
                 });
               } else {
-                console.log('🔄 Last active board not found in user boards, using first board');
+                console.log('🔄 Last active board not found in user boards, clearing localStorage and using first board');
+                // Clear the invalid board ID from localStorage
+                localStorage.removeItem(`lastActiveBoard_${user.id}`);
               }
             } else {
               console.log('🔄 No last active board found in localStorage, using first board');
@@ -350,6 +352,17 @@ export default function BoardPage({ params }: BoardPageProps) {
           }
         } catch (error) {
           console.error('❌ Failed to load board data from new system:', error);
+          
+          // If it's a board access error, clear the invalid board ID and try again
+          if (error instanceof Error && error.message.includes('Board not found or access denied')) {
+            console.log('🔄 Board access denied, clearing invalid board ID and reloading...');
+            localStorage.removeItem(`lastActiveBoard_${user.id}`);
+            setCurrentBoardId(''); // Clear the invalid board ID
+            // Reload the page to get a fresh board list
+            window.location.reload();
+            return;
+          }
+          
           // Fall back to the old system if new system isn't set up yet
           try {
             const oldBoardData = await loadBoard();
