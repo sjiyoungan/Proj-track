@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Boards Loading</title>
+</head>
+<body>
+    <h1>Debug Boards Loading</h1>
+    <p>Open the browser console (F12) and check for these logs:</p>
+    <ul>
+        <li><code>🔍 getUserBoards: Current user:</code> - Shows if user is authenticated</li>
+        <li><code>🔄 getUserBoards: Calling RPC function with email:</code> - Shows the email being used</li>
+        <li><code>🔍 getUserBoards: RPC response:</code> - Shows the response from the database</li>
+        <li><code>✅ getUserBoards: Returning boards:</code> - Shows the final result</li>
+        <li><code>🔄 Loading boards...</code> - Shows when BoardSelector starts loading</li>
+        <li><code>✅ Loaded boards:</code> - Shows the boards that were loaded</li>
+    </ul>
+    
+    <h2>Common Issues:</h2>
+    <ul>
+        <li><strong>No user found:</strong> User not authenticated</li>
+        <li><strong>RPC function error:</strong> Database function doesn't exist or has wrong parameters</li>
+        <li><strong>Empty boards array:</strong> No boards exist in database for this user</li>
+        <li><strong>Permission denied:</strong> RLS policies blocking access</li>
+    </ul>
+    
+    <h2>Steps to Debug:</h2>
+    <ol>
+        <li>Open browser console (F12)</li>
+        <li>Go to your app and try to access the board dropdown</li>
+        <li>Look for the debug logs above</li>
+        <li>Check for any error messages</li>
+        <li>Run the test-get-user-boards.sql script in Supabase SQL Editor</li>
+    </ol>
+</body>
+</html>
