@@ -471,26 +471,44 @@ export async function saveBoardById(boardId: string, data: {
 
 // Share a board with someone
 export async function shareBoard(boardId: string, sharedWithEmail: string, sharedWithName: string, accessLevel: 'view' | 'edit' = 'edit') {
+  console.log('🔍 shareBoard called with:', { boardId, sharedWithEmail, sharedWithName, accessLevel });
+  
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) {
+    console.error('❌ User not authenticated');
     throw new Error('User not authenticated');
   }
 
-  const { error } = await supabase
+  console.log('👤 User authenticated:', { userId: user.id, userEmail: user.email });
+
+  const insertData = {
+    owner_id: user.id,
+    shared_with_email: sharedWithEmail,
+    shared_with_name: sharedWithName,
+    board_id: boardId,
+    access_level: accessLevel
+  };
+
+  console.log('💾 Inserting sharing permission:', insertData);
+
+  const { data, error } = await supabase
     .from('sharing_permissions')
-    .insert({
-      owner_id: user.id,
-      shared_with_email: sharedWithEmail,
-      shared_with_name: sharedWithName,
-      board_id: boardId,
-      access_level: accessLevel
-    });
+    .insert(insertData)
+    .select();
 
   if (error) {
     console.error('❌ Error sharing board:', error);
+    console.error('❌ Error details:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint
+    });
     throw error;
   }
+
+  console.log('✅ Sharing permission created successfully:', data);
 }
 
 // Get sharing permissions for a board
