@@ -309,6 +309,42 @@ export default function BoardPage({ params }: BoardPageProps) {
         // Don't load if currentBoardId is empty
         if (!currentBoardId) {
           console.log('⏸️ Skipping load - currentBoardId is empty');
+          
+          // If we don't have a board ID and haven't loaded data yet, create empty data
+          if (!hasLoadedData) {
+            console.log('🔄 No board ID and no data loaded, creating empty project...');
+            const emptyProject: Project = {
+              id: `project-1`,
+              priority: 1,
+              name: '',
+              plan: 'select',
+              initiative: '',
+              selectedKRs: [],
+              designStatus: 'select',
+              buildStatus: 'select',
+              problemStatement: '',
+              solution: '',
+              successMetric: '',
+              figmaLink: '',
+              prdLink: '',
+              customLinks: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            
+            setProjects([emptyProject]);
+            setGlobalKRs([]);
+            setFilterState({
+              showInitiative: true,
+              showKR: true,
+              showPlan: true,
+              showDone: true,
+              showFuture: true,
+              sortBy: 'priority-asc'
+            });
+            setBoardName('New Board');
+            setHasLoadedData(true);
+          }
           return;
         }
         
@@ -355,11 +391,42 @@ export default function BoardPage({ params }: BoardPageProps) {
           
           // If it's a board access error, clear the invalid board ID and try again
           if (error instanceof Error && error.message.includes('Board not found or access denied')) {
-            console.log('🔄 Board access denied, clearing invalid board ID and reloading...');
+            console.log('🔄 Board access denied, clearing invalid board ID and creating empty data...');
             localStorage.removeItem(`lastActiveBoard_${user.id}`);
             setCurrentBoardId(''); // Clear the invalid board ID
-            // Reload the page to get a fresh board list
-            window.location.reload();
+            
+            // Create empty data instead of reloading
+            const emptyProject: Project = {
+              id: `project-1`,
+              priority: 1,
+              name: '',
+              plan: 'select',
+              initiative: '',
+              selectedKRs: [],
+              designStatus: 'select',
+              buildStatus: 'select',
+              problemStatement: '',
+              solution: '',
+              successMetric: '',
+              figmaLink: '',
+              prdLink: '',
+              customLinks: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            };
+            
+            setProjects([emptyProject]);
+            setGlobalKRs([]);
+            setFilterState({
+              showInitiative: true,
+              showKR: true,
+              showPlan: true,
+              showDone: true,
+              showFuture: true,
+              sortBy: 'priority-asc'
+            });
+            setBoardName('New Board');
+            setHasLoadedData(true);
             return;
           }
           
