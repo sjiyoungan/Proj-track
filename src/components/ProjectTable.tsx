@@ -277,17 +277,17 @@ export function ProjectTable({
 
   return (
     <div className="overflow-x-auto border border-slate-300 dark:border-slate-600 rounded-lg w-full">
-      <table className="w-full table-auto" style={{ minWidth: '800px' }}>
+      <table className="w-full" style={{ tableLayout: 'fixed', width: '100%' }}>
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
             <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
               Priority
             </SortableHeader>
-            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="min-w-64" style={{ paddingLeft: '9px' }}>
+            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ paddingLeft: '9px', width: '25%' }}>
               Name
             </SortableHeader>
             {filterState.showInitiative && (
-              <th className="px-4 py-3 pl-6 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider min-w-64">
+              <th className="px-4 py-3 pl-6 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider" style={{ width: '25%' }}>
                 Initiative
               </th>
             )}
@@ -355,7 +355,7 @@ export function ProjectTable({
                     isDragging={draggedProjectId === project.id}
                   />
                 </td>
-                <td className="pl-0 pr-4 py-4 min-w-64">
+                <td className="pl-0 pr-4 py-4" style={{ width: '25%' }}>
                   <DynamicInputField
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
@@ -364,7 +364,7 @@ export function ProjectTable({
                   />
                 </td>
                 {filterState.showInitiative && (
-                  <td className="px-4 py-4 min-w-64">
+                  <td className="px-4 py-4" style={{ width: '25%' }}>
                     <DynamicInputField
                       value={project.initiative}
                       onChange={(value) => onProjectUpdate({ ...project, initiative: value })}
