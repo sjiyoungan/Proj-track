@@ -36,14 +36,12 @@ export function BoardName({
               className={hasName ? "text-slate-900 dark:text-slate-100" : ""}
             />
           </div>
-                {/* Temporarily hidden - BoardSelector
-                <BoardSelector
-                  currentBoardId={currentBoardId}
-                  onBoardChange={onBoardChange}
-                  boardName={boardName}
-                  refreshTrigger={refreshTrigger}
-                />
-                */}
+                       <BoardSelector
+                         currentBoardId={currentBoardId}
+                         onBoardChange={onBoardChange}
+                         boardName={boardName}
+                         refreshTrigger={refreshTrigger}
+                       />
         </div>
       </div>
       <UserProfile />
