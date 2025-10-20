@@ -65,9 +65,12 @@ export function InputField({
     if (width === 'fill') {
       setInputWidth('100%');
     } else if (displayRef.current) {
-      setInputWidth(`${displayRef.current.offsetWidth}px`);
+      // Calculate the width based on content length, with minimum and maximum constraints
+      const contentWidth = Math.max(displayRef.current.offsetWidth, 200); // Minimum 200px
+      const maxWidth = Math.min(contentWidth, 600); // Maximum 600px
+      setInputWidth(`${maxWidth}px`);
     } else {
-      setInputWidth('auto');
+      setInputWidth('200px'); // Default minimum width
     }
     setIsEditing(true);
   };
@@ -126,7 +129,17 @@ export function InputField({
           <input
             ref={inputRef as React.RefObject<HTMLInputElement>}
             value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
+            onChange={(e) => {
+              setEditValue(e.target.value);
+              // Dynamically resize the input based on content
+              if (e.target.value.length > 0) {
+                const minWidth = 200;
+                const maxWidth = 600;
+                const charWidth = textSize === 'lg' ? 14 : 8; // Approximate character width
+                const calculatedWidth = Math.max(minWidth, Math.min(maxWidth, e.target.value.length * charWidth + 32));
+                setInputWidth(`${calculatedWidth}px`);
+              }
+            }}
             onKeyDown={handleKeyDown}
             onBlur={handleBlur}
             className={cn(

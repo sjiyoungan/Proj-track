@@ -354,11 +354,38 @@ export async function loadBoardById(boardId: string) {
     throw new Error('User not authenticated');
   }
 
-  const { data, error } = await supabase
+  // First, check if the user owns this board
+  let { data, error } = await supabase
     .from('boards')
     .select('*')
     .eq('id', boardId)
-    .eq('user_id', user.id); // CRITICAL: Ensure user owns this board
+    .eq('user_id', user.id);
+
+  // If user doesn't own the board, check if it's shared with them
+  if (!data || data.length === 0) {
+    console.log('🔄 Board not owned by user, checking shared permissions...');
+    
+    const { data: sharedData, error: sharedError } = await supabase
+      .from('sharing_permissions')
+      .select(`
+        board_id,
+        access_level,
+        boards!inner(*)
+      `)
+      .eq('board_id', boardId)
+      .eq('shared_with_email', user.email);
+
+    if (sharedError) {
+      console.error('❌ Error checking shared permissions:', sharedError);
+      throw sharedError;
+    }
+
+    if (sharedData && sharedData.length > 0) {
+      console.log('✅ Found shared board:', sharedData[0]);
+      data = [sharedData[0].boards]; // Extract the board data
+      error = null;
+    }
+  }
 
   console.log('🔍 loadBoardById database response:', {
     boardId,
