@@ -283,7 +283,7 @@ export function ProjectTable({
             <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
               Priority
             </SortableHeader>
-            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-48" style={{ paddingLeft: '9px' }}>
+            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-48" style={{ paddingLeft: '9px', minWidth: '200px', maxWidth: '200px' }}>
               Name
             </SortableHeader>
             {filterState.showInitiative && (
@@ -355,11 +355,13 @@ export function ProjectTable({
                     isDragging={draggedProjectId === project.id}
                   />
                 </td>
-                <td className="pl-0 pr-4 py-4 whitespace-nowrap" style={{ maxWidth: '200px' }}>
-                  <EditableCell
+                <td className="pl-0 pr-4 py-4" style={{ maxWidth: '200px', minWidth: '200px' }}>
+                  <DynamicInputField
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
-                    placeholder="Enter project"
+                    placeholder="Enter project name"
+                    multiline={true}
+                    className="w-full"
                   />
                 </td>
                 {filterState.showInitiative && (
