@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Saving Issues</title>
+</head>
+<body>
+    <h1>Debug Saving Issues</h1>
+    
+    <h2>Check Browser Console (F12 → Console)</h2>
+    <p>Look for these logs when you make changes:</p>
+    <ul>
+        <li><code>💾 Auto-save triggered:</code> - Shows when auto-save starts</li>
+        <li><code>💾 Saving to Supabase with boardName:</code> - Shows what's being saved</li>
+        <li><code>💾 saveBoardById called with:</code> - Shows the save function call</li>
+        <li><code>✅ Board saved successfully by ID:</code> - Confirms successful save</li>
+        <li><code>❌ Save failed with new system:</code> - Shows any save errors</li>
+    </ul>
+    
+    <h2>Common Issues:</h2>
+    <ul>
+        <li><strong>Authentication:</strong> User not properly authenticated</li>
+        <li><strong>Network:</strong> Internet connection issues</li>
+        <li><strong>Browser Cache:</strong> Old cached code</li>
+        <li><strong>Supabase Connection:</strong> Database connection issues</li>
+        <li><strong>Board ID:</strong> Missing or invalid board ID</li>
+    </ul>
+    
+    <h2>Debug Steps:</h2>
+    <ol>
+        <li><strong>Hard Refresh:</strong> Press Ctrl+Shift+R (or Cmd+Shift+R on Mac)</li>
+        <li><strong>Clear Cache:</strong> Clear browser cache and cookies</li>
+        <li><strong>Check Console:</strong> Look for error messages</li>
+        <li><strong>Check Network Tab:</strong> See if requests are failing</li>
+        <li><strong>Try Incognito:</strong> Test in incognito/private mode</li>
+    </ol>
+    
+    <h2>Quick Tests:</h2>
+    <ol>
+        <li>Make a small change (like editing a project name)</li>
+        <li>Wait 30 seconds for auto-save</li>
+        <li>Refresh the page</li>
+        <li>Check if the change persisted</li>
+    </ol>
+    
+    <h2>If Still Not Working:</h2>
+    <p>Please share:</p>
+    <ul>
+        <li>Any error messages from the console</li>
+        <li>What browser you're using</li>
+        <li>Whether you're on the same network</li>
+        <li>If you see the auto-save logs</li>
+    </ul>
+</body>
+</html>
