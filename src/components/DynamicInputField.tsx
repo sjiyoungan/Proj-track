@@ -18,7 +18,7 @@ export function DynamicInputField({
   placeholder = "Click to edit",
   className,
   textSize = 'sm',
-  maxWidth = '50vw'
+  maxWidth = '100%'
 }: DynamicInputFieldProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
@@ -87,13 +87,14 @@ export function DynamicInputField({
   return (
     <div
       className={cn(
-        "rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors",
+        "rounded border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-colors w-full",
         isEditing && "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
         className
       )}
       style={{
         padding: '2px',
-        maxWidth: maxWidth
+        maxWidth: maxWidth,
+        width: '100%'
       }}
     >
       {isEditing ? (

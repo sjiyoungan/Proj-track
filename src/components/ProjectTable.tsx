@@ -361,7 +361,6 @@ export function ProjectTable({
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
                     placeholder="Enter project name"
                     className="w-full"
-                    maxWidth="200px"
                   />
                 </td>
                 {filterState.showInitiative && (
