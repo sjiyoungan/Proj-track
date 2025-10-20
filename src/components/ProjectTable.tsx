@@ -277,7 +277,7 @@ export function ProjectTable({
 
   return (
     <div className="overflow-x-auto border border-slate-300 dark:border-slate-600 rounded-lg w-full">
-      <table className="w-full table-auto" style={{ minWidth: '100%', width: '100%' }}>
+      <table className="w-full table-auto" style={{ minWidth: '800px' }}>
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
             <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
