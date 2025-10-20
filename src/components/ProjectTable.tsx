@@ -360,8 +360,8 @@ export function ProjectTable({
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
                     placeholder="Enter project name"
-                    multiline={true}
                     className="w-full"
+                    maxWidth="200px"
                   />
                 </td>
                 {filterState.showInitiative && (
