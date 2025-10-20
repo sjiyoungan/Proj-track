@@ -256,25 +256,23 @@ export default function ProjectsPage() {
         </Card>
 
         {/* Project Table */}
-        <Card>
-          <CardContent className="p-0">
-            <ProjectTable
-              projects={projects}
-              globalKRs={globalKRs}
-              onGlobalKRChange={handleGlobalKRChange}
-              filterState={filterState}
-              activeTab={activeTab}
-              onProjectUpdate={handleProjectUpdate}
-              onProjectReorder={handleProjectReorder}
-              onSortChange={(sortOption: SortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
-              onProjectDelete={handleProjectDelete}
-              onAddNewProject={addNewProject}
-              showHoverRow={false}
-              hoverRowLocked={false}
-              onHoverRowLocked={() => {}}
-            />
-          </CardContent>
-        </Card>
+        <div className="w-full">
+          <ProjectTable
+            projects={projects}
+            globalKRs={globalKRs}
+            onGlobalKRChange={handleGlobalKRChange}
+            filterState={filterState}
+            activeTab={activeTab}
+            onProjectUpdate={handleProjectUpdate}
+            onProjectReorder={handleProjectReorder}
+            onSortChange={(sortOption: SortOption) => setFilterState({ ...filterState, sortBy: sortOption })}
+            onProjectDelete={handleProjectDelete}
+            onAddNewProject={addNewProject}
+            showHoverRow={false}
+            hoverRowLocked={false}
+            onHoverRowLocked={() => {}}
+          />
+        </div>
       </div>
     </div>
   );
