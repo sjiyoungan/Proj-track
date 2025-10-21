@@ -280,34 +280,34 @@ export function ProjectTable({
       <table className="w-full" style={{ tableLayout: 'fixed', width: '100%' }}>
         <thead className="bg-slate-50 dark:bg-slate-800">
           <tr className="border-b border-slate-100 dark:border-slate-600">
-            <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-20">
+            <SortableHeader sortKey="priority" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ width: '80px' }}>
               Priority
             </SortableHeader>
-            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ paddingLeft: '9px', width: '25%' }}>
+            <SortableHeader sortKey="name" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ paddingLeft: '9px', width: '25%', minWidth: '256px' }}>
               Name
             </SortableHeader>
             {filterState.showInitiative && (
-              <th className="px-4 py-3 pl-6 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider" style={{ width: '25%' }}>
+              <th className="px-4 py-3 pl-6 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider" style={{ width: '25%', minWidth: '256px' }}>
                 Initiative
               </th>
             )}
             {filterState.showKR && (
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-32">
+              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider" style={{ width: '128px' }}>
                 KR
               </th>
             )}
             {filterState.showPlan && (
-              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-32" style={{ paddingLeft: '8px' }}>
+              <SortableHeader sortKey="plan" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ paddingLeft: '8px', width: '128px' }}>
                 Plan
               </SortableHeader>
             )}
-            <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-28">
+            <SortableHeader sortKey="designStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ width: '112px' }}>
               Design Status
             </SortableHeader>
-            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="w-24">
+            <SortableHeader sortKey="buildStatus" currentSort={filterState.sortBy} onSortChange={onSortChange} className="" style={{ width: '96px' }}>
               Build Status
             </SortableHeader>
-            <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider w-10">
+            <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider" style={{ width: '40px' }}>
             </th>
           </tr>
         </thead>
@@ -343,7 +343,7 @@ export function ProjectTable({
                 onDragEnter={(e) => handleDragEnter(e, project.id)}
                 onDrop={handleDrop}
               >
-                <td className="px-2 py-4 whitespace-nowrap">
+                <td className="px-2 py-4 whitespace-nowrap" style={{ width: '80px' }}>
                   <PriorityDropdown
                     currentPriority={project.priority}
                     maxPriority={projects.length}
@@ -355,7 +355,7 @@ export function ProjectTable({
                     isDragging={draggedProjectId === project.id}
                   />
                 </td>
-                <td className="pl-0 pr-4 py-4" style={{ width: '25%' }}>
+                <td className="pl-0 pr-4 py-4" style={{ width: '25%', minWidth: '256px' }}>
                   <DynamicInputField
                     value={project.name}
                     onChange={(value) => onProjectUpdate({ ...project, name: value })}
@@ -364,7 +364,7 @@ export function ProjectTable({
                   />
                 </td>
                 {filterState.showInitiative && (
-                  <td className="px-4 py-4" style={{ width: '25%' }}>
+                  <td className="px-4 py-4" style={{ width: '25%', minWidth: '256px' }}>
                     <DynamicInputField
                       value={project.initiative}
                       onChange={(value) => onProjectUpdate({ ...project, initiative: value })}
@@ -374,7 +374,7 @@ export function ProjectTable({
                   </td>
                 )}
                 {filterState.showKR && (
-                  <td className="px-2 py-4 whitespace-nowrap">
+                  <td className="px-2 py-4 whitespace-nowrap" style={{ width: '128px' }}>
                     <KRDropdown
                       globalKRs={globalKRs}
                       selectedKRIds={Array.isArray(project.selectedKRs) ? project.selectedKRs : []}
@@ -385,7 +385,7 @@ export function ProjectTable({
                   </td>
                 )}
                 {filterState.showPlan && (
-                  <td className="pl-0 pr-2 py-4 whitespace-nowrap">
+                  <td className="pl-0 pr-2 py-4 whitespace-nowrap" style={{ width: '128px' }}>
                     <PillDropdown
                       value={project.plan}
                       onChange={(value) => onProjectUpdate({ ...project, plan: value as any })}
@@ -394,7 +394,7 @@ export function ProjectTable({
                     />
                   </td>
                 )}
-                <td className="px-2 py-4 whitespace-nowrap">
+                <td className="px-2 py-4 whitespace-nowrap" style={{ width: '112px' }}>
                   <PillDropdown
                     value={project.designStatus}
                     onChange={(value) => onProjectUpdate({ ...project, designStatus: value as any })}
@@ -402,7 +402,7 @@ export function ProjectTable({
                     variant="filled"
                   />
                 </td>
-                <td className="px-2 py-4 whitespace-nowrap">
+                <td className="px-2 py-4 whitespace-nowrap" style={{ width: '96px' }}>
                   <PillDropdown
                     value={project.buildStatus}
                     onChange={(value) => onProjectUpdate({ ...project, buildStatus: value as any })}
@@ -410,7 +410,7 @@ export function ProjectTable({
                     variant="filled"
                   />
                 </td>
-                <td className="pr-0 py-4 whitespace-nowrap">
+                <td className="pr-0 py-4 whitespace-nowrap" style={{ width: '40px' }}>
                   <Button
                     variant="ghost"
                     size="sm"
